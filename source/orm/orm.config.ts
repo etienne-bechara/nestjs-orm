@@ -1,13 +1,10 @@
 import { AppEnvironment, InjectSecret } from '@bechara/nestjs-core';
-import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-import { OrmConfigOptions } from '../../orm/orm.interface/orm.config.options';
-
 @Injectable()
-export class DatabaseConfig implements OrmConfigOptions {
+export class OrmConfig {
 
   @InjectSecret()
   @IsIn(Object.values(AppEnvironment))
@@ -46,7 +43,5 @@ export class DatabaseConfig implements OrmConfigOptions {
   @InjectSecret()
   @Transform((o) => o.value === 'true')
   public readonly ORM_SYNC_SAFE: boolean;
-
-  public readonly ORM_EXTRAS: MikroOrmModuleOptions = { };
 
 }

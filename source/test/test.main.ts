@@ -1,19 +1,34 @@
 import { AppModule } from '@bechara/nestjs-core';
 
+import { OrmConfig } from '../orm/orm.config';
+import { OrmModule } from '../orm/orm.module';
+import { CompanyEntity } from './company/company.entity';
 import { CompanyModule } from './company/company.module';
-import { DatabaseConfig } from './database/database.config';
-import { DatabaseModule } from './database/database.module';
+import { UserEntity } from './user/user.entity';
 import { UserModule } from './user/user.module';
 
 void AppModule.bootServer({
   disableConfigScan: true,
   disableModuleScan: true,
-  modules: [
-    DatabaseModule,
-    CompanyModule,
-    UserModule,
+  configs: [ OrmConfig ],
+  modules: [ CompanyModule, UserModule ],
+  imports: [
+    OrmModule.registerAsync({
+      disableEntityScan: true,
+      entities: [ CompanyEntity, UserEntity ],
+      inject: [ OrmConfig ],
+      useFactory: (ormConfig: OrmConfig) => ({
+        type: ormConfig.ORM_TYPE,
+        host: ormConfig.ORM_HOST,
+        port: ormConfig.ORM_PORT,
+        database: ormConfig.ORM_DATABASE,
+        username: ormConfig.ORM_USERNAME,
+        password: ormConfig.ORM_PASSWORD,
+        schemaSync: ormConfig.ORM_SYNC_SCHEMA,
+        safeSync: ormConfig.ORM_SYNC_SAFE,
+      }),
+    }),
   ],
-  configs: [
-    DatabaseConfig,
-  ],
+  providers: [ OrmConfig ],
+  exports: [ OrmConfig, OrmModule ],
 });

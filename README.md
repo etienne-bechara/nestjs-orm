@@ -28,7 +28,7 @@ npm i @mikro-orm/sqlite
 ```
 
 
-2\. Add the following variables to your `.env` (adjust accordingly):
+2\. Add these example variables to your `.env` (adjust accordingly):
 
 ```
 ORM_TYPE='mysql'
@@ -43,83 +43,38 @@ ORM_SYNC_SAFE=false
 
 It is recommended that you have a local database in order to test connectivity.
 
-
-3\. Create a new folder at your `source` to be responsible for handling the connection configuration. For this example we shall name it `database`.
-
-
-4\. Create environment injection file at `database.config.ts`, you may copy the template below in order to have built-in validation:
+3\. Import `OrmModule` and `OrmConfig` into you boot script and configure asynchronously:
 
 ```ts
-import { AppEnvironment, InjectSecret } from '@bechara/nestjs-core';
-import { OrmConfigOptions } from '@bechara/nestjs-orm';
-import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
-import { Transform } from 'class-transformer';
-import { IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-
-@Injectable()
-export class DatabaseConfig implements OrmConfigOptions {
-
-  @InjectSecret()
-  @IsIn(Object.values(AppEnvironment))
-  public readonly NODE_ENV: AppEnvironment;
-
-  @InjectSecret()
-  @IsIn([ 'mongo', 'mysql', 'mariadb', 'postgresql', 'sqlite' ])
-  public readonly ORM_TYPE: 'mongo' | 'mysql' | 'mariadb' | 'postgresql' | 'sqlite';
-
-  @InjectSecret()
-  @IsString() @IsNotEmpty()
-  public readonly ORM_HOST: string;
-
-  @InjectSecret()
-  @Transform((o) => Number.parseInt(o.value))
-  @IsNumber()
-  public readonly ORM_PORT: number;
-
-  @InjectSecret()
-  @IsString() @IsNotEmpty()
-  public readonly ORM_USERNAME: string;
-
-  @InjectSecret()
-  @IsOptional()
-  @IsString() @IsNotEmpty()
-  public readonly ORM_PASSWORD: string;
-
-  @InjectSecret()
-  @IsString() @IsNotEmpty()
-  public readonly ORM_DATABASE: string;
-
-  @InjectSecret()
-  @Transform((o) => o.value === 'true')
-  public readonly ORM_SYNC_SCHEMA: boolean;
-
-  @InjectSecret()
-  @Transform((o) => o.value === 'true')
-  public readonly ORM_SYNC_SAFE: boolean;
-
-  public readonly ORM_EXTRAS: MikroOrmModuleOptions = { };
-
-}
-```
-
-5\. Create the connection module wrapper at `database.module.ts`:
-
-```ts
+import { AppModule } from '@bechara/nestjs-core';
+import { OrmConfig } from '@bechara/nestjs-orm';
 import { OrmModule } from '@bechara/nestjs-orm';
-import { Module } from '@nestjs/common';
 
-import { DatabaseConfig } from './database.config';
-
-@Module({
-  imports: [ OrmModule.register({ config: DatabaseConfig }) ],
-  providers: [ DatabaseConfig ],
-  exports: [ DatabaseConfig ],
-})
-export class DatabaseModule { }
+void AppModule.bootServer({
+  configs: [ OrmConfig ],
+  imports: [
+    OrmModule.registerAsync({
+      inject: [ OrmConfig ],
+      useFactory: (ormConfig: OrmConfig) => ({
+        type: ormConfig.ORM_TYPE,
+        host: ormConfig.ORM_HOST,
+        port: ormConfig.ORM_PORT,
+        database: ormConfig.ORM_DATABASE,
+        username: ormConfig.ORM_USERNAME,
+        password: ormConfig.ORM_PASSWORD,
+        schemaSync: ormConfig.ORM_SYNC_SCHEMA,
+        safeSync: ormConfig.ORM_SYNC_SAFE,
+      }),
+    }),
+  ],
+  providers: [ OrmConfig ],
+  exports: [ OrmConfig, OrmModule ],
+});
 ```
 
-6\. Before booting the application, create at least one entity inside your project source. Refer to **Usage** section below for further details.
+If you wish to change how environment variables are injected you may provide your own configuration instead of using the built-in `OrmConfig`.
+
+4\. Before booting the application, create at least one entity inside your project source. Refer to **Usage** section below for further details.
 
 
 ## Usage
