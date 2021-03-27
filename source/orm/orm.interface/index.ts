@@ -1,4 +1,3 @@
-export * from './orm.config.options';
 export * from './orm.controller.options';
 export * from './orm.module.options';
 export * from './orm.paginated.response';
