@@ -1,0 +1,112 @@
+{
+  "name": "@bechara/nestjs-orm",
+  "version": "0.1.0",
+  "description": "ORM Module Component for NestJS Projects",
+  "author": {
+    "name": "Etienne Bechara",
+    "email": "bechara.etienne@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/etienne-bechara/nestjs-orm"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "prepare": "husky install .config/husky",
+    "start": "nodemon",
+    "build": "rimraf ./dist && npm run index && tsc -p tsconfig.build.json && ncp ./source ./dist/source && rimraf ./source/index.ts",
+    "index": "rimraf ./source/index.ts && barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
+    "lint": "eslint **/*.ts --max-warnings=0",
+    "lint:fix": "eslint **/*.ts --fix",
+    "test": "jest --verbose --forceExit --passWithNoTests",
+    "test:watch": "jest --verbose --watch",
+    "test:coverage": "jest --coverage --watchAll=false --passWithNoTests",
+    "update:patch": "ncu -u --dep dev,prod -t minor && npm i && npm audit fix",
+    "update:minor": "ncu -u --dep dev,prod -t major && npm i && npm audit fix",
+    "update:major": "ncu -u --dep dev,prod -t latest && npm i && npm audit fix --force"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "*.ts": "eslint --cache --fix"
+  },
+  "nodemonConfig": {
+    "exec": "node --inspect=9229 -r ts-node/register ./source/test/test.main.ts",
+    "ext": "ts",
+    "watch": [
+      ".env",
+      "source"
+    ]
+  },
+  "jest": {
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "testRegex": ".spec.ts$",
+    "transform": {
+      "ts$": "ts-jest"
+    }
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      "@semantic-release/changelog",
+      "@semantic-release/git",
+      "@semantic-release/github"
+    ]
+  },
+  "peerDependencies": {
+    "@bechara/nestjs-core": "^2.0.0",
+    "@mikro-orm/core": "^4.0.0",
+    "@mikro-orm/nestjs": "^4.0.0"
+  },
+  "dependencies": {
+    "class-transformer": "0.4.0",
+    "class-validator": "0.13.1",
+    "flat": "5.0.2",
+    "uuid": "8.3.2"
+  },
+  "devDependencies": {
+    "@bechara/eslint-config-bechara-ts": "1.0.1",
+    "@bechara/nestjs-core": "2.0.2",
+    "@commitlint/cli": "12.0.1",
+    "@commitlint/config-conventional": "12.0.1",
+    "@mikro-orm/core": "4.5.0",
+    "@mikro-orm/mysql": "4.5.0",
+    "@mikro-orm/nestjs": "4.2.0",
+    "@nestjs/common": "7.6.15",
+    "@nestjs/core": "7.6.15",
+    "@nestjs/platform-express": "7.6.15",
+    "@nestjs/testing": "7.6.15",
+    "@semantic-release/changelog": "5.0.1",
+    "@semantic-release/commit-analyzer": "8.0.1",
+    "@semantic-release/git": "9.0.0",
+    "@semantic-release/github": "7.2.0",
+    "@semantic-release/npm": "7.0.10",
+    "@semantic-release/release-notes-generator": "9.0.2",
+    "@types/jest": "26.0.22",
+    "@types/node": "14.14.37",
+    "barrelsby": "2.2.0",
+    "class-transformer": "0.4.0",
+    "class-validator": "0.13.1",
+    "eslint": "7.18.0",
+    "husky": "5.2.0",
+    "jest": "26.6.3",
+    "lint-staged": "10.5.4",
+    "ncp": "2.0.0",
+    "nodemon": "2.0.7",
+    "npm-check-updates": "11.3.0",
+    "rimraf": "3.0.2",
+    "ts-jest": "26.5.4",
+    "ts-node": "9.1.1",
+    "typescript": "4.2.3"
+  }
+}
