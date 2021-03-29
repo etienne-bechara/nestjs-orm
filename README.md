@@ -14,7 +14,7 @@ If not, please refer to documentation above before proceeding.
 1\. Install the new necessary dependencies:
 
 ```
-npm i @bechara/nestjs-orm @mikro-orm/core @mikro-orm/nestjs
+npm i @bechara/nestjs-orm
 ```
 
 Followed by the corresponding driver of your database type:
