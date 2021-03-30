@@ -1,8 +1,8 @@
 import { IsOptional } from 'class-validator';
 
-import { UserCreateDto } from './user.create.dto';
+import { PersonCreateDto } from './person.create.dto';
 
-export class UserUpdateDto extends UserCreateDto {
+export class PersonUpdateDto extends PersonCreateDto {
 
   @IsOptional()
   public name: string;
@@ -11,7 +11,10 @@ export class UserUpdateDto extends UserCreateDto {
   public age: number;
 
   @IsOptional()
-  public capital: number;
+  public height: number;
+
+  @IsOptional()
+  public weight: number;
 
   @IsOptional()
   public preferences: Record<string, any>;

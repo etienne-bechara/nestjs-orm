@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller } from '@bechara/nestjs-core';
 
 import { OrmController } from '../../orm/orm.controller';
 import { OrmControllerMethod } from '../../orm/orm.enum';

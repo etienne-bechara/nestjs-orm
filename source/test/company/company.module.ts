@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module } from '@bechara/nestjs-core';
 
 import { CompanyController } from './company.controller';
 import { CompanyService } from './company.service';

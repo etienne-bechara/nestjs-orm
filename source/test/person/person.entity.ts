@@ -1,11 +1,12 @@
-import { Collection, Entity, ManyToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection, Entity, ManyToMany, OneToMany, Property, Unique } from '@mikro-orm/core';
 
 import { OrmUuidEntity } from '../../orm/orm.entity';
 import { CompanyEntity } from '../company/company.entity';
+import { ContactEntity } from '../contact/contact.entity';
 
-@Entity({ tableName: 'user' })
+@Entity({ tableName: 'person' })
 @Unique({ properties: [ 'name' ] })
-export class UserEntity extends OrmUuidEntity {
+export class PersonEntity extends OrmUuidEntity {
 
   @Property()
   public name: string;
@@ -14,10 +15,16 @@ export class UserEntity extends OrmUuidEntity {
   public age: number;
 
   @Property({ columnType: 'float' })
-  public capital: number;
+  public height: number;
+
+  @Property({ columnType: 'float' })
+  public weight: number;
 
   @Property({ nullable: true })
   public preferences: Record<string, any>;
+
+  @OneToMany(() => ContactEntity, contact => contact.person)
+  public contacts = new Collection<ContactEntity>(this);
 
   @ManyToMany(() => CompanyEntity, company => company.employees)
   public employers = new Collection<CompanyEntity>(this);

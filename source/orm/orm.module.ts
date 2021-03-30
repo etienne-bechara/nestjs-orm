@@ -1,7 +1,6 @@
-import { AppConfig, AppEnvironment, LoggerService, UtilModule } from '@bechara/nestjs-core';
+import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, UtilModule } from '@bechara/nestjs-core';
 import { MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { DynamicModule, Module } from '@nestjs/common';
 
 import { SchemaModuleOptions } from '../schema/schema.interface';
 import { SchemaModule } from '../schema/schema.module';

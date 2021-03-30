@@ -10,6 +10,6 @@ export class CompanyReadDto extends OrmPaginationDto {
   public name: string;
 
   @IsOptional()
-  public parent: CompanyEntity;
+  public headquarter: CompanyEntity;
 
 }

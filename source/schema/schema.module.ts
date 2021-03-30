@@ -1,5 +1,4 @@
-import { LoggerModule } from '@bechara/nestjs-core';
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, LoggerModule, Module } from '@bechara/nestjs-core';
 import { v4 } from 'uuid';
 
 import { SchemaInjectionToken } from './schema.enum';

@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Delete, Get, NotFoundException,
-  Param, Post, Put, Query, UseInterceptors } from '@nestjs/common';
+  Param, Post, Put, Query, UseInterceptors } from '@bechara/nestjs-core';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { unflatten } from 'flat';

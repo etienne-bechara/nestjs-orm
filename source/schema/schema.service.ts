@@ -1,6 +1,5 @@
-import { LoggerService } from '@bechara/nestjs-core';
+import { Inject, Injectable, LoggerService } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
-import { Inject, Injectable } from '@nestjs/common';
 
 import { SchemaInjectionToken } from './schema.enum';
 import { SchemaModuleOptions } from './schema.interface';

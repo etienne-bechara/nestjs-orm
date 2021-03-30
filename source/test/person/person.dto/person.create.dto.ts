@@ -1,6 +1,6 @@
 import { IsInt, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Min } from 'class-validator';
 
-export class UserCreateDto {
+export class PersonCreateDto {
 
   @IsString() @IsNotEmpty()
   public name: string;
@@ -9,7 +9,10 @@ export class UserCreateDto {
   public age: number;
 
   @IsNumber() @Min(0)
-  public capital: number;
+  public height: number;
+
+  @IsNumber() @Min(0)
+  public weight: number;
 
   @IsOptional()
   @IsObject()

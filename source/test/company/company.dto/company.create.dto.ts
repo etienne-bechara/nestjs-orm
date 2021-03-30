@@ -7,6 +7,6 @@ export class CompanyCreateDto {
 
   @IsOptional()
   @IsUUID()
-  public parent: string;
+  public headquarter: string;
 
 }

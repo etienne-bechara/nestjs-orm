@@ -1,5 +1,5 @@
+import { ModuleMetadata } from '@bechara/nestjs-core';
 import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
-import { ModuleMetadata } from '@nestjs/common';
 
 export interface OrmAsyncModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   disableEntityScan?: boolean;

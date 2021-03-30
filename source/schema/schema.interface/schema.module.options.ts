@@ -1,4 +1,4 @@
-import { ModuleMetadata } from '@nestjs/common';
+import { ModuleMetadata } from '@bechara/nestjs-core';
 
 export interface SchemaAsyncModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   inject?: any[];

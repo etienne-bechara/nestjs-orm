@@ -1,5 +1,4 @@
-import { AppEnvironment, InjectSecret } from '@bechara/nestjs-core';
-import { Injectable } from '@nestjs/common';
+import { AppEnvironment, Injectable, InjectSecret } from '@bechara/nestjs-core';
 import { Transform } from 'class-transformer';
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 

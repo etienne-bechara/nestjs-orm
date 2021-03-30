@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-fn-reference-in-iterator */
+import { BadRequestException, ConflictException, InternalServerErrorException,
+  NotFoundException, NotImplementedException } from '@bechara/nestjs-core';
 import { EntityData, EntityRepository, FilterQuery, QueryOrder } from '@mikro-orm/core';
-import { BadRequestException, ConflictException,
-  InternalServerErrorException, NotFoundException, NotImplementedException } from '@nestjs/common';
 
 import { OrmPaginatedResponse, OrmReadOptions, OrmReadParams,
   OrmServiceOptions, OrmUpsertOptions } from './orm.interface';
@@ -103,29 +103,16 @@ export abstract class OrmService<Entity> {
    * @param data
    */
   public async update(entity: Entity, data: EntityData<Entity>): Promise<Entity> {
-    const dummyEntity = this.entityRepository.create(data);
-    const dummyData = Object.assign({ }, data);
-    let updateRequired = false;
+    const updatedEntity = this.entityRepository.assign(entity, data);
 
-    for (const key in dummyData) {
-      if (entity[key] !== dummyEntity[key]) {
-        entity[key] = data[key];
-        updateRequired = true;
-      }
+    try {
+      await this.entityRepository.persistAndFlush(updatedEntity);
+    }
+    catch (e) {
+      this.queryExceptionHandler(e, entity);
     }
 
-    if (updateRequired) {
-      try {
-        await this.entityRepository.persistAndFlush(entity);
-      }
-      catch (e) {
-        this.queryExceptionHandler(e, entity);
-      }
-    }
-
-    return updateRequired
-      ? this.readById(entity['id'])
-      : entity;
+    return this.readById(entity['id']);
   }
 
   /**

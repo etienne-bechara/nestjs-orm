@@ -4,18 +4,32 @@ import { OrmConfig } from '../orm/orm.config';
 import { OrmModule } from '../orm/orm.module';
 import { CompanyEntity } from './company/company.entity';
 import { CompanyModule } from './company/company.module';
-import { UserEntity } from './user/user.entity';
-import { UserModule } from './user/user.module';
+import { ContactEntity } from './contact/contact.entity';
+import { ContactModule } from './contact/contact.module';
+import { PersonEntity } from './person/person.entity';
+import { PersonModule } from './person/person.module';
+import { StartupModule } from './startup/startup.module';
 
 void AppModule.bootServer({
   disableConfigScan: true,
   disableModuleScan: true,
-  configs: [ OrmConfig ],
-  modules: [ CompanyModule, UserModule ],
+  configs: [
+    OrmConfig,
+  ],
+  modules: [
+    ContactModule,
+    CompanyModule,
+    PersonModule,
+    StartupModule,
+  ],
   imports: [
     OrmModule.registerAsync({
       disableEntityScan: true,
-      entities: [ CompanyEntity, UserEntity ],
+      entities: [
+        ContactEntity,
+        CompanyEntity,
+        PersonEntity,
+      ],
       inject: [ OrmConfig ],
       useFactory: (ormConfig: OrmConfig) => ({
         type: ormConfig.ORM_TYPE,
@@ -29,6 +43,11 @@ void AppModule.bootServer({
       }),
     }),
   ],
-  providers: [ OrmConfig ],
-  exports: [ OrmConfig, OrmModule ],
+  providers: [
+    OrmConfig,
+  ],
+  exports: [
+    OrmConfig,
+    OrmModule,
+  ],
 });

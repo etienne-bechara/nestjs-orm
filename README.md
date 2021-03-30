@@ -100,7 +100,7 @@ Example:
 import { OrmService } from '@bechara/nestjs-orm';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable } from '@bechara/nestjs-core';
 
 // This entity is whatever you defined in the previous step 
 import { UserEntity } from './user.entity';
@@ -144,7 +144,7 @@ Example:
 
 ```ts
 import { OrmController, OrmControllerMethod } from '@bechara/nestjs-orm';
-import { Controller } from '@nestjs/common';
+import { Controller } from '@bechara/nestjs-core';
 
 // These DTOs are validations customized with class-validator and class-transformer
 import { UserCreateDto, UserReadDto, UserUpdateDto } from './user.dto';
