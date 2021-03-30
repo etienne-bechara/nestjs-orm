@@ -15,36 +15,47 @@ export class OrmEntitySerializer implements NestInterceptor {
     return next
       .handle()
       .pipe(
-        map((data) => {
-          if (data) {
-            if (Array.isArray(data)) {
-              data = data.map((d) => d?.toJSON ? d.toJSON() : d);
-
-              for (const d of data) {
-                this.eliminateRecursion(d.id, d);
-              }
-            }
-            else if (data.results && Array.isArray(data.results)) {
-              data.results = data.results.map((d) => d?.toJSON ? d.toJSON() : d);
-
-              for (const d of data.results) {
-                this.eliminateRecursion(d.id, d);
-              }
-            }
-            else if (data.toJSON) {
-              data = data.toJSON();
-              this.eliminateRecursion(data.id, data);
-            }
-          }
-
-          return data;
-        }),
+        map((data) => this.stringifyEntities(data)),
       );
   }
 
   /**
-   * Given an object, eliminate properties that references
-   * defined parent id.
+   * Given any data object, check for entities and execute their
+   * stringify method.
+   * @param data
+   */
+  private stringifyEntities(data: any): any {
+    if (!data) return;
+
+    // Array of entities
+    if (Array.isArray(data)) {
+      data = data.map((d) => d?.toJSON ? d.toJSON() : d);
+
+      for (const d of data) {
+        this.eliminateRecursion(d.id, d);
+      }
+    }
+
+    // Paginated entity
+    if (data.records && Array.isArray(data.records)) {
+      data.records = data.records.map((d) => d?.toJSON ? d.toJSON() : d);
+
+      for (const d of data.records) {
+        this.eliminateRecursion(d.id, d);
+      }
+    }
+
+    // Single entity
+    if (data.toJSON) {
+      data = data.toJSON();
+      this.eliminateRecursion(data.id, data);
+    }
+
+    return data;
+  }
+
+  /**
+   * Given an object, eliminate properties that references its parent id.
    * @param parentId
    * @param data
    */
