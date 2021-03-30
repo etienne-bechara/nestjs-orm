@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/etienne-bechara/nestjs-orm/compare/v1.0.0...v1.0.1) (2021-03-29)
+
+
+### Bug Fixes
+
+* add overrides ([b73c9bf](https://github.com/etienne-bechara/nestjs-orm/commit/b73c9bf9125034147b391eb95a195cdb2b19a8dc))
+
 # 1.0.0 (2021-03-27)
 
 
