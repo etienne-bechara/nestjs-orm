@@ -23,16 +23,18 @@ jobs:
           node-version: 14.x
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm i -g pnpm
+          pnpm i --frozen-lockfile
 
       - name: Run Lint Check
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Execute Unit Tests
-        run: npm run test
+        run: pnpm run test
 
       - name: Build Distributable Package
-        run: npm run build
+        run: pnpm run build
 
       - name: Publish Package to NPM
-        run: npx semantic-release
+        run: pnpx semantic-release
