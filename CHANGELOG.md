@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/etienne-bechara/nestjs-orm/compare/v1.0.2...v1.0.3) (2021-04-06)
+
+
+### Bug Fixes
+
+* glob require paths ([dbda3e9](https://github.com/etienne-bechara/nestjs-orm/commit/dbda3e9e0ef22f370cb6ca60494fe795a2c63036))
+
 ## [1.0.2](https://github.com/etienne-bechara/nestjs-orm/compare/v1.0.1...v1.0.2) (2021-04-03)
 
 
