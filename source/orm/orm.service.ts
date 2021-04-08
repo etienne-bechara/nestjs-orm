@@ -132,10 +132,12 @@ export abstract class OrmService<Entity> {
 
   /**
    * Reads a single entity by its ID.
+   * Obeys a custom default populate different than default.
    * @param id
    * @param options
    */
   public async readById(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
+    options.populate = options.populate || this.serviceOptions.populateById;
     const entity = await this.read(id, options);
 
     if (!entity[0]) {

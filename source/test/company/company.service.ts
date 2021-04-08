@@ -14,7 +14,8 @@ export class CompanyService extends OrmService<CompanyEntity> {
   ) {
     super(companyRepository, {
       uniqueKey: [ 'name' ],
-      populate: [ 'headquarter', 'branches', 'employees' ],
+      populate: [ 'employees' ],
+      populateById: [ 'headquarter', 'branches', 'employees' ],
     });
   }
 
