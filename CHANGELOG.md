@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/etienne-bechara/nestjs-orm/compare/v1.1.0...v1.1.1) (2021-04-08)
+
+
+### Bug Fixes
+
+* entity recursion elimation ([63321d7](https://github.com/etienne-bechara/nestjs-orm/commit/63321d75900e5d87eaeb69bf7ee758d925ddb8ab))
+
 # [1.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v1.0.3...v1.1.0) (2021-04-08)
 
 
