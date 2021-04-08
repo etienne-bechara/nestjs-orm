@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v1.0.3...v1.1.0) (2021-04-08)
+
+
+### Features
+
+* allow default populate by id ([3a7ed30](https://github.com/etienne-bechara/nestjs-orm/commit/3a7ed301c2d860d59a7cf695dfb6ddfe6203609f))
+
 ## [1.0.3](https://github.com/etienne-bechara/nestjs-orm/compare/v1.0.2...v1.0.3) (2021-04-06)
 
 
