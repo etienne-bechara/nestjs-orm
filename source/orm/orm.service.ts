@@ -1,8 +1,9 @@
 /* eslint-disable unicorn/no-fn-reference-in-iterator */
 import { BadRequestException, ConflictException, InternalServerErrorException,
   NotFoundException, NotImplementedException } from '@bechara/nestjs-core';
-import { EntityData, EntityRepository, FilterQuery, QueryOrder } from '@mikro-orm/core';
+import { EntityData, EntityRepository, FilterQuery } from '@mikro-orm/core';
 
+import { OrmQueryOrder } from './orm.enum';
 import { OrmPaginatedResponse, OrmReadOptions, OrmReadParams,
   OrmServiceOptions, OrmUpsertOptions } from './orm.interface';
 
@@ -45,9 +46,11 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    let entities: Entity[];
+    options.orderBy ??= { [options.sort]: options.order };
+    options.populate ??= this.serviceOptions.populate;
     options.refresh = true;
-    options.populate = options.populate || this.serviceOptions.populate;
+
+    let entities: Entity[];
 
     if (typeof params === 'string') {
       params = { id: params };
@@ -175,10 +178,10 @@ export abstract class OrmService<Entity> {
   public async readAndCount(
     params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
   ): Promise<OrmPaginatedResponse<Entity>> {
-    if (!options.limit) options.limit = 100;
-    if (!options.offset) options.offset = 0;
-    if (!options.sort) options.sort = 'updated';
-    if (!options.order) options.order = QueryOrder.DESC;
+    options.limit ||= 100;
+    options.offset ||= 0;
+    options.sort ??= 'updated';
+    options.order ??= OrmQueryOrder.DESC;
 
     return {
       sort: options.sort,

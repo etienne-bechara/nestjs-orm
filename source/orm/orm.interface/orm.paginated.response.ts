@@ -1,8 +1,8 @@
-import { QueryOrder } from '@mikro-orm/core';
+import { OrmQueryOrder } from '../orm.enum';
 
 export interface OrmPaginatedResponse<Entity> {
   sort: string;
-  order: QueryOrder;
+  order: OrmQueryOrder;
   limit: number;
   offset: number;
   count: number;

@@ -1,6 +1,7 @@
-import { QueryOrder } from '@mikro-orm/core';
 import { Transform } from 'class-transformer';
 import { IsDefined, IsIn, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+
+import { OrmQueryOrder } from '../orm.enum';
 
 export abstract class OrmPaginationDto {
 
@@ -9,7 +10,7 @@ export abstract class OrmPaginationDto {
   public sort?: string;
 
   @IsOptional()
-  @IsIn(Object.values(QueryOrder))
+  @IsIn(Object.values(OrmQueryOrder))
   public order?: string;
 
   @IsOptional()
