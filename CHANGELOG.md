@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/etienne-bechara/nestjs-orm/compare/v1.1.2...v2.0.0) (2021-04-09)
+
+
+### Bug Fixes
+
+* sync major ver with core ([0eab3e9](https://github.com/etienne-bechara/nestjs-orm/commit/0eab3e99c004308d140d01719fd16900eca69638))
+
+
+### BREAKING CHANGES
+
+* sync major ver with core
+
 ## [1.1.2](https://github.com/etienne-bechara/nestjs-orm/compare/v1.1.1...v1.1.2) (2021-04-08)
 
 
