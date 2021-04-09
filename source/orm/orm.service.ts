@@ -46,11 +46,13 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    options.orderBy ??= { [options.sort]: options.order };
     options.populate ??= this.serviceOptions.populate;
     options.refresh = true;
-
     let entities: Entity[];
+
+    if (options.sort && options.order) {
+      options.orderBy = { [options.sort]: options.order };
+    }
 
     if (typeof params === 'string') {
       params = { id: params };
