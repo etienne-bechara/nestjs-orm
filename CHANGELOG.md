@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.0...v2.0.1) (2021-04-09)
+
+
+### Bug Fixes
+
+* order by undefined ([1063ac1](https://github.com/etienne-bechara/nestjs-orm/commit/1063ac11b19351e3a256be367388020b65c7eef7))
+
 # [2.0.0](https://github.com/etienne-bechara/nestjs-orm/compare/v1.1.2...v2.0.0) (2021-04-09)
 
 
