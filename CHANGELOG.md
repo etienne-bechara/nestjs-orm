@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.1...v2.0.2) (2021-04-13)
+
+
+### Bug Fixes
+
+* method naming convention ([e78208d](https://github.com/etienne-bechara/nestjs-orm/commit/e78208d79a8ddced96d243651ab3d35d6c42eaa5))
+* throw on missing entity during readUnique ([8bcf10d](https://github.com/etienne-bechara/nestjs-orm/commit/8bcf10d8313e21c4a3f48afb64f9e517a9aeb4c8))
+
 ## [2.0.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.0...v2.0.1) (2021-04-09)
 
 
