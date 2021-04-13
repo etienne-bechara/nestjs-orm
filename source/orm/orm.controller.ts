@@ -212,7 +212,7 @@ export abstract class OrmController<Entity> {
   @Delete(':id')
   public async deleteById(@Param('id') id: string): Promise<Entity> {
     await this.validateRequest({ method: OrmControllerMethod.DELETE_BY_ID });
-    return this.entityService.deleteById(id);
+    return this.entityService.removeById(id);
   }
 
 }
