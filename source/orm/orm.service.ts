@@ -153,12 +153,16 @@ export abstract class OrmService<Entity> {
   }
 
   /**
-   * Read a supposedly unique entity, if the constraint fails throw a conflict exception.
+   * Read a supposedly unique entity, throws an exception if either none or more than one.
    * @param params
    * @param options
    */
   public async readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     const entities = await this.read(params, options);
+
+    if (entities.length === 0) {
+      throw new NotFoundException('entity with given constraints does not exist');
+    }
 
     if (entities.length > 1) {
       throw new ConflictException({
@@ -270,10 +274,10 @@ export abstract class OrmService<Entity> {
   }
 
   /**
-   * Deletes a single entity by its id.
+   * Removes a single entity by its id.
    * @param id
    */
-  public async deleteById(id: string): Promise<Entity> {
+  public async removeById(id: string): Promise<Entity> {
     const entity = await this.readById(id);
     return this.remove(entity);
   }
