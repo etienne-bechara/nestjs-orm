@@ -1,6 +1,6 @@
 {
   "name": "@bechara/nestjs-orm",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "ORM Module Component for NestJS Projects",
   "author": {
     "name": "Etienne Bechara",
@@ -52,12 +52,15 @@
     "@commitlint/config-conventional": "12.1.1",
     "@mikro-orm/mysql": "4.5.3",
     "@nestjs/testing": "7.6.15",
+    "@semantic-release/changelog": "5.0.1",
+    "@semantic-release/git": "9.0.0",
     "@types/jest": "26.0.22",
     "@types/node": "14.14.41",
     "eslint": "7.24.0",
     "husky": "6.0.0",
     "jest": "26.6.3",
     "lint-staged": "10.5.4",
+    "semantic-release": "17.4.2",
     "ts-jest": "26.5.5",
     "ts-node-dev": "1.1.6",
     "typescript": "4.2.4"

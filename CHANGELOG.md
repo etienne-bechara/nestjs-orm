@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.2...v2.0.3) (2021-04-19)
+
+
+### Bug Fixes
+
+* better config organization ([6f5cf33](https://github.com/etienne-bechara/nestjs-orm/commit/6f5cf33cb4a02d58db9006132d5a4d87c4917503))
+* lint ([b8ace23](https://github.com/etienne-bechara/nestjs-orm/commit/b8ace238ba9c02fbb32463dfd4f1fb1908a94ff9))
+
 ## [2.0.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.1...v2.0.2) (2021-04-13)
 
 
