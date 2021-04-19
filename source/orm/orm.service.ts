@@ -288,7 +288,7 @@ export abstract class OrmService<Entity> {
    * @param data
    */
   protected queryExceptionHandler(e: Error, data?: EntityData<Entity> | any): void {
-    if (e.message.match(/duplicate entry/gi)) {
+    if (/duplicate entry/gi.test(e.message)) {
       const violation = /entry '(.+?)' for/gi.exec(e.message);
       throw new ConflictException({
         message: 'unique constraint violation',
@@ -296,19 +296,19 @@ export abstract class OrmService<Entity> {
       });
     }
 
-    if (e.message.match(/cannot add.+foreign key.+fails/gi)) {
+    if (/cannot add.+foreign key.+fails/gi.test(e.message)) {
       const violation = /references `(.+?)`/gi.exec(e.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new BadRequestException(`${constraint} must reference an existing entity`);
     }
 
-    if (e.message.match(/cannot delete.+foreign key.+fails/gi)) {
+    if (/cannot delete.+foreign key.+fails/gi.test(e.message)) {
       const violation = /\.`(.+?)`, constraint/gi.exec(e.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new ConflictException(`${constraint} constraint prevents cascade deletion`);
     }
 
-    if (e.message.match(/query by not existing property/gi)) {
+    if (/query by not existing property/gi.test(e.message)) {
       const violation = /.+ (.+)/gi.exec(e.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new BadRequestException(`${constraint.replace('Entity', '').toLowerCase()} should not exist`);

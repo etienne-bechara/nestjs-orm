@@ -30,13 +30,13 @@ export class OrmEntitySerializer implements NestInterceptor {
     // Array of entities
     if (Array.isArray(data)) {
       data = data.map((d) => d?.toJSON ? d.toJSON() : d);
-      data.forEach((d) => this.eliminateRecursion(d.id, d));
+      for (const d of data) this.eliminateRecursion(d.id, d);
     }
 
     // Paginated entity
     if (data.records && Array.isArray(data.records)) {
       data.records = data.records.map((d) => d?.toJSON ? d.toJSON() : d);
-      data.records.forEach((d) => this.eliminateRecursion(d.id, d));
+      for (const d of data.records) this.eliminateRecursion(d.id, d);
     }
 
     // Single entity
@@ -57,7 +57,7 @@ export class OrmEntitySerializer implements NestInterceptor {
     if (!data || !parentId || typeof data !== 'object') return;
 
     if (Array.isArray(data)) {
-      data.forEach((d) => this.eliminateRecursion(parentId, d));
+      for (const d of data) this.eliminateRecursion(parentId, d);
       return;
     }
 
