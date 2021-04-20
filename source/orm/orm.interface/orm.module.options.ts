@@ -1,6 +1,8 @@
 import { ModuleMetadata } from '@bechara/nestjs-core';
 import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
 
+import { SyncModuleOptions } from '../../sync/sync.interface';
+
 export interface OrmAsyncModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   disableEntityScan?: boolean;
   entities?: any[];
@@ -15,7 +17,6 @@ export interface OrmModuleOptions {
   username: string;
   password?: string;
   database?: string;
-  schemaSync?: boolean;
-  safeSync?: boolean;
+  sync?: SyncModuleOptions;
   extras?: MikroOrmModuleOptions;
 }

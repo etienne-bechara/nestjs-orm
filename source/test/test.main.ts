@@ -1,4 +1,4 @@
-import { AppModule } from '@bechara/nestjs-core';
+import { AppEnvironment, AppModule } from '@bechara/nestjs-core';
 
 import { OrmConfig } from '../orm/orm.config';
 import { OrmModule } from '../orm/orm.module';
@@ -38,8 +38,10 @@ void AppModule.bootServer({
         database: ormConfig.ORM_DATABASE,
         username: ormConfig.ORM_USERNAME,
         password: ormConfig.ORM_PASSWORD,
-        schemaSync: ormConfig.ORM_SYNC_SCHEMA,
-        safeSync: ormConfig.ORM_SYNC_SAFE,
+        sync: {
+          enable: true,
+          safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,
+        },
       }),
     }),
   ],

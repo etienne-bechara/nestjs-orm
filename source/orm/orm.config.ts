@@ -35,12 +35,4 @@ export class OrmConfig {
   @IsString() @IsNotEmpty()
   public readonly ORM_DATABASE: string;
 
-  @InjectSecret()
-  @Transform((o) => o.value === 'true')
-  public readonly ORM_SYNC_SCHEMA: boolean;
-
-  @InjectSecret()
-  @Transform((o) => o.value === 'true')
-  public readonly ORM_SYNC_SAFE: boolean;
-
 }

@@ -1,39 +1,39 @@
 import { DynamicModule, LoggerModule, Module } from '@bechara/nestjs-core';
 import { v4 } from 'uuid';
 
-import { SchemaInjectionToken } from './schema.enum';
-import { SchemaAsyncModuleOptions, SchemaModuleOptions } from './schema.interface';
-import { SchemaService } from './schema.service';
+import { SyncInjectionToken } from './sync.enum';
+import { SyncAsyncModuleOptions, SyncModuleOptions } from './sync.interface';
+import { SyncService } from './sync.service';
 
 @Module({
   imports: [ LoggerModule ],
   providers: [
-    SchemaService,
+    SyncService,
     {
-      provide: SchemaInjectionToken.MODULE_OPTIONS,
+      provide: SyncInjectionToken.MODULE_OPTIONS,
       useValue: { },
     },
   ],
   exports: [
-    SchemaService,
+    SyncService,
   ],
 })
-export class SchemaModule {
+export class SyncModule {
 
   /**
    * Registers underlying service with provided options.
    * @param options
    */
-  public static register(options: SchemaModuleOptions): DynamicModule {
+  public static register(options: SyncModuleOptions): DynamicModule {
     return {
-      module: SchemaModule,
+      module: SyncModule,
       providers: [
         {
-          provide: SchemaInjectionToken.MODULE_ID,
+          provide: SyncInjectionToken.MODULE_ID,
           useValue: v4(),
         },
         {
-          provide: SchemaInjectionToken.MODULE_OPTIONS,
+          provide: SyncInjectionToken.MODULE_OPTIONS,
           useValue: options,
         },
       ],
@@ -44,17 +44,17 @@ export class SchemaModule {
    * Register underlying service with provided options asynchronously.
    * @param options
    */
-  public static registerAsync(options: SchemaAsyncModuleOptions = { }): DynamicModule {
+  public static registerAsync(options: SyncAsyncModuleOptions = { }): DynamicModule {
     return {
-      module: SchemaModule,
+      module: SyncModule,
       imports: options.imports,
       providers: [
         {
-          provide: SchemaInjectionToken.MODULE_ID,
+          provide: SyncInjectionToken.MODULE_ID,
           useValue: v4(),
         },
         {
-          provide: SchemaInjectionToken.MODULE_OPTIONS,
+          provide: SyncInjectionToken.MODULE_OPTIONS,
           inject: options.inject,
           useFactory: options.useFactory,
         },

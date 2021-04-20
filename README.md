@@ -37,8 +37,6 @@ ORM_PORT=3306
 ORM_USERNAME='root'
 ORM_PASSWORD='1234'
 ORM_DATABASE='test'
-ORM_SYNC_SCHEMA=true
-ORM_SYNC_SAFE=false
 ```
 
 It is recommended that you have a local database in order to test connectivity.
@@ -46,9 +44,8 @@ It is recommended that you have a local database in order to test connectivity.
 3\. Import `OrmModule` and `OrmConfig` into you boot script and configure asynchronously:
 
 ```ts
-import { AppModule } from '@bechara/nestjs-core';
-import { OrmConfig } from '@bechara/nestjs-orm';
-import { OrmModule } from '@bechara/nestjs-orm';
+import { AppEnvironment, AppModule } from '@bechara/nestjs-core';
+import { OrmConfig. OrmModule } from '@bechara/nestjs-orm';
 
 void AppModule.bootServer({
   configs: [ OrmConfig ],
@@ -62,8 +59,10 @@ void AppModule.bootServer({
         database: ormConfig.ORM_DATABASE,
         username: ormConfig.ORM_USERNAME,
         password: ormConfig.ORM_PASSWORD,
-        schemaSync: ormConfig.ORM_SYNC_SCHEMA,
-        safeSync: ormConfig.ORM_SYNC_SAFE,
+        sync: {
+          enable: true,
+          safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,
+        },
       }),
     }),
   ],

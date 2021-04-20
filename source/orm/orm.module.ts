@@ -2,8 +2,8 @@ import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, UtilMo
 import { MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
-import { SchemaModuleOptions } from '../schema/schema.interface';
-import { SchemaModule } from '../schema/schema.module';
+import { SyncModuleOptions } from '../sync/sync.interface';
+import { SyncModule } from '../sync/sync.module';
 import { OrmIdEntity, OrmTimestampEntity, OrmUuidEntity } from './orm.entity';
 import { OrmInjectionToken } from './orm.enum';
 import { OrmAsyncModuleOptions, OrmModuleOptions } from './orm.interface';
@@ -35,19 +35,21 @@ export class OrmModule {
 
     return {
       module: OrmModule,
+
       imports: [
         MikroOrmModule.forRootAsync({
           inject: [ OrmInjectionToken.ORM_PROVIDER_OPTIONS ],
-          useFactory: (mikroOrmOptions: OrmModuleOptions) => ({ ...mikroOrmOptions }),
+          useFactory: (mikroOrmOptions: OrmModuleOptions) => mikroOrmOptions,
         }),
 
-        SchemaModule.registerAsync({
+        SyncModule.registerAsync({
           inject: [ OrmInjectionToken.ORM_SCHEMA_OPTIONS ],
-          useFactory: (schemaModuleOptions: SchemaModuleOptions) => ({ ...schemaModuleOptions }),
+          useFactory: (syncModuleOptions: SyncModuleOptions) => syncModuleOptions,
         }),
 
         MikroOrmModule.forFeature({ entities }),
       ],
+
       providers: [
         AppConfig,
         {
@@ -78,12 +80,10 @@ export class OrmModule {
         {
           provide: OrmInjectionToken.ORM_SCHEMA_OPTIONS,
           inject: [ OrmInjectionToken.ORM_MODULE_OPTIONS ],
-          useFactory: (ormModuleOptions: OrmModuleOptions): SchemaModuleOptions => ({
-            safeSync: ormModuleOptions.safeSync,
-            schemaSync: ormModuleOptions.schemaSync,
-          }),
+          useFactory: (ormModuleOptions: OrmModuleOptions): SyncModuleOptions => ormModuleOptions.sync,
         },
       ],
+
       exports: [
         OrmInjectionToken.ORM_PROVIDER_OPTIONS,
         OrmInjectionToken.ORM_SCHEMA_OPTIONS,
