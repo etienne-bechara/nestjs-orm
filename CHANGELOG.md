@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.4...v2.1.0) (2021-04-20)
+
+
+### Features
+
+* add sync schema blacklist ([6a8ccdc](https://github.com/etienne-bechara/nestjs-orm/commit/6a8ccdc19ff5728c6281231cc43b5f145fd473d3))
+
 ## [2.0.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.3...v2.0.4) (2021-04-20)
 
 
