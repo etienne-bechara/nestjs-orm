@@ -1,3 +1,11 @@
+## [2.0.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.3...v2.0.4) (2021-04-20)
+
+
+### Bug Fixes
+
+* ci publish ([815d649](https://github.com/etienne-bechara/nestjs-orm/commit/815d64948eb988806a307101af3012e61896130a))
+* ci publish ([0e0bec9](https://github.com/etienne-bechara/nestjs-orm/commit/0e0bec9faf271e30e2ba143d711cfe0ebc2d4584))
+
 ## [2.0.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.2...v2.0.3) (2021-04-19)
 
 
