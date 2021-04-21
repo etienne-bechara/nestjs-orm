@@ -1,7 +1,7 @@
 import { OrmControllerMethod } from '../orm.enum';
 
 export interface OrmControllerOptions {
-  methods: OrmControllerMethod[];
+  methods?: OrmControllerMethod[];
   dto?: OrmControllerDto;
 }
 

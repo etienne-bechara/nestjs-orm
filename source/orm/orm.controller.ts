@@ -17,7 +17,7 @@ export abstract class OrmController<Entity> {
 
   public constructor(
     public readonly entityService: OrmService<Entity>,
-    protected readonly controllerOptions: OrmControllerOptions,
+    protected readonly controllerOptions: OrmControllerOptions = { },
   ) { }
 
   /**
@@ -26,7 +26,7 @@ export abstract class OrmController<Entity> {
    */
   private async validateRequest(params: OrmRequestValidation): Promise<OrmValidationData> {
     const options = this.controllerOptions;
-    let queryData, queryOptions;
+    options.methods ??= [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ];
     options.dto ??= { };
 
     if (!options.methods.includes(params.method)) {
@@ -40,6 +40,8 @@ export abstract class OrmController<Entity> {
     if (params.update && options.dto.update) {
       await this.plainToDto(params.update, options.dto.update);
     }
+
+    let queryData, queryOptions;
 
     if (params.read && options.dto.read) {
       const paginationProperties = [ 'sort', 'order', 'limit', 'offset' ];
