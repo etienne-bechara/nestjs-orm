@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.2...v2.2.3) (2021-04-21)
+
+
+### Bug Fixes
+
+* set suggested configs as optional ([198d454](https://github.com/etienne-bechara/nestjs-orm/commit/198d454952b34209b1d9775c22c931fa92e81ff6))
+
 ## [2.2.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.1...v2.2.2) (2021-04-21)
 
 
