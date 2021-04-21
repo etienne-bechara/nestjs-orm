@@ -16,7 +16,7 @@ export class SyncService {
     const options = this.syncModuleOptions;
 
     if (options.enable) {
-      void this.syncSync(options);
+      void this.syncSchema(options);
     }
   }
 
@@ -36,7 +36,7 @@ export class SyncService {
    * configured entities.
    * @param options
    */
-  public async syncSync(options: SyncModuleOptions): Promise<void> {
+  public async syncSchema(options: SyncModuleOptions): Promise<void> {
     this.loggerService.info('[OrmService] Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
@@ -57,7 +57,7 @@ export class SyncService {
   /**
    * Erase current database schema and recreate it.
    */
-  public async resetSync(): Promise<void> {
+  public async resetSchema(): Promise<void> {
     this.loggerService.info('[OrmService] Starting database schema reset...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
