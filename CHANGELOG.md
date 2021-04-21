@@ -1,3 +1,15 @@
+# [2.2.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.1.0...v2.2.0) (2021-04-21)
+
+
+### Bug Fixes
+
+* make dtos optional ([e9bdc0a](https://github.com/etienne-bechara/nestjs-orm/commit/e9bdc0a68330aaba062393fab07b82b3d14e2ade))
+
+
+### Features
+
+* make controllers easier to configure and add pathc by id ([a58615d](https://github.com/etienne-bechara/nestjs-orm/commit/a58615db210df44cca22daa02402402dee2c7361))
+
 # [2.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.0.4...v2.1.0) (2021-04-20)
 
 
