@@ -1,3 +1,10 @@
+## [2.2.5](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.4...v2.2.5) (2021-04-21)
+
+
+### Bug Fixes
+
+* typo ([39948bb](https://github.com/etienne-bechara/nestjs-orm/commit/39948bb2bc564b5e4d7f77ab5222668a132d1fb9))
+
 ## [2.2.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.3...v2.2.4) (2021-04-21)
 
 
