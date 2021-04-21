@@ -1,3 +1,10 @@
+## [2.2.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.3...v2.2.4) (2021-04-21)
+
+
+### Bug Fixes
+
+* port typing ([a64b9a3](https://github.com/etienne-bechara/nestjs-orm/commit/a64b9a3b07970dbb8e104a7ff381409990e29f44))
+
 ## [2.2.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.2...v2.2.3) (2021-04-21)
 
 
