@@ -32,8 +32,13 @@ export abstract class OrmController<Entity> {
       throw new NotFoundException(`Cannot ${params.method.split('_BY_')[0]} to path`);
     }
 
-    if (params.create) await this.plainToDto(params.create, options.dto.create);
-    if (params.update) await this.plainToDto(params.update, options.dto.update);
+    if (params.create && options.dto.create) {
+      await this.plainToDto(params.create, options.dto.create);
+    }
+
+    if (params.update && options.dto.update) {
+      await this.plainToDto(params.update, options.dto.update);
+    }
 
     if (params.read) {
       const paginationProperties = [ 'sort', 'order', 'limit', 'offset' ];

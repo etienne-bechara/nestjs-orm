@@ -157,7 +157,10 @@ export class UserController extends OrmController<UserEntity> {
     private readonly userService: UserService,
   ) {
     super(userService, {
+      // Available built-in methods:
       methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
+
+      // If no DTO is provided all requests shall pass
       dto: { read: UserReadDto, create: UserCreateDto, update: UserUpdateDto },
     });
   }

@@ -6,7 +6,7 @@ export interface OrmControllerOptions {
 }
 
 export interface OrmControllerDto {
-  read: any;
-  create: any;
-  update: any;
+  read?: any;
+  create?: any;
+  update?: any;
 }
