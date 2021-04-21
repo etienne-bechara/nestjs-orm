@@ -1,8 +1,8 @@
 import { OrmControllerMethod } from '../orm.enum';
 
 export interface OrmControllerOptions {
-  dto: OrmControllerDto;
   methods: OrmControllerMethod[];
+  dto?: OrmControllerDto;
 }
 
 export interface OrmControllerDto {

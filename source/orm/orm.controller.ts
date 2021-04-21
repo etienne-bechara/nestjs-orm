@@ -27,6 +27,7 @@ export abstract class OrmController<Entity> {
   private async validateRequest(params: OrmRequestValidation): Promise<OrmValidationData> {
     const options = this.controllerOptions;
     let queryData, queryOptions;
+    options.dto ??= { };
 
     if (!options.methods.includes(params.method)) {
       throw new NotFoundException(`Cannot ${params.method.split('_BY_')[0]} to path`);
@@ -40,7 +41,7 @@ export abstract class OrmController<Entity> {
       await this.plainToDto(params.update, options.dto.update);
     }
 
-    if (params.read) {
+    if (params.read && options.dto.read) {
       const paginationProperties = [ 'sort', 'order', 'limit', 'offset' ];
       const parsedQuery = this.parseFilterOperators(params.read);
 
