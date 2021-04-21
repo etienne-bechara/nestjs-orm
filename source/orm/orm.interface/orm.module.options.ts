@@ -10,13 +10,6 @@ export interface OrmAsyncModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   useFactory?: (...args: any[]) => Promise<OrmModuleOptions> | OrmModuleOptions;
 }
 
-export interface OrmModuleOptions {
-  type: 'mongo' | 'mysql' | 'mariadb' | 'postgresql' | 'sqlite';
-  host: string;
-  port: number;
-  username: string;
-  password?: string;
-  database?: string;
+export interface OrmModuleOptions extends MikroOrmModuleOptions {
   sync?: SyncModuleOptions;
-  extras?: MikroOrmModuleOptions;
 }

@@ -56,9 +56,10 @@ void AppModule.bootServer({
         type: ormConfig.ORM_TYPE,
         host: ormConfig.ORM_HOST,
         port: ormConfig.ORM_PORT,
-        database: ormConfig.ORM_DATABASE,
-        username: ormConfig.ORM_USERNAME,
+        dbName: ormConfig.ORM_DATABASE,
+        user: ormConfig.ORM_USERNAME,
         password: ormConfig.ORM_PASSWORD,
+        pool: { min: 1, max: 25 },
         sync: {
           enable: true,
           safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,

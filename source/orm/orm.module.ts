@@ -64,18 +64,17 @@ export class OrmModule {
             ormModuleOptions: OrmModuleOptions,
             loggerService: LoggerService,
             appConfig: AppConfig,
-          ): MikroORMOptions => ({
-            type: ormModuleOptions.type,
-            host: ormModuleOptions.host,
-            port: ormModuleOptions.port,
-            dbName: ormModuleOptions.database,
-            user: ormModuleOptions.username,
-            password: ormModuleOptions.password,
-            debug: appConfig.NODE_ENV === AppEnvironment.LOCAL,
-            logger: (msg): void => loggerService.debug(`[OrmService] ${msg}`),
-            entities: rootEntities,
-            ...ormModuleOptions.extras,
-          } as any),
+          ): MikroORMOptions => {
+            const mikroOrmOptions: MikroORMOptions = { ...ormModuleOptions } as any;
+            delete mikroOrmOptions['sync'];
+
+            return {
+              debug: appConfig.NODE_ENV === AppEnvironment.LOCAL,
+              logger: (msg): void => loggerService.debug(`[OrmService] ${msg}`),
+              entities: rootEntities,
+              ...mikroOrmOptions,
+            };
+          },
         },
         {
           provide: OrmInjectionToken.ORM_SCHEMA_OPTIONS,
