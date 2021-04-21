@@ -1,3 +1,10 @@
+## [2.2.7](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.6...v2.2.7) (2021-04-21)
+
+
+### Bug Fixes
+
+* assign default value to sync module ([0c51bc8](https://github.com/etienne-bechara/nestjs-orm/commit/0c51bc82d4f43d7dcf47d212eca665f1994f9bcc))
+
 ## [2.2.6](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.5...v2.2.6) (2021-04-21)
 
 
