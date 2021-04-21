@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.1...v2.2.2) (2021-04-21)
+
+
+### Bug Fixes
+
+* make controller options optional ([c425955](https://github.com/etienne-bechara/nestjs-orm/commit/c425955acff4ddee10869396412e6d08392e5e23))
+
 ## [2.2.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.0...v2.2.1) (2021-04-21)
 
 
