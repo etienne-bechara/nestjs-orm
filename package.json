@@ -46,8 +46,8 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@bechara/eslint-config-bechara-ts": "1.1.1",
-    "@bechara/nestjs-core": "2.0.16",
+    "@bechara/eslint-config-bechara-ts": "1.1.3",
+    "@bechara/nestjs-core": "2.0.17",
     "@commitlint/cli": "12.1.1",
     "@commitlint/config-conventional": "12.1.1",
     "@mikro-orm/mysql": "4.5.3",
