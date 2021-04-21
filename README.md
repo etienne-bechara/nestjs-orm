@@ -142,7 +142,7 @@ Finally, you may automatic boot routes to manipulate your entities by extending 
 Example:
 
 ```ts
-import { OrmController, OrmControllerMethod } from '@bechara/nestjs-orm';
+import { OrmController } from '@bechara/nestjs-orm';
 import { Controller } from '@bechara/nestjs-core';
 
 // These DTOs are validations customized with class-validator and class-transformer
@@ -157,14 +157,8 @@ export class UserController extends OrmController<UserEntity> {
     private readonly userService: UserService,
   ) {
     super(userService, {
-      routes: [
-        { method: OrmControllerMethod.GET, queryDto: UserReadDto },
-        { method: OrmControllerMethod.GET_BY_ID, queryDto: UserReadDto },
-        { method: OrmControllerMethod.POST, bodyDto: UserCreateDto },
-        { method: OrmControllerMethod.PUT, bodyDto: UserCreateDto },
-        { method: OrmControllerMethod.PUT_BY_ID, bodyDto: UserUpdateDto },
-        { method: OrmControllerMethod.DELETE_BY_ID },
-      ],
+      methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
+      dto: { read: UserReadDto, create: UserCreateDto, update: UserUpdateDto },
     });
   }
 

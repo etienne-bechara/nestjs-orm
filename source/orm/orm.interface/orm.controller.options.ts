@@ -1,11 +1,12 @@
 import { OrmControllerMethod } from '../orm.enum';
 
 export interface OrmControllerOptions {
-  routes: OrmControllerRoute[];
+  dto: OrmControllerDto;
+  methods: OrmControllerMethod[];
 }
 
-export interface OrmControllerRoute {
-  method: OrmControllerMethod;
-  queryDto?: any;
-  bodyDto?: any;
+export interface OrmControllerDto {
+  read: any;
+  create: any;
+  update: any;
 }

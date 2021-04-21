@@ -7,4 +7,7 @@ export class CompanyUpdateDto extends CompanyCreateDto {
   @IsOptional()
   public name: string;
 
+  @IsOptional()
+  public capital: number;
+
 }

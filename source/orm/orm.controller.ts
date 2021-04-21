@@ -1,11 +1,10 @@
 import { BadRequestException, Body, Delete, Get, NotFoundException,
-  Param, Post, Put, Query, UseInterceptors } from '@bechara/nestjs-core';
+  Param, Patch, Post, Put, Query, UseInterceptors } from '@bechara/nestjs-core';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { unflatten } from 'flat';
 
 import { OrmPaginationDto } from './orm.dto';
-import { OrmControllerMethod } from './orm.enum';
 import { OrmEntitySerializer } from './orm.interceptor';
 import { OrmControllerOptions, OrmPaginatedResponse, OrmRequestValidation, OrmValidationData } from './orm.interface';
 import { OrmService } from './orm.service';
@@ -26,32 +25,21 @@ export abstract class OrmController<Entity> {
    * @param params
    */
   private async validateRequest(params: OrmRequestValidation): Promise<OrmValidationData> {
-    const matchingRoute = this.controllerOptions.routes.find((r) => r.method === params.method);
-    let body, queryData, queryOptions;
+    const options = this.controllerOptions;
+    let queryData, queryOptions;
 
-    if (!matchingRoute) {
+    if (!options.methods.includes(params.method)) {
       throw new NotFoundException(`Cannot ${params.method.split('_BY_')[0]} to path`);
     }
 
-    const mandatoryBody = [
-      OrmControllerMethod.POST,
-      OrmControllerMethod.PUT,
-      OrmControllerMethod.PUT_BY_ID,
-    ];
+    if (params.create) await this.plainToDto(params.create, options.dto.create);
+    if (params.update) await this.plainToDto(params.update, options.dto.update);
 
-    if (!params.body && mandatoryBody.includes(params.method)) {
-      throw new BadRequestException('missing request body');
-    }
-
-    if (params.body) {
-      body = await this.plainToDto(params.body, matchingRoute.bodyDto);
-    }
-
-    if (params.query) {
+    if (params.read) {
       const paginationProperties = [ 'sort', 'order', 'limit', 'offset' ];
-      const parsedQuery = this.parseFilterOperators(params.query);
+      const parsedQuery = this.parseFilterOperators(params.read);
 
-      const query = await this.plainToDto(parsedQuery.stripped, matchingRoute.queryDto);
+      const query = await this.plainToDto(parsedQuery.stripped, options.dto.read);
       queryData = parsedQuery.unflatted;
       queryOptions = { ...query };
 
@@ -66,7 +54,7 @@ export abstract class OrmController<Entity> {
       }
     }
 
-    return { queryData, queryOptions, body };
+    return { queryData, queryOptions };
   }
 
   /**
@@ -157,7 +145,7 @@ export abstract class OrmController<Entity> {
    */
   @Get()
   public async get(@Query() query: OrmPaginationDto & Entity): Promise<OrmPaginatedResponse<Entity>> {
-    const validationData = await this.validateRequest({ method: OrmControllerMethod.GET, query });
+    const validationData = await this.validateRequest({ method: 'GET', read: query });
     return this.entityService.readAndCount(validationData.queryData, validationData.queryOptions);
   }
 
@@ -167,7 +155,7 @@ export abstract class OrmController<Entity> {
    */
   @Get(':id')
   public async getById(@Param('id') id: string): Promise<Entity> {
-    await this.validateRequest({ method: OrmControllerMethod.GET_BY_ID });
+    await this.validateRequest({ method: 'GET:id' });
     return this.entityService.readById(id);
   }
 
@@ -178,7 +166,7 @@ export abstract class OrmController<Entity> {
    */
   @Post()
   public async post(@Body() body: Entity): Promise<Entity> {
-    await this.validateRequest({ method: OrmControllerMethod.POST, body });
+    await this.validateRequest({ method: 'POST', create: body });
     return this.entityService.create(body);
   }
 
@@ -189,19 +177,31 @@ export abstract class OrmController<Entity> {
    */
   @Put()
   public async put(@Body() body: Entity): Promise<Entity> {
-    await this.validateRequest({ method: OrmControllerMethod.PUT, body });
+    await this.validateRequest({ method: 'PUT', create: body });
     return this.entityService.upsert(body);
   }
 
   /**
-   * Updates a single entity validating its data
+   * Replaces a single entity validating its data
    * across provided create DTO.
    * @param id
    * @param body
    */
   @Put(':id')
   public async putById(@Param('id') id: string, @Body() body: Entity): Promise<Entity> {
-    await this.validateRequest({ method: OrmControllerMethod.PUT_BY_ID, body });
+    await this.validateRequest({ method: 'PUT:id', create: body });
+    return this.entityService.updateById(id, body);
+  }
+
+  /**
+   * Updates a single entity validating its data
+   * across provided update DTO.
+   * @param id
+   * @param body
+   */
+  @Patch(':id')
+  public async patchById(@Param('id') id: string, @Body() body: Entity): Promise<Entity> {
+    await this.validateRequest({ method: 'PATCH:id', update: body });
     return this.entityService.updateById(id, body);
   }
 
@@ -211,7 +211,7 @@ export abstract class OrmController<Entity> {
    */
   @Delete(':id')
   public async deleteById(@Param('id') id: string): Promise<Entity> {
-    await this.validateRequest({ method: OrmControllerMethod.DELETE_BY_ID });
+    await this.validateRequest({ method: 'DELETE:id' });
     return this.entityService.removeById(id);
   }
 

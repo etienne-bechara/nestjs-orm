@@ -10,6 +10,9 @@ export class CompanyEntity extends OrmUuidEntity {
   @Property()
   public name: string;
 
+  @Property()
+  public capital: number;
+
   @ManyToOne(() => CompanyEntity, { nullable: true })
   public headquarter: CompanyEntity;
 

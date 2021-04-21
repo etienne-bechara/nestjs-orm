@@ -1,7 +1,6 @@
 import { Controller } from '@bechara/nestjs-core';
 
 import { OrmController } from '../../orm/orm.controller';
-import { OrmControllerMethod } from '../../orm/orm.enum';
 import { PersonCreateDto, PersonReadDto, PersonUpdateDto } from './person.dto';
 import { PersonEntity } from './person.entity';
 import { PersonService } from './person.service';
@@ -13,14 +12,8 @@ export class PersonController extends OrmController<PersonEntity> {
     private readonly userService: PersonService,
   ) {
     super(userService, {
-      routes: [
-        { method: OrmControllerMethod.GET, queryDto: PersonReadDto },
-        { method: OrmControllerMethod.GET_BY_ID, queryDto: PersonReadDto },
-        { method: OrmControllerMethod.POST, bodyDto: PersonCreateDto },
-        { method: OrmControllerMethod.PUT, bodyDto: PersonCreateDto },
-        { method: OrmControllerMethod.PUT_BY_ID, bodyDto: PersonUpdateDto },
-        { method: OrmControllerMethod.DELETE_BY_ID },
-      ],
+      methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
+      dto: { read: PersonReadDto, create: PersonCreateDto, update: PersonUpdateDto },
     });
   }
 

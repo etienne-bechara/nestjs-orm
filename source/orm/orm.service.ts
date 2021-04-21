@@ -291,8 +291,8 @@ export abstract class OrmService<Entity> {
     if (/duplicate entry/gi.test(e.message)) {
       const violation = /entry '(.+?)' for/gi.exec(e.message);
       throw new ConflictException({
-        message: 'unique constraint violation',
-        violation: violation ? violation[1] : null,
+        message: 'entity already exists',
+        key: violation ? violation[1] : null,
       });
     }
 

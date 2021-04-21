@@ -26,21 +26,25 @@ export class StartupService {
       // Google has a headquarter and 2 branches
       const googleHq = await this.companyService.upsert({
         name: 'GOOGLE LLC',
+        capital: 123456789,
       });
 
       const googleBrazil = await this.companyService.upsert({
         name: 'GOOGLE BRASIL LTDA',
         headquarter: googleHq,
+        capital: 987654,
       });
 
       const googleMexico = await this.companyService.upsert({
         name: 'GOOGLE MEXICO LTDA',
         headquarter: googleHq,
+        capital: 765443,
       });
 
       // Facebook has no relationships
       const facebook = await this.companyService.upsert({
         name: 'FACEBOOK LLC',
+        capital: 76543210,
       });
 
       // John works for Google and Facebook
