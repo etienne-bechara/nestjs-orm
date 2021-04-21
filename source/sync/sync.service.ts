@@ -9,7 +9,7 @@ export class SyncService {
 
   public constructor(
     @Inject(SyncInjectionToken.MODULE_OPTIONS)
-    private readonly syncModuleOptions: SyncModuleOptions,
+    private readonly syncModuleOptions: SyncModuleOptions = { },
     private readonly mikroOrm: MikroORM,
     private readonly loggerService: LoggerService,
   ) {
