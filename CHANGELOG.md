@@ -1,3 +1,11 @@
+## [2.2.6](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.5...v2.2.6) (2021-04-21)
+
+
+### Bug Fixes
+
+* extend base mikro-orm instead of implementing again ([7deb911](https://github.com/etienne-bechara/nestjs-orm/commit/7deb9117147bb65a3f970150e51ebef8f6ae2c63))
+* interface ([206678d](https://github.com/etienne-bechara/nestjs-orm/commit/206678dfaeaeb077a576ad764edec6bde6d4a3d3))
+
 ## [2.2.5](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.4...v2.2.5) (2021-04-21)
 
 
