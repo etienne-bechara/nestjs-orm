@@ -1,6 +1,5 @@
 import { AppEnvironment, Injectable, InjectSecret } from '@bechara/nestjs-core';
-import { Transform } from 'class-transformer';
-import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 @Injectable()
 export class OrmConfig {
@@ -22,8 +21,7 @@ export class OrmConfig {
 
   @IsOptional()
   @InjectSecret()
-  @Transform((o) => Number.parseInt(o.value))
-  @IsNumber()
+  @IsNumberString()
   public readonly ORM_PORT: number;
 
   @IsOptional()
