@@ -70,7 +70,7 @@ export class OrmModule {
 
             return {
               debug: appConfig.NODE_ENV === AppEnvironment.LOCAL,
-              logger: (msg): void => loggerService.debug(`[OrmService] ${msg}`),
+              logger: (msg): void => loggerService.trace(`[OrmService] ${msg}`),
               entities: rootEntities,
               ...mikroOrmOptions,
             };
