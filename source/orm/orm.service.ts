@@ -223,7 +223,7 @@ export abstract class OrmService<Entity> {
    * @param entity
    * @param data
    */
-  public async updateOne(entity: Entity[], data: EntityData<Entity>): Promise<Entity> {
+  public async updateOne(entity: Entity, data: EntityData<Entity>): Promise<Entity> {
     const [ updatedEntity ] = await this.update(entity, data);
     return updatedEntity;
   }
