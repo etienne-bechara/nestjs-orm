@@ -1,6 +1,4 @@
-import { OrmReadOptions } from './orm.read.options';
-
-export interface OrmUpsertOptions<Entity> extends OrmReadOptions<Entity> {
+export interface OrmUpsertOptions {
   uniqueKey?: string[];
   allowUpdate?: boolean;
   disallowRetry?: boolean;

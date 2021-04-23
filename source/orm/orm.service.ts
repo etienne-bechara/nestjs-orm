@@ -151,40 +151,20 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async create(data: AnyEntity<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity>
-  public async create(data: AnyEntity<Entity>[], options?: OrmReadOptions<Entity>): Promise<Entity[]>
-  public async create(
-    data: AnyEntity<Entity> | AnyEntity<Entity>[], options?: OrmReadOptions<Entity>,
-  ): Promise<Entity | Entity[]> {
-    // Multiple
-    if (data && Array.isArray(data)) {
-      const newEntities = data.map((d) => this.entityRepository.create(d));
-
-      try {
-        await this.entityRepository.persistAndFlush(newEntities);
-      }
-      catch (e) {
-        this.queryExceptionHandler(e, newEntities);
-      }
-
-      return options
-        ? this.read(newEntities.map((e) => e['id']), options)
-        : newEntities;
-    }
-
-    // Single
-    const newEntity = this.entityRepository.create(data);
+  public async create(data: AnyEntity<Entity>): Promise<Entity>
+  public async create(data: AnyEntity<Entity>[]): Promise<Entity[]>
+  public async create(data: AnyEntity<Entity> | AnyEntity<Entity>[]): Promise<Entity | Entity[]> {
+    const dataArray = Array.isArray(data) ? data : [ data ];
+    const newEntities = dataArray.map((d) => this.entityRepository.create(d));
 
     try {
-      await this.entityRepository.persistAndFlush(newEntity);
+      await this.entityRepository.persistAndFlush(newEntities);
     }
     catch (e) {
-      this.queryExceptionHandler(e, newEntity);
+      this.queryExceptionHandler(e, newEntities);
     }
 
-    return options
-      ? this.readById(newEntity['id'], options)
-      : newEntity;
+    return Array.isArray(data) ? newEntities : newEntities[0];
   }
 
   /**
@@ -193,40 +173,31 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async update(entity: Entity, data: AnyEntity<Entity>, options?: OrmReadOptions<Entity>,): Promise<Entity>;
-  public async update(entities: Entity[], data: AnyEntity<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity[]>;
+  public async update(entity: Entity, data: AnyEntity<Entity>): Promise<Entity>;
+  public async update(entities: Entity[], data: AnyEntity<Entity>[]): Promise<Entity[]>;
   public async update(
-    entities: Entity | Entity[], data: AnyEntity<Entity>, options?: OrmReadOptions<Entity>,
+    entities: Entity | Entity[], data: AnyEntity<Entity> | AnyEntity<Entity>[],
   ): Promise<Entity| Entity[]> {
-    // Multiple
-    if (entities && Array.isArray(entities)) {
-      const updatedEntities = entities.map((e) => this.entityRepository.assign(e, data));
+    const entityArray = Array.isArray(entities) ? entities : [ entities ];
+    const dataArray = Array.isArray(data) ? data : [ data ];
+    const updatedEntities = entityArray.map((e, i) => this.entityRepository.assign(e, dataArray[i]));
 
-      try {
-        await this.entityRepository.persistAndFlush(updatedEntities);
-      }
-      catch (e) {
-        this.queryExceptionHandler(e, entities);
-      }
-
-      return options
-        ? this.read(updatedEntities.map((e) => ({ id: e['id'] })), options)
-        : updatedEntities;
+    if (entityArray.length !== dataArray.length) {
+      throw new InternalServerErrorException({
+        message: 'failed to map entities to update data',
+        entityArray,
+        dataArray,
+      });
     }
 
-    // Single
-    const updatedEntity = this.entityRepository.assign(entities as Entity, data);
-
     try {
-      await this.entityRepository.persistAndFlush(updatedEntity);
+      await this.entityRepository.persistAndFlush(updatedEntities);
     }
     catch (e) {
       this.queryExceptionHandler(e, entities);
     }
 
-    return options
-      ? this.readById(updatedEntity['id'], options)
-      : updatedEntity;
+    return Array.isArray(entities) ? updatedEntities : updatedEntities[0];
   }
 
   /**
@@ -234,11 +205,10 @@ export abstract class OrmService<Entity> {
    * and return the updated object.
    * @param id
    * @param data
-   * @param options
    */
-  public async updateById(id: string, data: AnyEntity<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
+  public async updateById(id: string, data: AnyEntity<Entity>): Promise<Entity> {
     const target = await this.readById(id);
-    return this.update(target, data, options);
+    return this.update(target, data);
   }
 
   /**
@@ -246,42 +216,80 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async readCreateOrUpdate(data: AnyEntity<Entity>, options: OrmUpsertOptions<Entity>): Promise<Entity> {
+  private async readCreateOrUpdate(data: AnyEntity<Entity>, options?: OrmUpsertOptions): Promise<Entity>;
+  private async readCreateOrUpdate(data: AnyEntity<Entity>[], options?: OrmUpsertOptions): Promise<Entity[]>;
+  private async readCreateOrUpdate(
+    data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { },
+  ): Promise<Entity | Entity[]> {
     const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
-    const clause = { };
+    const dataArray = Array.isArray(data) ? data : [ data ];
+    const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
 
-    for (const key of uniqueKey) {
-      clause[key] = data[key];
+    const existingEntities: Entity[] = [ ];
+    const updateTargets: Entity[] = [ ];
+    const updateData: AnyEntity<Entity>[] = [ ];
+    const createData: AnyEntity<Entity>[] = [ ];
+
+    for (const dataItem of dataArray) {
+      const populate = [ ];
+      const clause = { };
+
+      // Create clause (based on unique key) and population (based on many-to-many)
+      for (const key of uniqueKey) clause[key] = dataItem[key];
+      for (const key in dataItem) Array.isArray(dataItem[key]) ? populate.push(key) : undefined;
+      const matchingEntities = await this.read(clause, { populate });
+
+      // Conflict (error)
+      if (matchingEntities.length > 1) {
+        throw new ConflictException({
+          message: 'unique constraint references more than one entity',
+          uniqueKey,
+          matches: matchingEntities.map((e) => e['id']),
+        });
+      }
+
+      // Match (create or update)
+      if (matchingEntities.length === 1) {
+        if (options.allowUpdate) {
+          resultMap.push({ index: updateTargets.length, target: 'update' });
+          updateTargets.push(matchingEntities[0]);
+          updateData.push(dataItem);
+        }
+        else {
+          resultMap.push({ index: existingEntities.length, target: 'read' });
+          existingEntities.push(matchingEntities[0]);
+        }
+      }
+      // Missing (create)
+      else {
+        resultMap.push({ index: createData.length, target: 'create' });
+        createData.push(dataItem);
+      }
     }
 
-    const matchingEntities = await this.read(clause, { populate: [ ] });
+    // Allow a single retry to handle concurrent creation
+    let createdEntities: Entity[];
 
-    // Conflict (error)
-    if (matchingEntities.length > 1) {
-      throw new ConflictException({
-        message: 'unique constraint references more than one entity',
-        unique_key: uniqueKey,
-        matches: matchingEntities.map((e) => e['id']),
-      });
-    }
-
-    // Match (create or update)
-    if (matchingEntities.length === 1) {
-      return options.allowUpdate
-        ? this.update(matchingEntities[0], data, options)
-        : matchingEntities[0];
-    }
-
-    // Missing (create)
     try {
-      const newEntity = await this.create(data, options);
-      return newEntity;
+      createdEntities = await this.create(createData);
     }
     catch (e) {
       if (options.disallowRetry) throw e;
       options.disallowRetry = true;
-      return this.readCreateOrUpdate(data, options);
+      return this.readCreateOrUpdate(data as any, options);
     }
+
+    const updatedEntities = await this.update(updateTargets, updateData);
+
+    const resultEntities = resultMap.map((i) => {
+      switch (i.target) {
+        case 'read': return existingEntities[i.index];
+        case 'create': return createdEntities[i.index];
+        case 'update': return updatedEntities[i.index];
+      }
+    });
+
+    return Array.isArray(data) ? resultEntities : resultEntities[0];
   }
 
   /**
@@ -290,9 +298,13 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async resert(data: AnyEntity<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+  public async readOrCreate(data: AnyEntity<Entity>, options?: OrmUpsertOptions): Promise<Entity>;
+  public async readOrCreate(data: AnyEntity<Entity>[], options?: OrmUpsertOptions): Promise<Entity[]>;
+  public async readOrCreate(
+    data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { },
+  ): Promise<Entity | Entity[]> {
     options.allowUpdate = false;
-    return this.readCreateOrUpdate(data, options);
+    return this.readCreateOrUpdate(data as any, options);
   }
 
   /**
@@ -301,9 +313,13 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async upsert(data: AnyEntity<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+  public async createOrUpdate(data: AnyEntity<Entity>, options?: OrmUpsertOptions): Promise<Entity>;
+  public async createOrUpdate(data: AnyEntity<Entity>[], options?: OrmUpsertOptions): Promise<Entity[]>;
+  public async createOrUpdate(
+    data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { },
+  ): Promise<Entity | Entity[]> {
     options.allowUpdate = true;
-    return this.readCreateOrUpdate(data, options);
+    return this.readCreateOrUpdate(data as any, options);
   }
 
   /**

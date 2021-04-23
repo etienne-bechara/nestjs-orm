@@ -122,16 +122,29 @@ export class UserService extends OrmService<UserEntity> {
 ```
 
 At this point, you may inject you `UserService` in any order provider and have its methods available to you:
+
 ```ts
-readById(id: string, options: OrmReadOptions<Entity> = { }): Entity;
-readByIdOrFail(id: string, options: OrmReadOptions<Entity> = { }): Entity;
-readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Entity;
-readUniqueOrFail(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Entity;
-readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): OrmPaginatedResponse<Entity>;
-updateById(id: string, data: EntityData<Entity>): Entity;
-removeById(id: string): Entity;
-resert(data: EntityData<Entity>, uniqueKey?: string[]): Entity;
-upsert(data: EntityData<Entity>, uniqueKey?: string[]): Entity;
+// Read entities
+read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]>;
+count(options: OrmReadParams<Entity>): Promise<number>;
+readById(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
+readByIdOrFail(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
+readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
+readUniqueOrFail(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
+readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPaginatedResponse<Entity>>;
+
+// Create entities
+create(data: AnyEntity<Entity> | AnyEntity<Entity>[]): Promise<Entity | Entity[]>;
+readOrCreate(data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { }): Promise<Entity | Entity[]>;
+
+// Update entities
+update(entities: Entity | Entity[], data: AnyEntity<Entity> | AnyEntity<Entity>[]): Promise<Entity| Entity[]>;
+updateById(id: string, data: AnyEntity<Entity>): Promise<Entity>;
+createOrUpdate(data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { }): Promise<Entity | Entity[]>;
+
+// Remove entities
+remove(entities: Entity | Entity[]): Promise<Entity| Entity[]>;
+removeById(id: string): Promise<Entity>;
 ```
 
 ### Creating an Entity Controller

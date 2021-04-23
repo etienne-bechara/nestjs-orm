@@ -186,7 +186,7 @@ export abstract class OrmController<Entity> {
   @Put()
   public async put(@Body() body: AnyEntity<Entity>): Promise<Entity> {
     await this.validateRequest({ method: 'PUT', create: body });
-    return this.entityService.upsert(body);
+    return this.entityService.createOrUpdate(body);
   }
 
   /**
