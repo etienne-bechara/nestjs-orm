@@ -95,7 +95,24 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async create(data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
+  public async create(data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity | Entity[]> {
+    // Multiple
+    if (data && Array.isArray(data)) {
+      const newEntities = data.map((d) => this.entityRepository.create(d));
+
+      try {
+        await this.entityRepository.persistAndFlush(newEntities);
+      }
+      catch (e) {
+        this.queryExceptionHandler(e, newEntities);
+      }
+
+      return options
+        ? this.read(newEntities.map((e) => e['id']), options)
+        : newEntities;
+    }
+
+    // Single
     const newEntity = this.entityRepository.create(data);
 
     try {
@@ -112,18 +129,37 @@ export abstract class OrmService<Entity> {
 
   /**
    * Wrapper responsible for all UPDATE operations.
-   * @param entity
+   * @param entities
    * @param data
    * @param options
    */
-  public async update(entity: Entity, data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
-    const updatedEntity = this.entityRepository.assign(entity, data);
+  public async update(
+    entities: Entity | Entity[], data: EntityData<Entity>, options?: OrmReadOptions<Entity>,
+  ): Promise<Entity| Entity[]> {
+    // Multiple
+    if (entities && Array.isArray(entities)) {
+      const updatedEntities = entities.map((e) => this.entityRepository.assign(e, data));
+
+      try {
+        await this.entityRepository.persistAndFlush(updatedEntities);
+      }
+      catch (e) {
+        this.queryExceptionHandler(e, entities);
+      }
+
+      return options
+        ? this.read(updatedEntities.map((e) => ({ id: e['id'] })), options)
+        : updatedEntities;
+    }
+
+    // Single
+    const updatedEntity = this.entityRepository.assign(entities as Entity, data);
 
     try {
       await this.entityRepository.persistAndFlush(updatedEntity);
     }
     catch (e) {
-      this.queryExceptionHandler(e, entity);
+      this.queryExceptionHandler(e, entities);
     }
 
     return options
@@ -133,17 +169,17 @@ export abstract class OrmService<Entity> {
 
   /**
    * Wrapper responsible for all DELETE operations.
-   * @param entity
+   * @param entities
    */
-  public async remove(entity: Entity): Promise<Entity> {
+  public async remove(entities: Entity | Entity[]): Promise<Entity| Entity[]> {
     try {
-      await this.entityRepository.removeAndFlush(entity);
+      await this.entityRepository.removeAndFlush(entities);
     }
     catch (e) {
-      this.queryExceptionHandler(e, entity);
+      this.queryExceptionHandler(e, entities);
     }
 
-    return entity;
+    return entities;
   }
 
   /**
@@ -234,7 +270,7 @@ export abstract class OrmService<Entity> {
    */
   public async updateById(id: string, data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
     const target = await this.readById(id);
-    return this.update(target, data, options);
+    return this.update(target, data, options) as Promise<Entity>;
   }
 
   /**
@@ -242,7 +278,9 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions<Entity>): Promise<Entity> {
+  public async readCreateOrUpdate(
+    data: EntityData<Entity>, options: OrmUpsertOptions<Entity>,
+  ): Promise<Entity | Entity[]> {
     const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
     const clause = { };
 
@@ -286,7 +324,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async resert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+  public async resert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity | Entity[]> {
     options.allowUpdate = false;
     return this.readCreateOrUpdate(data, options);
   }
@@ -297,7 +335,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity | Entity[]> {
     options.allowUpdate = true;
     return this.readCreateOrUpdate(data, options);
   }
@@ -308,7 +346,7 @@ export abstract class OrmService<Entity> {
    */
   public async removeById(id: string): Promise<Entity> {
     const entity = await this.readById(id);
-    return this.remove(entity);
+    return this.remove(entity) as Promise<Entity>;
   }
 
   /**

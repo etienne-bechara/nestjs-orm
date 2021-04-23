@@ -164,7 +164,7 @@ export abstract class OrmController<Entity> {
   @Get(':id')
   public async getById(@Param('id') id: string): Promise<Entity> {
     await this.validateRequest({ method: 'GET:id' });
-    return this.entityService.readById(id);
+    return this.entityService.readByIdOrFail(id);
   }
 
   /**
@@ -175,7 +175,7 @@ export abstract class OrmController<Entity> {
   @Post()
   public async post(@Body() body: Entity): Promise<Entity> {
     await this.validateRequest({ method: 'POST', create: body });
-    return this.entityService.create(body);
+    return this.entityService.create(body) as Promise<Entity>;
   }
 
   /**
@@ -186,7 +186,7 @@ export abstract class OrmController<Entity> {
   @Put()
   public async put(@Body() body: Entity): Promise<Entity> {
     await this.validateRequest({ method: 'PUT', create: body });
-    return this.entityService.upsert(body);
+    return this.entityService.upsert(body) as Promise<Entity>;
   }
 
   /**
