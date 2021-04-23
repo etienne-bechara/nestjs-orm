@@ -26,7 +26,7 @@ export class StartupService {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // John, Jane and Robert
-      const [ john, jane, robert ] = await this.personService.createOrUpdate([
+      const [ john, jane, robert ] = await this.personService.readOrCreate([
         {
           name: 'John Doe',
           age: 15,
@@ -49,33 +49,33 @@ export class StartupService {
       ]);
 
       // Google has a headquarter and 2 branches
-      const googleHq = await this.companyService.createOrUpdate({
+      const googleHq = await this.companyService.upsertOne({
         name: 'GOOGLE LLC',
         capital: 123456789,
       });
 
-      await this.companyService.createOrUpdate([
+      await this.companyService.upsert([
         {
           name: 'FACEBOOK LLC',
           capital: 76543210,
-          employees: [ robert ] as any,
+          employees: [ robert ],
         },
         {
           name: 'GOOGLE BRASIL LTDA',
           headquarter: googleHq,
           capital: 987654,
-          employees: [ john, jane ] as any,
+          employees: [ john, jane ],
         },
         {
           name: 'GOOGLE MEXICO LTDA',
           headquarter: googleHq,
           capital: 765443,
-          employees: [ jane ] as any,
+          employees: [ jane ],
         },
       ]);
 
       // John has 3 contact methods
-      await this.contactService.createOrUpdate([
+      await this.contactService.upsert([
         {
           type: ContactType.EMAIL,
           value: 'john.doe@google.com',

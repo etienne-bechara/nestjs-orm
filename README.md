@@ -125,25 +125,30 @@ At this point, you may inject you `UserService` in any order provider and have i
 
 ```ts
 // Read entities
-read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]>;
-count(options: OrmReadParams<Entity>): Promise<number>;
-readById(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
-readByIdOrFail(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
-readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
-readUniqueOrFail(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity>;
-readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPaginatedResponse<Entity>>;
+read(): Promise<Entity[]>;
+count(): Promise<number>;
+readById(): Promise<Entity>;
+readByIdOrFail(): Promise<Entity>;
+readUnique(): Promise<Entity>;
+readUniqueOrFail(): Promise<Entity>;
+readAndCount(): Promise<OrmPaginatedResponse<Entity>>;
 
 // Create entities
-create(data: AnyEntity<Entity> | AnyEntity<Entity>[]): Promise<Entity | Entity[]>;
-readOrCreate(data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { }): Promise<Entity | Entity[]>;
+create(): Promise<Entity[]>;
+createOne(): Promise<Entity>;
+readOrCreate(): Promise<Entity[]>;
+readOrCreateOne(): Promise<Entity>;
 
 // Update entities
-update(entities: Entity | Entity[], data: AnyEntity<Entity> | AnyEntity<Entity>[]): Promise<Entity| Entity[]>;
-updateById(id: string, data: AnyEntity<Entity>): Promise<Entity>;
-createOrUpdate(data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { }): Promise<Entity | Entity[]>;
+update(): Promise<Entity[]>;
+updateOne(): Promise<Entity>;
+updateById(): Promise<Entity>;
+upsert(): Promise<Entity[]>;
+upsertOne(): Promise<Entity>;
 
 // Remove entities
-remove(entities: Entity | Entity[]): Promise<Entity| Entity[]>;
+remove(): Promise<Entity[]>;
+removeOne(): Promise<Entity>;
 removeById(id: string): Promise<Entity>;
 ```
 

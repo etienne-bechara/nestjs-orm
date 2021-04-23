@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Delete, Get, NotFoundException, Param, Patch, Post, Put, Query, UseInterceptors } from '@bechara/nestjs-core';
-import { AnyEntity } from '@mikro-orm/core';
+import { EntityData } from '@mikro-orm/core';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { unflatten } from 'flat';
@@ -173,9 +173,9 @@ export abstract class OrmController<Entity> {
    * @param body
    */
   @Post()
-  public async post(@Body() body: AnyEntity<Entity>): Promise<Entity> {
+  public async post(@Body() body: EntityData<Entity>): Promise<Entity> {
     await this.validateRequest({ method: 'POST', create: body });
-    return this.entityService.create(body);
+    return this.entityService.createOne(body);
   }
 
   /**
@@ -184,9 +184,9 @@ export abstract class OrmController<Entity> {
    * @param body
    */
   @Put()
-  public async put(@Body() body: AnyEntity<Entity>): Promise<Entity> {
+  public async put(@Body() body: EntityData<Entity>): Promise<Entity> {
     await this.validateRequest({ method: 'PUT', create: body });
-    return this.entityService.createOrUpdate(body);
+    return this.entityService.upsertOne(body);
   }
 
   /**
@@ -196,7 +196,7 @@ export abstract class OrmController<Entity> {
    * @param body
    */
   @Put(':id')
-  public async putById(@Param('id') id: string, @Body() body: AnyEntity<Entity>): Promise<Entity> {
+  public async putById(@Param('id') id: string, @Body() body: EntityData<Entity>): Promise<Entity> {
     await this.validateRequest({ method: 'PUT:id', create: body });
     return this.entityService.updateById(id, body);
   }
@@ -208,7 +208,7 @@ export abstract class OrmController<Entity> {
    * @param body
    */
   @Patch(':id')
-  public async patchById(@Param('id') id: string, @Body() body: AnyEntity<Entity>): Promise<Entity> {
+  public async patchById(@Param('id') id: string, @Body() body: EntityData<Entity>): Promise<Entity> {
     await this.validateRequest({ method: 'PATCH:id', update: body });
     return this.entityService.updateById(id, body);
   }

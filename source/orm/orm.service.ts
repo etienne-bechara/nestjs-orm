@@ -1,7 +1,7 @@
-/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable max-len */
 /* eslint-disable unicorn/no-fn-reference-in-iterator */
 import { BadRequestException, ConflictException, InternalServerErrorException, NotFoundException, NotImplementedException } from '@bechara/nestjs-core';
-import { AnyEntity, EntityRepository, FilterQuery } from '@mikro-orm/core';
+import { EntityData, EntityRepository, FilterQuery } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from './orm.enum';
 import { OrmPaginatedResponse, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpsertOptions } from './orm.interface';
@@ -17,7 +17,8 @@ export abstract class OrmService<Entity> {
   ) { }
 
   /**
-   * Wrapper responsible for all SELECT operations.
+   * Read entities matching given criteria, allowing pagination
+   * and population options.
    * @param params
    * @param options
    */
@@ -51,7 +52,7 @@ export abstract class OrmService<Entity> {
   }
 
   /**
-   * Wrapper responsible for all COUNT operations.
+   * Count entities matching given criteria.
    * @param options
    */
   public async count(options: OrmReadParams<Entity>): Promise<number> {
@@ -68,8 +69,7 @@ export abstract class OrmService<Entity> {
   }
 
   /**
-   * Reads a single entity by its ID.
-   * Obeys a custom default populate different than default.
+   * Read a single entity by its ID.
    * @param id
    * @param options
    */
@@ -111,26 +111,23 @@ export abstract class OrmService<Entity> {
 
   /**
    * Read a supposedly unique entity, throws an exception
-   * if not found or if matches more than one.
+   * if matching more than one or if not found.
    * @param params
    * @param options
    */
-  public async readUniqueOrFail(
-    params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
-  ): Promise<Entity> {
+  public async readUniqueOrFail(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     options.findOrFail = true;
     return this.readUnique(params, options);
   }
 
   /**
    * Read and count all entities that matches given criteria.
-   * Returns an object continuing limit, offset, count and results.
+   * Returns an object containing sort and order criteria,
+   * limit, offset, count and records themselves.
    * @param params
    * @param options
    */
-  public async readAndCount(
-    params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
-  ): Promise<OrmPaginatedResponse<Entity>> {
+  public async readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPaginatedResponse<Entity>> {
     options.sort ??= 'updated';
     options.order ??= OrmQueryOrder.DESC;
     options.limit ||= 100;
@@ -147,13 +144,14 @@ export abstract class OrmService<Entity> {
   }
 
   /**
-   * Wrapper responsible for all INSERT operations.
+   * Create multiple entities based on provided data.
    * @param data
-   * @param options
    */
-  public async create(data: AnyEntity<Entity>): Promise<Entity>
-  public async create(data: AnyEntity<Entity>[]): Promise<Entity[]>
-  public async create(data: AnyEntity<Entity> | AnyEntity<Entity>[]): Promise<Entity | Entity[]> {
+  public async create(data: EntityData<Entity>): Promise<Entity[]> {
+    if (Array.isArray(data) && data.length > 0 && this.serviceOptions.disableBatchCreate) {
+      throw new NotImplementedException('creating multiple entities is disabled');
+    }
+
     const dataArray = Array.isArray(data) ? data : [ data ];
     const newEntities = dataArray.map((d) => this.entityRepository.create(d));
 
@@ -164,20 +162,29 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, newEntities);
     }
 
-    return Array.isArray(data) ? newEntities : newEntities[0];
+    return newEntities;
   }
 
   /**
-   * Wrapper responsible for all UPDATE operations.
+   * Create a single entity based on provided data.
+   * @param data
+   */
+  public async createOne(data: EntityData<Entity>): Promise<Entity> {
+    const [ createdEntity ] = await this.create(data);
+    return createdEntity;
+  }
+
+  /**
+   * Update target entities based on provided data.
+   * In canse of multiple, target amount must match data amount.
    * @param entities
    * @param data
-   * @param options
    */
-  public async update(entity: Entity, data: AnyEntity<Entity>): Promise<Entity>;
-  public async update(entities: Entity[], data: AnyEntity<Entity>[]): Promise<Entity[]>;
-  public async update(
-    entities: Entity | Entity[], data: AnyEntity<Entity> | AnyEntity<Entity>[],
-  ): Promise<Entity| Entity[]> {
+  public async update(entities: Entity | Entity[], data: EntityData<Entity>): Promise<Entity[]> {
+    if (Array.isArray(entities) && entities.length > 0 && this.serviceOptions.disableBatchUpdate) {
+      throw new NotImplementedException('updating multiple entities is disabled');
+    }
+
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     const dataArray = Array.isArray(data) ? data : [ data ];
     const updatedEntities = entityArray.map((e, i) => this.entityRepository.assign(e, dataArray[i]));
@@ -197,38 +204,45 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, entities);
     }
 
-    return Array.isArray(entities) ? updatedEntities : updatedEntities[0];
+    return updatedEntities;
   }
 
   /**
-   * Updates a singles entity by its id with plain data
-   * and return the updated object.
+   * Update a singles entity by its ID.
    * @param id
    * @param data
    */
-  public async updateById(id: string, data: AnyEntity<Entity>): Promise<Entity> {
+  public async updateById(id: string, data: EntityData<Entity>): Promise<Entity> {
     const target = await this.readById(id);
-    return this.update(target, data);
+    const updatedEntity = await this.update(target, data);
+    return updatedEntity[0];
+  }
+
+  /**
+   * Updates a single entity based on provided data.
+   * @param entity
+   * @param data
+   */
+  public async updateOne(entity: Entity[], data: EntityData<Entity>): Promise<Entity> {
+    const [ updatedEntity ] = await this.update(entity, data);
+    return updatedEntity;
   }
 
   /**
    * Read, create or update according to provided constraints.
+   * An unique key must be specified either at service or method options.
    * @param data
    * @param options
    */
-  private async readCreateOrUpdate(data: AnyEntity<Entity>, options?: OrmUpsertOptions): Promise<Entity>;
-  private async readCreateOrUpdate(data: AnyEntity<Entity>[], options?: OrmUpsertOptions): Promise<Entity[]>;
-  private async readCreateOrUpdate(
-    data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { },
-  ): Promise<Entity | Entity[]> {
+  private async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity[]> {
     const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
     const dataArray = Array.isArray(data) ? data : [ data ];
     const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
 
     const existingEntities: Entity[] = [ ];
     const updateTargets: Entity[] = [ ];
-    const updateData: AnyEntity<Entity>[] = [ ];
-    const createData: AnyEntity<Entity>[] = [ ];
+    const updateData: EntityData<Entity>[] = [ ];
+    const createData: EntityData<Entity>[] = [ ];
 
     for (const dataItem of dataArray) {
       const populate = [ ];
@@ -276,7 +290,7 @@ export abstract class OrmService<Entity> {
     catch (e) {
       if (options.disallowRetry) throw e;
       options.disallowRetry = true;
-      return this.readCreateOrUpdate(data as any, options);
+      return this.readCreateOrUpdate(data, options);
     }
 
     const updatedEntities = await this.update(updateTargets, updateData);
@@ -289,46 +303,62 @@ export abstract class OrmService<Entity> {
       }
     });
 
-    return Array.isArray(data) ? resultEntities : resultEntities[0];
+    return resultEntities;
   }
 
   /**
-   * Based on incoming data and a unique key,
-   * create a new entity or returns matching one.
+   * Read or create multiple entities based on provided data.
+   * An unique key must be specified either at service or method options.
    * @param data
    * @param options
    */
-  public async readOrCreate(data: AnyEntity<Entity>, options?: OrmUpsertOptions): Promise<Entity>;
-  public async readOrCreate(data: AnyEntity<Entity>[], options?: OrmUpsertOptions): Promise<Entity[]>;
-  public async readOrCreate(
-    data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { },
-  ): Promise<Entity | Entity[]> {
+  public async readOrCreate(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity[]> {
     options.allowUpdate = false;
-    return this.readCreateOrUpdate(data as any, options);
+    return this.readCreateOrUpdate(data, options);
   }
 
   /**
-   * Based on incoming data and a unique key,
-   * create a new entity or update matching one.
+   * Read or create a single entity based on provided data.
+   * An unique key must be specified either at service or method options.
    * @param data
    * @param options
    */
-  public async createOrUpdate(data: AnyEntity<Entity>, options?: OrmUpsertOptions): Promise<Entity>;
-  public async createOrUpdate(data: AnyEntity<Entity>[], options?: OrmUpsertOptions): Promise<Entity[]>;
-  public async createOrUpdate(
-    data: AnyEntity<Entity> | AnyEntity<Entity>[], options: OrmUpsertOptions = { },
-  ): Promise<Entity | Entity[]> {
-    options.allowUpdate = true;
-    return this.readCreateOrUpdate(data as any, options);
+  public async readOrCreateOne(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity> {
+    const [ entity ] = await this.readOrCreate(data, options);
+    return entity;
   }
 
   /**
-   * Wrapper responsible for all DELETE operations.
+   * Creates or updates multiple entities based on provided data.
+   * An unique key must be specified either at service or method options.
+   * @param data
+   * @param options
+   */
+  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity[]> {
+    options.allowUpdate = true;
+    return this.readCreateOrUpdate(data, options);
+  }
+
+  /**
+   * Creates or updates a single entity  based on provided data.
+   * An unique key must be specified either at service or method options.
+   * @param data
+   * @param options
+   */
+  public async upsertOne(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity> {
+    const [ entity ] = await this.upsert(data, options);
+    return entity;
+  }
+
+  /**
+   * Remove target entities.
    * @param entities
    */
-  public async remove(entity: Entity): Promise<Entity>;
-  public async remove(entities: Entity[]): Promise<Entity[]>;
-  public async remove(entities: Entity | Entity[]): Promise<Entity| Entity[]> {
+  public async remove(entities: Entity | Entity[]): Promise<Entity[]> {
+    if (Array.isArray(entities) && this.serviceOptions.disableBatchRemove) {
+      throw new NotImplementedException('removing multiple entities is disabled');
+    }
+
     try {
       await this.entityRepository.removeAndFlush(entities);
     }
@@ -336,23 +366,33 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, entities);
     }
 
-    return entities;
+    return Array.isArray(entities) ? entities : [ entities ];
   }
 
   /**
-   * Removes a single entity by its id.
+   * Remove a single entity by its ID.
    * @param id
    */
   public async removeById(id: string): Promise<Entity> {
     const entity = await this.readById(id);
-    return this.remove(entity);
+    await this.remove(entity);
+    return entity;
+  }
+
+  /**
+   * Remove a single entity.
+   * @param entity
+   */
+  public async removeOne(entity: Entity): Promise<Entity> {
+    const [ removedEntity ] = await this.remove(entity);
+    return removedEntity;
   }
 
   /**
    * Returns provided unique key or default (whichever is valid).
    * @param uniqueKey
    */
-  private getValidUniqueKey(uniqueKey?: string[]): string[] {
+  protected getValidUniqueKey(uniqueKey?: string[]): string[] {
     const defaultKey = this.serviceOptions.uniqueKey;
     let validKey: string[];
 
@@ -372,11 +412,11 @@ export abstract class OrmService<Entity> {
   }
 
   /**
-   * Handles all query exceptions.
+   * Handle all query exceptions.
    * @param e
    * @param data
    */
-  protected queryExceptionHandler(e: Error, data?: AnyEntity<Entity> | any): void {
+  protected queryExceptionHandler(e: Error, data?: EntityData<Entity> | any): void {
     if (/duplicate entry/gi.test(e.message)) {
       const violation = /entry '(.+?)' for/gi.exec(e.message);
       throw new ConflictException({
