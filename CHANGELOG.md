@@ -1,3 +1,10 @@
+## [2.5.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.2...v2.5.3) (2021-04-23)
+
+
+### Bug Fixes
+
+* allow auto refresh after upsert ([5269392](https://github.com/etienne-bechara/nestjs-orm/commit/526939273d768c32493d80e8f22616a056839b9a))
+
 ## [2.5.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.1...v2.5.2) (2021-04-23)
 
 
