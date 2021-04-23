@@ -176,7 +176,7 @@ export abstract class OrmService<Entity> {
 
   /**
    * Update target entities based on provided data.
-   * In canse of multiple, target amount must match data amount.
+   * In cane of multiple, target amount must match data amount.
    * @param entities
    * @param data
    */
@@ -187,7 +187,6 @@ export abstract class OrmService<Entity> {
 
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     const dataArray = Array.isArray(data) ? data : [ data ];
-    const updatedEntities = entityArray.map((e, i) => this.entityRepository.assign(e, dataArray[i]));
 
     if (entityArray.length !== dataArray.length) {
       throw new InternalServerErrorException({
@@ -196,6 +195,19 @@ export abstract class OrmService<Entity> {
         dataArray,
       });
     }
+
+    // Before assignment, ensure collections were populated
+    const updatedEntities = await Promise.all(
+      entityArray.map(async (entity, i) => {
+        for (const key in entity as any) {
+          if (dataArray[i]?.[key] && entity[key]?.isInitialized && !entity[key].isInitialized()) {
+            await entity[key].init();
+          }
+        }
+
+        return this.entityRepository.assign(entity, dataArray[i]);
+      }),
+    );
 
     try {
       await this.entityRepository.persistAndFlush(updatedEntities);
