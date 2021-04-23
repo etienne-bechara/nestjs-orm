@@ -1,3 +1,11 @@
+# [2.3.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.7...v2.3.0) (2021-04-23)
+
+
+### Features
+
+* increase query performance and add fail option ([97324eb](https://github.com/etienne-bechara/nestjs-orm/commit/97324eb6df9bfac786f362d84c70c3e3191f26e4))
+* support multiple entities at create, update and remove ([9238341](https://github.com/etienne-bechara/nestjs-orm/commit/92383415d71fe6b9785e353bdc3f81a72a820dc3))
+
 ## [2.2.7](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.6...v2.2.7) (2021-04-21)
 
 
