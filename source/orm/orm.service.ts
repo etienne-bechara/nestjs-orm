@@ -4,7 +4,7 @@ import { BadRequestException, ConflictException, InternalServerErrorException, N
 import { EntityData, EntityRepository, FilterQuery } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from './orm.enum';
-import { OrmPaginatedResponse, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpsertOptions } from './orm.interface';
+import { OrmCreateOptions, OrmPaginatedResponse, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpsertOptions } from './orm.interface';
 
 /**
  * Creates an abstract service tied with a repository.
@@ -15,6 +15,30 @@ export abstract class OrmService<Entity> {
     private readonly entityRepository: EntityRepository<Entity>,
     protected readonly serviceOptions: OrmServiceOptions<Entity> = { },
   ) { }
+
+  /**
+   * Update target entities according to configuration.
+   * @param entities
+   * @param options
+   */
+  public async refresh(entities: Entity[], options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
+    const entityIds = entities.map((e) => e['id']);
+    const orderedEntities: Entity[] = [ ];
+
+    const refreshedEntities = await this.read(entityIds, options);
+
+    for (const id of entityIds) {
+      for (const [ index, entity ] of refreshedEntities.entries()) {
+        if (entity['id'] === id) {
+          orderedEntities.push(entity);
+          refreshedEntities.splice(index, 1);
+          continue;
+        }
+      }
+    }
+
+    return orderedEntities;
+  }
 
   /**
    * Read entities matching given criteria, allowing pagination
@@ -146,8 +170,9 @@ export abstract class OrmService<Entity> {
   /**
    * Create multiple entities based on provided data.
    * @param data
+   * @param options
    */
-  public async create(data: EntityData<Entity>): Promise<Entity[]> {
+  public async create(data: EntityData<Entity>, options: OrmCreateOptions = { }): Promise<Entity[]> {
     if (Array.isArray(data) && data.length > 0 && this.serviceOptions.disableBatchCreate) {
       throw new NotImplementedException('creating multiple entities is disabled');
     }
@@ -162,15 +187,18 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, newEntities);
     }
 
-    return newEntities;
+    return options.disableRefresh
+      ? newEntities
+      : this.refresh(newEntities);
   }
 
   /**
    * Create a single entity based on provided data.
    * @param data
+   * @param options
    */
-  public async createOne(data: EntityData<Entity>): Promise<Entity> {
-    const [ createdEntity ] = await this.create(data);
+  public async createOne(data: EntityData<Entity>, options: OrmCreateOptions = { }): Promise<Entity> {
+    const [ createdEntity ] = await this.create(data, options);
     return createdEntity;
   }
 
@@ -179,8 +207,9 @@ export abstract class OrmService<Entity> {
    * In cane of multiple, target amount must match data amount.
    * @param entities
    * @param data
+   * @param options
    */
-  public async update(entities: Entity | Entity[], data: EntityData<Entity>): Promise<Entity[]> {
+  public async update(entities: Entity | Entity[], data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity[]> {
     if (Array.isArray(entities) && entities.length > 0 && this.serviceOptions.disableBatchUpdate) {
       throw new NotImplementedException('updating multiple entities is disabled');
     }
@@ -216,17 +245,20 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, entities);
     }
 
-    return updatedEntities;
+    return options.disableRefresh
+      ? updatedEntities
+      : this.refresh(updatedEntities);
   }
 
   /**
    * Update a singles entity by its ID.
    * @param id
    * @param data
+   * @param options
    */
-  public async updateById(id: string, data: EntityData<Entity>): Promise<Entity> {
+  public async updateById(id: string, data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity> {
     const target = await this.readById(id);
-    const updatedEntity = await this.update(target, data);
+    const updatedEntity = await this.update(target, data, options);
     return updatedEntity[0];
   }
 
@@ -234,9 +266,10 @@ export abstract class OrmService<Entity> {
    * Updates a single entity based on provided data.
    * @param entity
    * @param data
+   * @param options
    */
-  public async updateOne(entity: Entity, data: EntityData<Entity>): Promise<Entity> {
-    const [ updatedEntity ] = await this.update(entity, data);
+  public async updateOne(entity: Entity, data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity> {
+    const [ updatedEntity ] = await this.update(entity, data, options);
     return updatedEntity;
   }
 
@@ -297,15 +330,15 @@ export abstract class OrmService<Entity> {
     let createdEntities: Entity[];
 
     try {
-      createdEntities = await this.create(createData);
+      createdEntities = await this.create(createData, options);
     }
     catch (e) {
-      if (options.disallowRetry) throw e;
-      options.disallowRetry = true;
+      if (options.disableRetry) throw e;
+      options.disableRetry = true;
       return this.readCreateOrUpdate(data, options);
     }
 
-    const updatedEntities = await this.update(updateTargets, updateData);
+    const updatedEntities = await this.update(updateTargets, updateData, options);
 
     const resultEntities = resultMap.map((i) => {
       switch (i.target) {
