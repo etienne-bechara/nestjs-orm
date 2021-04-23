@@ -123,17 +123,15 @@ export class UserService extends OrmService<UserEntity> {
 
 At this point, you may inject you `UserService` in any order provider and have its methods available to you:
 ```ts
-readById(id: string, options: OrmReadOptions<Entity> = { }): Entity
-
-readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Entity
-
-readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): OrmPaginatedResponse<Entity>
-
-updateById(id: string, data: EntityData<Entity>): Entity
-
-resert(data: EntityData<Entity>, uniqueKey?: string[]): Entity 
-
-upsert(data: EntityData<Entity>, uniqueKey?: string[]): Entity
+readById(id: string, options: OrmReadOptions<Entity> = { }): Entity;
+readByIdOrFail(id: string, options: OrmReadOptions<Entity> = { }): Entity;
+readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Entity;
+readUniqueOrFail(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Entity;
+readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): OrmPaginatedResponse<Entity>;
+updateById(id: string, data: EntityData<Entity>): Entity;
+removeById(id: string): Entity;
+resert(data: EntityData<Entity>, uniqueKey?: string[]): Entity;
+upsert(data: EntityData<Entity>, uniqueKey?: string[]): Entity;
 ```
 
 ### Creating an Entity Controller

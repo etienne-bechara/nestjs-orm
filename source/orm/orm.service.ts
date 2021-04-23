@@ -21,11 +21,11 @@ export abstract class OrmService<Entity> {
    * Returns provided unique key or default (whichever is valid).
    * @param uniqueKey
    */
-  private getValidUniqueKey(uniqueKey: string[]): string[] {
+  private getValidUniqueKey(uniqueKey?: string[]): string[] {
     const defaultKey = this.serviceOptions.uniqueKey;
     let validKey: string[];
 
-    if (Array.isArray(uniqueKey) && uniqueKey.length > 0) {
+    if (uniqueKey && Array.isArray(uniqueKey) && uniqueKey.length > 0) {
       validKey = uniqueKey;
     }
 
@@ -54,15 +54,20 @@ export abstract class OrmService<Entity> {
       options.orderBy = { [options.sort]: options.order };
     }
 
-    if (typeof params === 'string') {
-      params = { id: params };
-    }
+    const findParams = typeof params === 'string'
+      ? { id: params }
+      : params;
 
     try {
-      entities = await this.entityRepository.find(params, options);
+      entities = await this.entityRepository.find(findParams, options);
     }
     catch (e) {
       this.queryExceptionHandler(e, entities);
+    }
+
+    if (options.findOrFail) {
+      const entityError = typeof params === 'string' ? 'id' : 'params';
+      throw new NotFoundException(`entity with given ${entityError} does not exist`);
     }
 
     return Array.isArray(entities) ? entities : [ ];
@@ -70,13 +75,13 @@ export abstract class OrmService<Entity> {
 
   /**
    * Wrapper responsible for all COUNT operations.
-   * @param params
+   * @param options
    */
-  public async count(params: OrmReadParams<Entity>): Promise<number> {
+  public async count(options: OrmReadParams<Entity>): Promise<number> {
     let count: number;
 
     try {
-      count = await this.entityRepository.count(params as FilterQuery<Entity>);
+      count = await this.entityRepository.count(options as FilterQuery<Entity>);
     }
     catch (e) {
       this.queryExceptionHandler(e);
@@ -88,8 +93,9 @@ export abstract class OrmService<Entity> {
   /**
    * Wrapper responsible for all INSERT operations.
    * @param data
+   * @param options
    */
-  public async create(data: EntityData<Entity>): Promise<Entity> {
+  public async create(data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
     const newEntity = this.entityRepository.create(data);
 
     try {
@@ -99,15 +105,18 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, newEntity);
     }
 
-    return this.readById(newEntity['id']);
+    return options
+      ? this.readById(newEntity['id'], options)
+      : newEntity;
   }
 
   /**
    * Wrapper responsible for all UPDATE operations.
    * @param entity
    * @param data
+   * @param options
    */
-  public async update(entity: Entity, data: EntityData<Entity>): Promise<Entity> {
+  public async update(entity: Entity, data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
     const updatedEntity = this.entityRepository.assign(entity, data);
 
     try {
@@ -117,7 +126,9 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, entity);
     }
 
-    return this.readById(entity['id']);
+    return options
+      ? this.readById(updatedEntity['id'], options)
+      : updatedEntity;
   }
 
   /**
@@ -143,26 +154,28 @@ export abstract class OrmService<Entity> {
    */
   public async readById(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     options.populate = options.populate || this.serviceOptions.populateById;
-    const entity = await this.read(id, options);
-
-    if (!entity[0]) {
-      throw new NotFoundException('entity with given id does not exist');
-    }
-
-    return entity[0];
+    const entities = await this.read(id, options);
+    return entities[0];
   }
 
   /**
-   * Read a supposedly unique entity, throws an exception if either none or more than one.
+   * Reads a single entity by its ID, fails if inexistent.
+   * @param id
+   * @param options
+   */
+  public async readByIdOrFail(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
+    options.findOrFail = true;
+    return this.readById(id, options);
+  }
+
+  /**
+   * Read a supposedly unique entity, throws an exception
+   * if matching more than one.
    * @param params
    * @param options
    */
   public async readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     const entities = await this.read(params, options);
-
-    if (entities.length === 0) {
-      throw new NotFoundException('entity with given constraints does not exist');
-    }
 
     if (entities.length > 1) {
       throw new ConflictException({
@@ -176,6 +189,19 @@ export abstract class OrmService<Entity> {
   }
 
   /**
+   * Read a supposedly unique entity, throws an exception
+   * if not found or if matches more than one.
+   * @param params
+   * @param options
+   */
+  public async readUniqueOrFail(
+    params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
+  ): Promise<Entity> {
+    options.findOrFail = true;
+    return this.readUnique(params, options);
+  }
+
+  /**
    * Read and count all entities that matches given criteria.
    * Returns an object continuing limit, offset, count and results.
    * @param params
@@ -184,10 +210,10 @@ export abstract class OrmService<Entity> {
   public async readAndCount(
     params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
   ): Promise<OrmPaginatedResponse<Entity>> {
-    options.limit ||= 100;
-    options.offset ||= 0;
     options.sort ??= 'updated';
     options.order ??= OrmQueryOrder.DESC;
+    options.limit ||= 100;
+    options.offset ??= 0;
 
     return {
       sort: options.sort,
@@ -204,10 +230,11 @@ export abstract class OrmService<Entity> {
    * and return the updated object.
    * @param id
    * @param data
+   * @param options
    */
-  public async updateById(id: string, data: EntityData<Entity>): Promise<Entity> {
+  public async updateById(id: string, data: EntityData<Entity>, options?: OrmReadOptions<Entity>): Promise<Entity> {
     const target = await this.readById(id);
-    return this.update(target, data);
+    return this.update(target, data, options);
   }
 
   /**
@@ -215,7 +242,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity> {
+  public async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions<Entity>): Promise<Entity> {
     const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
     const clause = { };
 
@@ -223,7 +250,7 @@ export abstract class OrmService<Entity> {
       clause[key] = data[key];
     }
 
-    const matchingEntities = await this.read(clause);
+    const matchingEntities = await this.read(clause, { populate: [ ] });
 
     // Conflict (error)
     if (matchingEntities.length > 1) {
@@ -237,13 +264,13 @@ export abstract class OrmService<Entity> {
     // Match (create or update)
     if (matchingEntities.length === 1) {
       return options.allowUpdate
-        ? this.update(matchingEntities[0], data)
+        ? this.update(matchingEntities[0], data, options)
         : matchingEntities[0];
     }
 
     // Missing (create)
     try {
-      const newEntity = await this.create(data);
+      const newEntity = await this.create(data, options);
       return newEntity;
     }
     catch (e) {
@@ -257,20 +284,22 @@ export abstract class OrmService<Entity> {
    * Based on incoming data and a unique key,
    * create a new entity or returns matching one.
    * @param data
-   * @param uniqueKey
+   * @param options
    */
-  public async resert(data: EntityData<Entity>, uniqueKey?: string[]): Promise<Entity> {
-    return this.readCreateOrUpdate(data, { uniqueKey });
+  public async resert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+    options.allowUpdate = false;
+    return this.readCreateOrUpdate(data, options);
   }
 
   /**
    * Based on incoming data and a unique key,
    * create a new entity or update matching one.
    * @param data
-   * @param uniqueKey
+   * @param options
    */
-  public async upsert(data: EntityData<Entity>, uniqueKey?: string[]): Promise<Entity> {
-    return this.readCreateOrUpdate(data, { uniqueKey, allowUpdate: true });
+  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+    options.allowUpdate = true;
+    return this.readCreateOrUpdate(data, options);
   }
 
   /**
@@ -315,8 +344,7 @@ export abstract class OrmService<Entity> {
     }
 
     throw new InternalServerErrorException({
-      message: 'failed to execute query statement',
-      query: e.message,
+      message: e.message,
       data,
     });
   }
