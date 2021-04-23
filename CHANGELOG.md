@@ -1,3 +1,15 @@
+# [2.4.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.3.0...v2.4.0) (2021-04-23)
+
+
+### Bug Fixes
+
+* interface for multiple entities handling ([a7e9c01](https://github.com/etienne-bechara/nestjs-orm/commit/a7e9c01d1e01d4010d0e65c4ad203e5e7fdf6aa1))
+
+
+### Features
+
+* improve array support ([846509c](https://github.com/etienne-bechara/nestjs-orm/commit/846509c1c121d064d558da4e814388a07327a5b6))
+
 # [2.3.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.2.7...v2.3.0) (2021-04-23)
 
 
