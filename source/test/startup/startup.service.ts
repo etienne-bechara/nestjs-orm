@@ -23,55 +23,58 @@ export class StartupService {
    */
   private async createBaseEntities(): Promise<void> {
     try {
+      // John
+      const john = await this.personService.upsert({
+        name: 'John Doe',
+        age: 30,
+        height: 179.5,
+        weight: 76.4,
+        preferences: { color: 'blue' },
+      });
+
+      // Jane
+      const jane = await this.personService.upsert({
+        name: 'Jane Doe',
+        age: 27,
+        height: 164.3,
+        weight: 63.8,
+      });
+
+      // Robert
+      const robert = await this.personService.upsert({
+        name: 'Robert Doe',
+        age: 34,
+        height: 172.9,
+        weight: 87.1,
+      });
+
       // Google has a headquarter and 2 branches
       const googleHq = await this.companyService.upsert({
         name: 'GOOGLE LLC',
         capital: 123456789,
       });
 
-      const googleBrazil = await this.companyService.upsert({
+      // John and Jane work at Google Brazil
+      await this.companyService.upsert({
         name: 'GOOGLE BRASIL LTDA',
         headquarter: googleHq,
         capital: 987654,
+        employees: [ john, jane ] as any,
       });
 
-      const googleMexico = await this.companyService.upsert({
+      // Jane also works at Google Mexico
+      await this.companyService.upsert({
         name: 'GOOGLE MEXICO LTDA',
         headquarter: googleHq,
         capital: 765443,
+        employees: [ jane ] as any,
       });
 
-      // Facebook has no relationships
-      const facebook = await this.companyService.upsert({
+      // Robert works at Facebook
+      await this.companyService.upsert({
         name: 'FACEBOOK LLC',
         capital: 76543210,
-      });
-
-      // John works for Google and Facebook
-      const john = await this.personService.upsert({
-        name: 'John Doe',
-        age: 30,
-        height: 179.5,
-        weight: 76.4,
-        employers: [ googleBrazil, facebook ],
-        preferences: { color: 'blue' },
-      });
-
-      // Jane works for Google
-      const jane = await this.personService.upsert({
-        name: 'Jane Doe',
-        age: 27,
-        height: 164.3,
-        weight: 63.8,
-        employers: [ googleMexico ],
-      });
-
-      // Robert is unemployed
-      await this.personService.upsert({
-        name: 'Robert Doe',
-        age: 34,
-        height: 172.9,
-        weight: 87.1,
+        employees: [ robert ] as any,
       });
 
       // John has 3 contact methods
