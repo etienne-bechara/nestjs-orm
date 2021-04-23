@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.0...v2.5.1) (2021-04-23)
+
+
+### Bug Fixes
+
+* update one entity type ([28dc180](https://github.com/etienne-bechara/nestjs-orm/commit/28dc1806b51326c6bdfee5dbd3f2bc8c22f84f93))
+
 # [2.5.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.4.0...v2.5.0) (2021-04-23)
 
 
