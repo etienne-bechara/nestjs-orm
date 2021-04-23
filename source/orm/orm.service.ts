@@ -4,7 +4,7 @@ import { BadRequestException, ConflictException, InternalServerErrorException, N
 import { EntityData, EntityRepository, FilterQuery } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from './orm.enum';
-import { OrmCreateOptions, OrmPaginatedResponse, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpsertOptions } from './orm.interface';
+import { OrmCreateOptions, OrmPaginatedResponse, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from './orm.interface';
 
 /**
  * Creates an abstract service tied with a repository.
@@ -205,36 +205,26 @@ export abstract class OrmService<Entity> {
   /**
    * Update target entities based on provided data.
    * In cane of multiple, target amount must match data amount.
-   * @param entities
-   * @param data
+   * @param params
    * @param options
    */
-  public async update(entities: Entity | Entity[], data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity[]> {
-    if (Array.isArray(entities) && entities.length > 0 && this.serviceOptions.disableBatchUpdate) {
+  public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions = { }): Promise<Entity[]> {
+    if (Array.isArray(params) && params.length > 0 && this.serviceOptions.disableBatchUpdate) {
       throw new NotImplementedException('updating multiple entities is disabled');
     }
 
-    const entityArray = Array.isArray(entities) ? entities : [ entities ];
-    const dataArray = Array.isArray(data) ? data : [ data ];
-
-    if (entityArray.length !== dataArray.length) {
-      throw new InternalServerErrorException({
-        message: 'failed to map entities to update data',
-        entityArray,
-        dataArray,
-      });
-    }
+    const paramsArray = Array.isArray(params) ? params : [ params ];
 
     // Before assignment, ensure collections were populated
     const updatedEntities = await Promise.all(
-      entityArray.map(async (entity, i) => {
+      paramsArray.map(async ({ entity, data }) => {
         for (const key in entity as any) {
-          if (dataArray[i]?.[key] && entity[key]?.isInitialized && !entity[key].isInitialized()) {
+          if (data?.[key] && entity[key]?.isInitialized && !entity[key].isInitialized()) {
             await entity[key].init();
           }
         }
 
-        return this.entityRepository.assign(entity, dataArray[i]);
+        return this.entityRepository.assign(entity, data);
       }),
     );
 
@@ -242,7 +232,7 @@ export abstract class OrmService<Entity> {
       await this.entityRepository.persistAndFlush(updatedEntities);
     }
     catch (e) {
-      this.queryExceptionHandler(e, entities);
+      this.queryExceptionHandler(e, params);
     }
 
     return options.disableRefresh
@@ -257,8 +247,8 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async updateById(id: string, data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity> {
-    const target = await this.readById(id);
-    const updatedEntity = await this.update(target, data, options);
+    const entity = await this.readById(id);
+    const updatedEntity = await this.update({ entity, data }, options);
     return updatedEntity[0];
   }
 
@@ -269,7 +259,7 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async updateOne(entity: Entity, data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity> {
-    const [ updatedEntity ] = await this.update(entity, data, options);
+    const [ updatedEntity ] = await this.update({ entity, data }, options);
     return updatedEntity;
   }
 
@@ -285,8 +275,7 @@ export abstract class OrmService<Entity> {
     const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
 
     const existingEntities: Entity[] = [ ];
-    const updateTargets: Entity[] = [ ];
-    const updateData: EntityData<Entity>[] = [ ];
+    const updateParams: OrmUpdateParams<Entity>[] = [ ];
     const createData: EntityData<Entity>[] = [ ];
 
     for (const dataItem of dataArray) {
@@ -310,9 +299,8 @@ export abstract class OrmService<Entity> {
       // Match (create or update)
       if (matchingEntities.length === 1) {
         if (options.allowUpdate) {
-          resultMap.push({ index: updateTargets.length, target: 'update' });
-          updateTargets.push(matchingEntities[0]);
-          updateData.push(dataItem);
+          resultMap.push({ index: updateParams.length, target: 'update' });
+          updateParams.push({ entity: matchingEntities[0], data: dataItem });
         }
         else {
           resultMap.push({ index: existingEntities.length, target: 'read' });
@@ -338,7 +326,7 @@ export abstract class OrmService<Entity> {
       return this.readCreateOrUpdate(data, options);
     }
 
-    const updatedEntities = await this.update(updateTargets, updateData, options);
+    const updatedEntities = await this.update(updateParams, options);
 
     const resultEntities = resultMap.map((i) => {
       switch (i.target) {

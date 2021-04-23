@@ -7,5 +7,6 @@ export * from './orm.read.params';
 export * from './orm.request.validation';
 export * from './orm.service.options';
 export * from './orm.update.options';
+export * from './orm.update.params';
 export * from './orm.upsert.options';
 export * from './orm.validation.data';
