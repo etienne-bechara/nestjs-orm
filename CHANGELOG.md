@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.1...v2.5.2) (2021-04-23)
+
+
+### Bug Fixes
+
+* populate collections before update diff ([41a67e8](https://github.com/etienne-bechara/nestjs-orm/commit/41a67e8cdb31f2eee6893faae3ae6f92e9f94897))
+
 ## [2.5.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.0...v2.5.1) (2021-04-23)
 
 
