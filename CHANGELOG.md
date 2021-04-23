@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.4.0...v2.5.0) (2021-04-23)
+
+
+### Bug Fixes
+
+* change query logging to trace level ([c420bc5](https://github.com/etienne-bechara/nestjs-orm/commit/c420bc5b98b3e8c3fb497e1da2b59375a18eee4c))
+
+
+### Features
+
+* update methods to diferentitate batch operations from single ([b370b7d](https://github.com/etienne-bechara/nestjs-orm/commit/b370b7d74636c9efc1086acd5ba7adb355d7bdaa))
+
 # [2.4.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.3.0...v2.4.0) (2021-04-23)
 
 
