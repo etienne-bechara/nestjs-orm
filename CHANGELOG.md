@@ -1,3 +1,10 @@
+## [2.6.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.6.0...v2.6.1) (2021-04-24)
+
+
+### Bug Fixes
+
+* hook accessibility ([d563679](https://github.com/etienne-bechara/nestjs-orm/commit/d56367961184e6943da82d698d04b9decc724762))
+
 # [2.6.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.4...v2.6.0) (2021-04-24)
 
 
