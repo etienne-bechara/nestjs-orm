@@ -1,3 +1,10 @@
+## [2.6.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.6.1...v2.6.2) (2021-04-24)
+
+
+### Bug Fixes
+
+* separate population options from service and controller ([840ea0b](https://github.com/etienne-bechara/nestjs-orm/commit/840ea0b0fe1961109bbe26fbed0a6fb38f71c339))
+
 ## [2.6.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.6.0...v2.6.1) (2021-04-24)
 
 
