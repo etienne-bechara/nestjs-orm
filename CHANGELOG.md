@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.4...v2.6.0) (2021-04-24)
+
+
+### Features
+
+* add hook functionality ([6327264](https://github.com/etienne-bechara/nestjs-orm/commit/6327264b289740b965d846718085eac2eb711e22))
+
 ## [2.5.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.3...v2.5.4) (2021-04-23)
 
 
