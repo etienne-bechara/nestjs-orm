@@ -14,6 +14,7 @@ export class PersonController extends OrmController<PersonEntity> {
     super(userService, {
       methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
       dto: { read: PersonReadDto, create: PersonCreateDto, update: PersonUpdateDto },
+      populate: [ 'contacts', 'employers.headquarter' ],
     });
   }
 

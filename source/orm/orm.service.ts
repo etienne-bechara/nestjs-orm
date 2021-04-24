@@ -62,7 +62,7 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    options.populate ??= this.serviceOptions.populate;
+    options.populate ??= this.serviceOptions.defaultPopulate ?? false;
     options.refresh = true;
     let readEntities: Entity[];
 
@@ -117,7 +117,6 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async readById(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
-    options.populate = options.populate || this.serviceOptions.populateById;
     const entities = await this.read(id, options);
     return entities[0];
   }
@@ -464,7 +463,7 @@ export abstract class OrmService<Entity> {
    * @param uniqueKey
    */
   protected getValidUniqueKey(uniqueKey?: string[]): string[] {
-    const defaultKey = this.serviceOptions.uniqueKey;
+    const defaultKey = this.serviceOptions.defaultUniqueKey;
     let validKey: string[];
 
     if (uniqueKey && Array.isArray(uniqueKey) && uniqueKey.length > 0) {

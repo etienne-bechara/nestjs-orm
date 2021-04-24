@@ -13,8 +13,8 @@ export class ContactService extends OrmService<ContactEntity> {
     private readonly contactRepository: EntityRepository<ContactEntity>,
   ) {
     super(contactRepository, {
-      uniqueKey: [ 'value' ],
-      populate: [ 'person' ],
+      defaultUniqueKey: [ 'value' ],
+      defaultPopulate: true,
     });
   }
 

@@ -13,8 +13,8 @@ export class PersonService extends OrmService<PersonEntity> {
     private readonly userRepository: EntityRepository<PersonEntity>,
   ) {
     super(userRepository, {
-      uniqueKey: [ 'name' ],
-      populate: [ 'contacts', 'employers.headquarter' ],
+      defaultUniqueKey: [ 'name' ],
+      defaultPopulate: true,
     });
   }
 

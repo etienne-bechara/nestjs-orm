@@ -113,8 +113,8 @@ export class UserService extends OrmService<UserEntity> {
     private readonly userRepository: EntityRepository<UserEntity>,
   ) {
     super(userRepository, {
-      uniqueKey: [ 'name' ], // [Optional] Combination of fields to enable entity update instead of requiring ID
-      populate: [ 'employers' ], // [Optional] Nested entities to automatic populate
+      defaultUniqueKey: [ 'name' ], // [Optional] Combination of fields to enable entity update instead of requiring ID
+      defaultPopulate: [ 'employers' ], // [Optional] Nested entities to automatic populate
     });
   }
 

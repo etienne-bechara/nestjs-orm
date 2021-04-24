@@ -13,9 +13,8 @@ export class CompanyService extends OrmService<CompanyEntity> {
     private readonly companyRepository: EntityRepository<CompanyEntity>,
   ) {
     super(companyRepository, {
-      uniqueKey: [ 'name' ],
-      populate: [ 'employees' ],
-      populateById: [ 'headquarter', 'branches', 'employees' ],
+      defaultUniqueKey: [ 'name' ],
+      defaultPopulate: true,
     });
   }
 

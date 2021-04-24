@@ -14,6 +14,7 @@ export class ContactController extends OrmController<ContactEntity> {
     super(contactService, {
       methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
       dto: { read: ContactReadDto, create: ContactCreateDto, update: ContactUpdateDto },
+      populate: [ 'person' ],
     });
   }
 

@@ -14,6 +14,7 @@ export class CompanyController extends OrmController<CompanyEntity> {
     super(companyService, {
       methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
       dto: { read: CompanyReadDto, create: CompanyCreateDto, update: CompanyUpdateDto },
+      populate: [ 'employees' ],
     });
   }
 

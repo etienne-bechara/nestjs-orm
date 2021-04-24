@@ -1,5 +1,6 @@
+import { Populate } from '@mikro-orm/core';
+
 export interface OrmServiceOptions<T> {
-  uniqueKey?: string[];
-  populate?: (keyof T)[] | string[];
-  populateById?: (keyof T)[] | string[];
+  defaultPopulate?: Populate<T>;
+  defaultUniqueKey?: string[];
 }

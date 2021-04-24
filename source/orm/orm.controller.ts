@@ -17,7 +17,7 @@ export abstract class OrmController<Entity> {
 
   public constructor(
     public readonly entityService: OrmService<Entity>,
-    protected readonly controllerOptions: OrmControllerOptions = { },
+    protected readonly controllerOptions: OrmControllerOptions<Entity> = { },
   ) { }
 
   /**
@@ -153,8 +153,9 @@ export abstract class OrmController<Entity> {
    */
   @Get()
   public async get(@Query() query: OrmPaginationDto & Entity): Promise<OrmPaginatedResponse<Entity>> {
-    const validationData = await this.validateRequest({ method: 'GET', read: query });
-    return this.entityService.readAndCount(validationData.queryData, validationData.queryOptions);
+    const { queryData, queryOptions } = await this.validateRequest({ method: 'GET', read: query });
+    queryOptions.populate = this.controllerOptions.populate;
+    return this.entityService.readAndCount(queryData, queryOptions);
   }
 
   /**
@@ -164,7 +165,8 @@ export abstract class OrmController<Entity> {
   @Get(':id')
   public async getById(@Param('id') id: string): Promise<Entity> {
     await this.validateRequest({ method: 'GET:id' });
-    return this.entityService.readByIdOrFail(id);
+    const populate = this.controllerOptions.populateById ?? this.controllerOptions.populate;
+    return this.entityService.readByIdOrFail(id, { populate });
   }
 
   /**
