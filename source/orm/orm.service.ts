@@ -19,17 +19,17 @@ export abstract class OrmService<Entity> {
   ) { }
 
   /* Extendable Hooks */
-  public async beforeRead(params: OrmReadParams<Entity>): Promise<OrmReadParams<Entity>> { return params; }
-  public async afterRead(entity: Entity): Promise<Entity> { return entity; }
+  protected async beforeRead(params: OrmReadParams<Entity>): Promise<OrmReadParams<Entity>> { return params; }
+  protected async afterRead(entity: Entity): Promise<Entity> { return entity; }
 
-  public async beforeCreate(data: EntityData<Entity>): Promise<EntityData<Entity>> { return data; }
-  public async afterCreate(entity: Entity): Promise<Entity> { return entity; }
+  protected async beforeCreate(data: EntityData<Entity>): Promise<EntityData<Entity>> { return data; }
+  protected async afterCreate(entity: Entity): Promise<Entity> { return entity; }
 
-  public async beforeUpdate(params: OrmUpdateParams<Entity>): Promise<OrmUpdateParams<Entity>> { return params; }
-  public async afterUpdate(entity: Entity): Promise<Entity> { return entity; }
+  protected async beforeUpdate(params: OrmUpdateParams<Entity>): Promise<OrmUpdateParams<Entity>> { return params; }
+  protected async afterUpdate(entity: Entity): Promise<Entity> { return entity; }
 
-  public async beforeRemove(entity: Entity): Promise<Entity> { return entity; }
-  public async afterRemove(entity: Entity): Promise<Entity> { return entity; }
+  protected async beforeRemove(entity: Entity): Promise<Entity> { return entity; }
+  protected async afterRemove(entity: Entity): Promise<Entity> { return entity; }
 
   /**
    * Update target entities according to configuration.
