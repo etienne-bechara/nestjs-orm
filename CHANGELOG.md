@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.3...v2.5.4) (2021-04-23)
+
+
+### Bug Fixes
+
+* change update params for consistency ([59dfd6a](https://github.com/etienne-bechara/nestjs-orm/commit/59dfd6ae5292eea59ec89579b0e7d7894959c2a3))
+
 ## [2.5.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.5.2...v2.5.3) (2021-04-23)
 
 
