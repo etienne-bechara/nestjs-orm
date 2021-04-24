@@ -1,3 +1,5 @@
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable max-len */
 /* eslint-disable unicorn/no-fn-reference-in-iterator */
 import { BadRequestException, ConflictException, InternalServerErrorException, NotFoundException, NotImplementedException } from '@bechara/nestjs-core';
@@ -15,6 +17,19 @@ export abstract class OrmService<Entity> {
     private readonly entityRepository: EntityRepository<Entity>,
     protected readonly serviceOptions: OrmServiceOptions<Entity> = { },
   ) { }
+
+  /* Extendable Hooks */
+  public async beforeRead(params: OrmReadParams<Entity>): Promise<OrmReadParams<Entity>> { return params; }
+  public async afterRead(entity: Entity): Promise<Entity> { return entity; }
+
+  public async beforeCreate(data: EntityData<Entity>): Promise<EntityData<Entity>> { return data; }
+  public async afterCreate(entity: Entity): Promise<Entity> { return entity; }
+
+  public async beforeUpdate(params: OrmUpdateParams<Entity>): Promise<OrmUpdateParams<Entity>> { return params; }
+  public async afterUpdate(entity: Entity): Promise<Entity> { return entity; }
+
+  public async beforeRemove(entity: Entity): Promise<Entity> { return entity; }
+  public async afterRemove(entity: Entity): Promise<Entity> { return entity; }
 
   /**
    * Update target entities according to configuration.
@@ -49,7 +64,7 @@ export abstract class OrmService<Entity> {
   public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
     options.populate ??= this.serviceOptions.populate;
     options.refresh = true;
-    let entities: Entity[];
+    let readEntities: Entity[];
 
     if (options.sort && options.order) {
       options.orderBy = { [options.sort]: options.order };
@@ -57,22 +72,26 @@ export abstract class OrmService<Entity> {
 
     const findParams = typeof params === 'string'
       ? { id: params }
-      : params;
+      : await this.beforeRead(params);
 
     try {
-      entities = await this.entityRepository.find(findParams, options);
-      entities ??= [ ];
+      readEntities = await this.entityRepository.find(findParams as EntityData<Entity>, options);
+      readEntities ??= [ ];
     }
     catch (e) {
-      this.queryExceptionHandler(e, entities);
+      this.queryExceptionHandler(e, readEntities);
     }
 
-    if (!entities[0] && options.findOrFail) {
+    if (!readEntities[0] && options.findOrFail) {
       const entityError = typeof params === 'string' ? 'id' : 'params';
       throw new NotFoundException(`entity with given ${entityError} does not exist`);
     }
 
-    return entities;
+    for (let entity of readEntities) {
+      entity = await this.afterRead(entity);
+    }
+
+    return readEntities;
   }
 
   /**
@@ -173,11 +192,12 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async create(data: EntityData<Entity>, options: OrmCreateOptions = { }): Promise<Entity[]> {
-    if (Array.isArray(data) && data.length > 0 && this.serviceOptions.disableBatchCreate) {
-      throw new NotImplementedException('creating multiple entities is disabled');
+    const dataArray = Array.isArray(data) ? data : [ data ];
+
+    for (let dataItem of dataArray) {
+      dataItem = await this.beforeCreate(dataItem);
     }
 
-    const dataArray = Array.isArray(data) ? data : [ data ];
     const newEntities = dataArray.map((d) => this.entityRepository.create(d));
 
     try {
@@ -187,9 +207,15 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, newEntities);
     }
 
-    return options.disableRefresh
+    const createdEntities = options.disableRefresh
       ? newEntities
-      : this.refresh(newEntities);
+      : await this.refresh(newEntities);
+
+    for (let entity of createdEntities) {
+      entity = await this.afterCreate(entity);
+    }
+
+    return createdEntities;
   }
 
   /**
@@ -209,14 +235,14 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions = { }): Promise<Entity[]> {
-    if (Array.isArray(params) && params.length > 0 && this.serviceOptions.disableBatchUpdate) {
-      throw new NotImplementedException('updating multiple entities is disabled');
-    }
-
     const paramsArray = Array.isArray(params) ? params : [ params ];
 
+    for (let param of paramsArray) {
+      param = await this.beforeUpdate(param);
+    }
+
     // Before assignment, ensure collections were populated
-    const updatedEntities = await Promise.all(
+    const assignedEntities = await Promise.all(
       paramsArray.map(async ({ entity, data }) => {
         for (const key in entity as any) {
           if (data?.[key] && entity[key]?.isInitialized && !entity[key].isInitialized()) {
@@ -229,15 +255,21 @@ export abstract class OrmService<Entity> {
     );
 
     try {
-      await this.entityRepository.persistAndFlush(updatedEntities);
+      await this.entityRepository.persistAndFlush(assignedEntities);
     }
     catch (e) {
       this.queryExceptionHandler(e, params);
     }
 
-    return options.disableRefresh
-      ? updatedEntities
-      : this.refresh(updatedEntities);
+    const updatedEntities = options.disableRefresh
+      ? assignedEntities
+      : await this.refresh(assignedEntities);
+
+    for (let entity of updatedEntities) {
+      entity = await this.afterUpdate(entity);
+    }
+
+    return updatedEntities;
   }
 
   /**
@@ -388,18 +420,24 @@ export abstract class OrmService<Entity> {
    * @param entities
    */
   public async remove(entities: Entity | Entity[]): Promise<Entity[]> {
-    if (Array.isArray(entities) && this.serviceOptions.disableBatchRemove) {
-      throw new NotImplementedException('removing multiple entities is disabled');
+    const entityArray = Array.isArray(entities) ? entities : [ entities ];
+
+    for (let entity of entityArray) {
+      entity = await this.beforeRemove(entity);
     }
 
     try {
-      await this.entityRepository.removeAndFlush(entities);
+      await this.entityRepository.removeAndFlush(entityArray);
     }
     catch (e) {
       this.queryExceptionHandler(e, entities);
     }
 
-    return Array.isArray(entities) ? entities : [ entities ];
+    for (let entity of entityArray) {
+      entity = await this.beforeRemove(entity);
+    }
+
+    return entityArray;
   }
 
   /**

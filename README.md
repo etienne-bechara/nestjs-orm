@@ -152,6 +152,22 @@ removeOne(): Promise<Entity>;
 removeById(id: string): Promise<Entity>;
 ```
 
+You may also extending the functionality of these built-in methods with these provided hooks:
+
+```ts
+beforeRead(): Promise<OrmReadParams<Entity>>;
+afterRead(): Promise<Entity>;
+
+beforeCreate(): Promise<EntityData<Entity>>;
+afterCreate(): Promise<Entity>;
+
+beforeUpdate(): Promise<OrmUpdateParams<Entity>>;
+afterUpdate(): Promise<Entity>;
+
+beforeRemove(): Promise<Entity>;
+afterRemove(): Promise<Entity>;
+```
+
 ### Creating an Entity Controller
 
 Finally, you may automatic boot routes to manipulate your entities by extending the base controller and injecting the recently created service.
