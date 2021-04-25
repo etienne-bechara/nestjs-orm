@@ -190,7 +190,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async create(data: EntityData<Entity>, options: OrmCreateOptions = { }): Promise<Entity[]> {
+  public async create(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity[]> {
     const dataArray = Array.isArray(data) ? data : [ data ];
 
     for (let dataItem of dataArray) {
@@ -208,7 +208,7 @@ export abstract class OrmService<Entity> {
 
     const createdEntities = options.disableRefresh
       ? newEntities
-      : await this.refresh(newEntities);
+      : await this.refresh(newEntities, options);
 
     for (let entity of createdEntities) {
       entity = await this.afterCreate(entity);
@@ -222,7 +222,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async createOne(data: EntityData<Entity>, options: OrmCreateOptions = { }): Promise<Entity> {
+  public async createOne(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity> {
     const [ createdEntity ] = await this.create(data, options);
     return createdEntity;
   }
@@ -233,7 +233,7 @@ export abstract class OrmService<Entity> {
    * @param params
    * @param options
    */
-  public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions = { }): Promise<Entity[]> {
+  public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions<Entity> = { }): Promise<Entity[]> {
     const paramsArray = Array.isArray(params) ? params : [ params ];
 
     for (let param of paramsArray) {
@@ -262,7 +262,7 @@ export abstract class OrmService<Entity> {
 
     const updatedEntities = options.disableRefresh
       ? assignedEntities
-      : await this.refresh(assignedEntities);
+      : await this.refresh(assignedEntities, options);
 
     for (let entity of updatedEntities) {
       entity = await this.afterUpdate(entity);
@@ -277,7 +277,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async updateById(id: string, data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity> {
+  public async updateById(id: string, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { }): Promise<Entity> {
     const entity = await this.readById(id);
     const updatedEntity = await this.update({ entity, data }, options);
     return updatedEntity[0];
@@ -289,7 +289,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async updateOne(entity: Entity, data: EntityData<Entity>, options: OrmUpdateOptions = { }): Promise<Entity> {
+  public async updateOne(entity: Entity, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { }): Promise<Entity> {
     const [ updatedEntity ] = await this.update({ entity, data }, options);
     return updatedEntity;
   }
@@ -300,14 +300,14 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  private async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity[]> {
+  private async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity[]> {
     const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
     const dataArray = Array.isArray(data) ? data : [ data ];
     const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
 
-    const existingEntities: Entity[] = [ ];
     const updateParams: OrmUpdateParams<Entity>[] = [ ];
     const createData: EntityData<Entity>[] = [ ];
+    const existingEntities: Entity[] = [ ];
 
     for (const dataItem of dataArray) {
       const populate = [ ];
@@ -358,10 +358,11 @@ export abstract class OrmService<Entity> {
     }
 
     const updatedEntities = await this.update(updateParams, options);
+    const refreshedEntities = await this.refresh(existingEntities, options);
 
     const resultEntities = resultMap.map((i) => {
       switch (i.target) {
-        case 'read': return existingEntities[i.index];
+        case 'read': return refreshedEntities[i.index];
         case 'create': return createdEntities[i.index];
         case 'update': return updatedEntities[i.index];
       }
@@ -376,7 +377,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async readOrCreate(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity[]> {
+  public async readOrCreate(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity[]> {
     options.allowUpdate = false;
     return this.readCreateOrUpdate(data, options);
   }
@@ -387,7 +388,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async readOrCreateOne(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity> {
+  public async readOrCreateOne(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
     const [ entity ] = await this.readOrCreate(data, options);
     return entity;
   }
@@ -398,7 +399,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity[]> {
+  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity[]> {
     options.allowUpdate = true;
     return this.readCreateOrUpdate(data, options);
   }
@@ -409,7 +410,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async upsertOne(data: EntityData<Entity>, options: OrmUpsertOptions = { }): Promise<Entity> {
+  public async upsertOne(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
     const [ entity ] = await this.upsert(data, options);
     return entity;
   }
