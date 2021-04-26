@@ -113,8 +113,8 @@ export class UserService extends OrmService<UserEntity> {
     private readonly userRepository: EntityRepository<UserEntity>,
   ) {
     super(userRepository, {
-      defaultUniqueKey: [ 'name' ], // [Optional] Combination of fields to enable entity update instead of requiring ID
-      defaultPopulate: [ 'employers' ], // [Optional] Nested entities to automatic populate
+      defaultUniqueKey: [ 'name' ], // [Optional] Combination of fields to enable entity upsert
+      defaultPopulate: [ 'employers' ], // [Optional] Nested entities to automatic load when no 'populate' option is provided
     });
   }
 
@@ -132,6 +132,7 @@ readByIdOrFail(): Promise<Entity>;
 readUnique(): Promise<Entity>;
 readUniqueOrFail(): Promise<Entity>;
 readAndCount(): Promise<OrmPaginatedResponse<Entity>>;
+reload(): Promise<Entity[]>;
 
 // Create entities
 create(): Promise<Entity[]>;

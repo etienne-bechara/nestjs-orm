@@ -3,7 +3,7 @@
 /* eslint-disable max-len */
 /* eslint-disable unicorn/no-fn-reference-in-iterator */
 import { BadRequestException, ConflictException, InternalServerErrorException, NotFoundException, NotImplementedException } from '@bechara/nestjs-core';
-import { EntityData, EntityRepository, FilterQuery } from '@mikro-orm/core';
+import { EntityData, EntityRepository, FilterQuery, Populate } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from './orm.enum';
 import { OrmCreateOptions, OrmPagination, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from './orm.interface';
@@ -32,27 +32,12 @@ export abstract class OrmService<Entity> {
   protected async afterRemove(entity: Entity): Promise<Entity> { return entity; }
 
   /**
-   * Update target entities according to configuration.
+   * Execute ORM smart nested population on target entities.
    * @param entities
-   * @param options
+   * @param populate
    */
-  public async refresh(entities: Entity[], options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    const entityIds = entities.map((e) => e['id']);
-    const orderedEntities: Entity[] = [ ];
-
-    const refreshedEntities = await this.read(entityIds, options);
-
-    for (const id of entityIds) {
-      for (const [ index, entity ] of refreshedEntities.entries()) {
-        if (entity['id'] === id) {
-          orderedEntities.push(entity);
-          refreshedEntities.splice(index, 1);
-          continue;
-        }
-      }
-    }
-
-    return orderedEntities;
+  public async populate(entities: Entity | Entity[], populate: Populate<Entity>): Promise<void> {
+    await this.entityRepository.populate(entities, populate);
   }
 
   /**
@@ -186,6 +171,31 @@ export abstract class OrmService<Entity> {
   }
 
   /**
+   * Update target entities according to configuration,
+   * keeps original sorting.
+   * @param entities
+   * @param options
+   */
+  public async reload(entities: Entity[], options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
+    const entityIds = entities.map((e) => e['id']);
+    const orderedEntities: Entity[] = [ ];
+
+    const reloadedEntities = await this.read(entityIds, options);
+
+    for (const id of entityIds) {
+      for (const [ index, entity ] of reloadedEntities.entries()) {
+        if (entity['id'] === id) {
+          orderedEntities.push(entity);
+          reloadedEntities.splice(index, 1);
+          continue;
+        }
+      }
+    }
+
+    return orderedEntities;
+  }
+
+  /**
    * Create multiple entities based on provided data.
    * @param data
    * @param options
@@ -206,9 +216,9 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, newEntities);
     }
 
-    const createdEntities = options.disableRefresh
+    const createdEntities = options.disableReload
       ? newEntities
-      : await this.refresh(newEntities, options);
+      : await this.reload(newEntities, options);
 
     for (let entity of createdEntities) {
       entity = await this.afterCreate(entity);
@@ -260,9 +270,9 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, params);
     }
 
-    const updatedEntities = options.disableRefresh
+    const updatedEntities = options.disableReload
       ? assignedEntities
-      : await this.refresh(assignedEntities, options);
+      : await this.reload(assignedEntities, options);
 
     for (let entity of updatedEntities) {
       entity = await this.afterUpdate(entity);
@@ -358,11 +368,11 @@ export abstract class OrmService<Entity> {
     }
 
     const updatedEntities = await this.update(updateParams, options);
-    const refreshedEntities = await this.refresh(existingEntities, options);
+    const reloadedEntities = await this.reload(existingEntities, options);
 
     const resultEntities = resultMap.map((i) => {
       switch (i.target) {
-        case 'read': return refreshedEntities[i.index];
+        case 'read': return reloadedEntities[i.index];
         case 'create': return createdEntities[i.index];
         case 'update': return updatedEntities[i.index];
       }
