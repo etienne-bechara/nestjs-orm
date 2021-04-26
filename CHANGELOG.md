@@ -1,3 +1,10 @@
+## [2.8.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.1...v2.8.2) (2021-04-26)
+
+
+### Bug Fixes
+
+* hooks not triggering ([d72af86](https://github.com/etienne-bechara/nestjs-orm/commit/d72af86a7ca6cbfb67fb9f7c9d32c427e7123a92))
+
 ## [2.8.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.0...v2.8.1) (2021-04-26)
 
 
