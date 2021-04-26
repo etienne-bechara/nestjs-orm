@@ -1,3 +1,15 @@
+# [2.7.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.6.2...v2.7.0) (2021-04-26)
+
+
+### Bug Fixes
+
+* do not force decorators into controller, adds full CRUD example ([336f26c](https://github.com/etienne-bechara/nestjs-orm/commit/336f26c19a636d3684f4b58cf7dfe2763c947125))
+
+
+### Features
+
+* allow read options into any method ([87fe370](https://github.com/etienne-bechara/nestjs-orm/commit/87fe3706ac2bdf7fc1d6c7a0272279bbd56a7399))
+
 ## [2.6.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.6.1...v2.6.2) (2021-04-24)
 
 
