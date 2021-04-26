@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.7.0...v2.8.0) (2021-04-26)
+
+
+### Features
+
+* add wrapper for entity population and reload ([39bbe16](https://github.com/etienne-bechara/nestjs-orm/commit/39bbe16d963252aa4e3791ac3afc07ea6698db40))
+
 # [2.7.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.6.2...v2.7.0) (2021-04-26)
 
 
