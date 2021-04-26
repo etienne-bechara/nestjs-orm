@@ -72,8 +72,8 @@ export abstract class OrmService<Entity> {
       throw new NotFoundException(`entity with given ${entityError} does not exist`);
     }
 
-    for (let entity of readEntities) {
-      entity = await this.afterRead(entity);
+    for (const [ index, entity ] of readEntities.entries()) {
+      readEntities[index] = await this.afterRead(entity);
     }
 
     return readEntities;
@@ -203,8 +203,8 @@ export abstract class OrmService<Entity> {
   public async create(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity[]> {
     const dataArray = Array.isArray(data) ? data : [ data ];
 
-    for (let dataItem of dataArray) {
-      dataItem = await this.beforeCreate(dataItem);
+    for (const [ index, dataItem ] of dataArray.entries()) {
+      dataArray[index] = await this.beforeCreate(dataItem);
     }
 
     const newEntities = dataArray.map((d) => this.entityRepository.create(d));
@@ -220,8 +220,8 @@ export abstract class OrmService<Entity> {
       ? newEntities
       : await this.reload(newEntities, options);
 
-    for (let entity of createdEntities) {
-      entity = await this.afterCreate(entity);
+    for (const [ index, entity ] of createdEntities.entries()) {
+      createdEntities[index] = await this.afterCreate(entity);
     }
 
     return createdEntities;
@@ -246,8 +246,8 @@ export abstract class OrmService<Entity> {
   public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions<Entity> = { }): Promise<Entity[]> {
     const paramsArray = Array.isArray(params) ? params : [ params ];
 
-    for (let param of paramsArray) {
-      param = await this.beforeUpdate(param);
+    for (const [ index, param ] of paramsArray.entries()) {
+      paramsArray[index] = await this.beforeUpdate(param);
     }
 
     // Before assignment, ensure collections were populated
@@ -274,8 +274,8 @@ export abstract class OrmService<Entity> {
       ? assignedEntities
       : await this.reload(assignedEntities, options);
 
-    for (let entity of updatedEntities) {
-      entity = await this.afterUpdate(entity);
+    for (const [ index, entity ] of updatedEntities.entries()) {
+      updatedEntities[index] = await this.afterUpdate(entity);
     }
 
     return updatedEntities;
@@ -439,8 +439,8 @@ export abstract class OrmService<Entity> {
   public async remove(entities: Entity | Entity[]): Promise<Entity[]> {
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
 
-    for (let entity of entityArray) {
-      entity = await this.beforeRemove(entity);
+    for (const [ index, entity ] of entityArray.entries()) {
+      entityArray[index] = await this.beforeRemove(entity);
     }
 
     try {
@@ -450,8 +450,8 @@ export abstract class OrmService<Entity> {
       this.queryExceptionHandler(e, entities);
     }
 
-    for (let entity of entityArray) {
-      entity = await this.beforeRemove(entity);
+    for (const [ index, entity ] of entityArray.entries()) {
+      entityArray[index] = await this.afterRemove(entity);
     }
 
     return entityArray;
