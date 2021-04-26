@@ -359,7 +359,9 @@ export abstract class OrmService<Entity> {
     let createdEntities: Entity[];
 
     try {
-      createdEntities = await this.create(createData, options);
+      createdEntities = createData.length > 0
+        ? await this.create(createData, options)
+        : [ ];
     }
     catch (e) {
       if (options.disableRetry) throw e;
@@ -367,8 +369,13 @@ export abstract class OrmService<Entity> {
       return this.readCreateOrUpdate(data, options);
     }
 
-    const updatedEntities = await this.update(updateParams, options);
-    const reloadedEntities = await this.reload(existingEntities, options);
+    const updatedEntities = updateParams.length > 0
+      ? await this.update(updateParams, options)
+      : [ ];
+
+    const reloadedEntities = existingEntities.length > 0
+      ? await this.reload(existingEntities, options)
+      : [ ];
 
     const resultEntities = resultMap.map((i) => {
       switch (i.target) {
