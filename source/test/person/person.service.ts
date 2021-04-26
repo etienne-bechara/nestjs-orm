@@ -14,7 +14,7 @@ export class PersonService extends OrmService<PersonEntity> {
   ) {
     super(userRepository, {
       defaultUniqueKey: [ 'name' ],
-      defaultPopulate: true,
+      defaultPopulate: [ ],
     });
   }
 

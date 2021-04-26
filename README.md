@@ -170,13 +170,15 @@ afterRemove(): Promise<Entity>;
 
 ### Creating an Entity Controller
 
-Finally, you may automatic boot routes to manipulate your entities by extending the base controller and injecting the recently created service.
+Finally, expose a controller injecting your service as dependency to allow manipulation through HTTP requests.
+
+If you are looking for CRUD functionality you may copy exactly as the template below.
 
 Example:
 
 ```ts
-import { OrmController } from '@bechara/nestjs-orm';
-import { Controller } from '@bechara/nestjs-core';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@bechara/nestjs-core';
+import { OrmController, OrmPagination } from '@bechara/nestjs-orm';
 
 // These DTOs are validations customized with class-validator and class-transformer
 import { UserCreateDto, UserReadDto, UserUpdateDto } from './user.dto';
@@ -189,16 +191,49 @@ export class UserController extends OrmController<UserEntity> {
   public constructor(
     private readonly userService: UserService,
   ) {
-    super(userService, {
-      // Available built-in methods:
-      methods: [ 'GET', 'GET:id', 'POST', 'PUT', 'PUT:id', 'PATCH:id', 'DELETE:id' ],
+    super(userService);
+  }
 
-      // If no DTO is provided all requests shall pass
-      dto: { read: UserReadDto, create: UserCreateDto, update: UserUpdateDto },
-    });
+  @Get()
+  public async get(@Query() query: UserReadDto): Promise<OrmPagination<UserEntity>> {
+    // getReadArguments() is a built-in method that extracts pagination
+    // properties like sort, order, limit and offset
+    const { params, options } = this.getReadArguments(query);
+    return this.entityService.readAndCount(params, options);
+  }
+
+  @Get(':id')
+  public async getById(@Param('id') id: string): Promise<UserEntity> {
+    return this.entityService.readByIdOrFail(id);
+  }
+
+  @Post()
+  public async post(@Body() body: UserCreateDto): Promise<UserEntity> {
+    return this.entityService.createOne(body);
+  }
+
+  @Put()
+  public async put(@Body() body: UserCreateDto): Promise<UserEntity> {
+    return this.entityService.upsertOne(body);
+  }
+
+  @Put(':id')
+  public async putById(@Param('id') id: string, @Body() body: UserCreateDto): Promise<UserEntity> {
+    return this.entityService.updateById(id, body);
+  }
+
+  @Patch(':id')
+  public async patchById(@Param('id') id: string, @Body() body: UserUpdateDto): Promise<UserEntity> {
+    return this.entityService.updateById(id, body);
+  }
+
+  @Delete(':id')
+  public async deleteById(@Param('id') id: string): Promise<UserEntity> {
+    return this.entityService.removeById(id);
   }
 
 }
+
 ```
 
 
@@ -206,6 +241,6 @@ export class UserController extends OrmController<UserEntity> {
 
 Refer to `test` folder of this project for a full working example including:
 - Entities with several different column types
-- Entity relationships
+- Entity relationships including ManyToOne and ManyToMany
 - Service repository extension
-- Controller extension
+- Controller extension with CRUD functionality

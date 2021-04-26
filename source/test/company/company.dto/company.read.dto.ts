@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 import { OrmPaginationDto } from '../../../orm/orm.dto';
 import { CompanyEntity } from '../company.entity';
@@ -6,7 +6,6 @@ import { CompanyEntity } from '../company.entity';
 export class CompanyReadDto extends OrmPaginationDto {
 
   @IsOptional()
-  @IsString()
   public name: string;
 
   @IsOptional()

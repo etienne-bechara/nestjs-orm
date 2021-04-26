@@ -14,7 +14,7 @@ export class ContactService extends OrmService<ContactEntity> {
   ) {
     super(contactRepository, {
       defaultUniqueKey: [ 'value' ],
-      defaultPopulate: true,
+      defaultPopulate: [ 'person' ],
     });
   }
 

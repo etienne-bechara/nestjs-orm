@@ -6,7 +6,7 @@ import { BadRequestException, ConflictException, InternalServerErrorException, N
 import { EntityData, EntityRepository, FilterQuery } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from './orm.enum';
-import { OrmCreateOptions, OrmPaginatedResponse, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from './orm.interface';
+import { OrmCreateOptions, OrmPagination, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from './orm.interface';
 
 /**
  * Creates an abstract service tied with a repository.
@@ -169,7 +169,7 @@ export abstract class OrmService<Entity> {
    * @param params
    * @param options
    */
-  public async readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPaginatedResponse<Entity>> {
+  public async readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPagination<Entity>> {
     options.sort ??= 'updated';
     options.order ??= OrmQueryOrder.DESC;
     options.limit ||= 100;
@@ -508,10 +508,16 @@ export abstract class OrmService<Entity> {
       throw new ConflictException(`${constraint} constraint prevents cascade deletion`);
     }
 
-    if (/query by not existing property/gi.test(e.message)) {
+    if (e.message.startsWith('Trying to query by not existing property')) {
       const violation = /.+ (.+)/gi.exec(e.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new BadRequestException(`${constraint.replace('Entity', '').toLowerCase()} should not exist`);
+    }
+
+    if (e.message.startsWith('Invalid query condition')) {
+      const violation = /condition: (.+)/gi.exec(e.message);
+      const constraint = violation ? violation[1] : '{}';
+      throw new BadRequestException(`incorrect filter condition ${constraint}`);
     }
 
     throw new InternalServerErrorException({

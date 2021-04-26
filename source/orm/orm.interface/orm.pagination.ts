@@ -1,6 +1,6 @@
 import { OrmQueryOrder } from '../orm.enum';
 
-export interface OrmPaginatedResponse<Entity> {
+export interface OrmPagination<Entity> {
   sort: string;
   order: OrmQueryOrder;
   limit: number;
