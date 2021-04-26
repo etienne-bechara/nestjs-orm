@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.0...v2.8.1) (2021-04-26)
+
+
+### Bug Fixes
+
+* unnecessary upsert querying ([5546ade](https://github.com/etienne-bechara/nestjs-orm/commit/5546ade409bc05e51eba587b1684baacd91a8703))
+
 # [2.8.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.7.0...v2.8.0) (2021-04-26)
 
 
