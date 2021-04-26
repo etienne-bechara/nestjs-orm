@@ -4,9 +4,6 @@ import { OrmEntitySerializer } from './orm.interceptor';
 import { OrmReadArguments } from './orm.interface';
 import { OrmService } from './orm.service';
 
-/**
- * Implements generic CRUD controller connected to an entity service.
- */
 @UseInterceptors(OrmEntitySerializer)
 export abstract class OrmController<Entity> {
 
