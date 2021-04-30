@@ -1,3 +1,10 @@
+## [2.8.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.2...v2.8.3) (2021-04-30)
+
+
+### Bug Fixes
+
+* bump rxjs ([6872b36](https://github.com/etienne-bechara/nestjs-orm/commit/6872b36dec054542e12e51006dff9f6305cc82a4))
+
 ## [2.8.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.1...v2.8.2) (2021-04-26)
 
 
