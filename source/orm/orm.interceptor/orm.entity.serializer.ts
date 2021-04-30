@@ -1,5 +1,4 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@bechara/nestjs-core';
-import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
@@ -11,11 +10,11 @@ export class OrmEntitySerializer implements NestInterceptor {
    * @param context
    * @param next
    */
-  public intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  public intercept(context: ExecutionContext, next: CallHandler): any {
     return next
       .handle()
       .pipe(
-        map((data) => this.stringifyEntities(data)),
+        map((data) => this.stringifyEntities(data)) as any,
       );
   }
 
