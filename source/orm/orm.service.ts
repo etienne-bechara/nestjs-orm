@@ -288,7 +288,7 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async updateById(id: string, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { }): Promise<Entity> {
-    const entity = await this.readById(id);
+    const entity = await this.readByIdOrFail(id);
     const updatedEntity = await this.update({ entity, data }, options);
     return updatedEntity[0];
   }
@@ -462,7 +462,7 @@ export abstract class OrmService<Entity> {
    * @param id
    */
   public async removeById(id: string): Promise<Entity> {
-    const entity = await this.readById(id);
+    const entity = await this.readByIdOrFail(id);
     await this.remove(entity);
     return entity;
   }
