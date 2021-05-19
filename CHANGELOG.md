@@ -1,3 +1,10 @@
+## [2.8.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.3...v2.8.4) (2021-05-03)
+
+
+### Bug Fixes
+
+* fail if updating or removing by non-existing id ([ce2acc3](https://github.com/etienne-bechara/nestjs-orm/commit/ce2acc31fd601ac9aa981f078ad5a69d3e3e1a20))
+
 ## [2.8.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.2...v2.8.3) (2021-04-30)
 
 
