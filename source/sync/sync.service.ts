@@ -36,7 +36,7 @@ export class SyncService {
    * configured entities.
    * @param options
    */
-  public async syncSchema(options: SyncModuleOptions): Promise<void> {
+  public async syncSchema(options: SyncModuleOptions): Promise<{ queries: string[] }> {
     this.loggerService.info('[OrmService] Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
@@ -44,7 +44,8 @@ export class SyncService {
     syncDump = this.removeBlacklistedQueries(syncDump, options);
 
     if (syncDump.length === 0) {
-      return this.loggerService.notice('[OrmService] Database schema is up to date');
+      this.loggerService.notice('[OrmService] Database schema is up to date');
+      return;
     }
 
     let syncQueries = await generator.getUpdateSchemaSQL(true, options.safe);
@@ -52,6 +53,7 @@ export class SyncService {
     await generator.execute(syncQueries);
 
     this.loggerService.notice('[OrmService] Database schema successfully updated');
+    return { queries: syncQueries.split('\n') };
   }
 
   /**
