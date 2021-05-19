@@ -1,3 +1,10 @@
+## [2.8.5](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.4...v2.8.5) (2021-05-19)
+
+
+### Bug Fixes
+
+* return migration queries ([9c061a5](https://github.com/etienne-bechara/nestjs-orm/commit/9c061a506080e96481712bc29b20841fb19b12f5))
+
 ## [2.8.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.3...v2.8.4) (2021-05-03)
 
 
