@@ -1,3 +1,10 @@
+## [2.8.7](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.6...v2.8.7) (2021-05-20)
+
+
+### Bug Fixes
+
+* change default sorting on readAndCount() to id column which should always exist ([9e369f9](https://github.com/etienne-bechara/nestjs-orm/commit/9e369f98410544afb4ba5dd9232ab05de4c4d814))
+
 ## [2.8.6](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.5...v2.8.6) (2021-05-20)
 
 
