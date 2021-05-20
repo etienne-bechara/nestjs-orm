@@ -1,3 +1,10 @@
+## [2.8.6](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.5...v2.8.6) (2021-05-20)
+
+
+### Bug Fixes
+
+* improve sync result response ([382d0e4](https://github.com/etienne-bechara/nestjs-orm/commit/382d0e483db84a139a0035fef74d70d5827ab0a7))
+
 ## [2.8.5](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.4...v2.8.5) (2021-05-19)
 
 
