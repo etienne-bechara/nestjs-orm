@@ -155,8 +155,8 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPagination<Entity>> {
-    options.sort ??= 'updated';
-    options.order ??= OrmQueryOrder.DESC;
+    options.sort ??= 'id';
+    options.order ??= OrmQueryOrder.ASC;
     options.limit ||= 100;
     options.offset ??= 0;
 
