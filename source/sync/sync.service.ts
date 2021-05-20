@@ -1,8 +1,8 @@
 import { Inject, Injectable, LoggerService } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
 
-import { SyncInjectionToken } from './sync.enum';
-import { SyncModuleOptions } from './sync.interface';
+import { SyncInjectionToken, SyncSchemaStatus } from './sync.enum';
+import { SyncModuleOptions, SyncSchemaResult } from './sync.interface';
 
 @Injectable()
 export class SyncService {
@@ -36,7 +36,7 @@ export class SyncService {
    * configured entities.
    * @param options
    */
-  public async syncSchema(options: SyncModuleOptions): Promise<{ queries: string[] }> {
+  public async syncSchema(options: SyncModuleOptions): Promise<SyncSchemaResult> {
     this.loggerService.info('[OrmService] Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
@@ -45,15 +45,26 @@ export class SyncService {
 
     if (syncDump.length === 0) {
       this.loggerService.notice('[OrmService] Database schema is up to date');
-      return;
+      return { status: SyncSchemaStatus.UP_TO_DATE };
     }
 
+    let status = SyncSchemaStatus.MIGRATION_SUCCESSFUL;
     let syncQueries = await generator.getUpdateSchemaSQL(true, options.safe);
     syncQueries = this.removeBlacklistedQueries(syncQueries, options);
-    await generator.execute(syncQueries);
 
-    this.loggerService.notice('[OrmService] Database schema successfully updated');
-    return { queries: syncQueries.split('\n') };
+    try {
+      await generator.execute(syncQueries);
+      this.loggerService.notice('[OrmService] Database schema successfully updated');
+    }
+    catch (e) {
+      status = SyncSchemaStatus.MIGRATION_FAILED;
+      this.loggerService.error('[OrmService] Database schema update failed', e, { syncQueries });
+    }
+
+    return {
+      status,
+      queries: syncQueries.split('\n'),
+    };
   }
 
   /**
