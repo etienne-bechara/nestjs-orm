@@ -55,7 +55,7 @@ export abstract class OrmService<Entity> {
       options.orderBy = { [options.sort]: options.order };
     }
 
-    const findParams = typeof params === 'string'
+    const findParams = typeof params === 'string' || typeof params === 'number'
       ? { id: params }
       : await this.beforeRead(params);
 
@@ -68,7 +68,7 @@ export abstract class OrmService<Entity> {
     }
 
     if (!readEntities[0] && options.findOrFail) {
-      const entityError = typeof params === 'string' ? 'id' : 'params';
+      const entityError = typeof params === 'string' || typeof params === 'number' ? 'id' : 'params';
       throw new NotFoundException(`entity with given ${entityError} does not exist`);
     }
 
@@ -101,7 +101,7 @@ export abstract class OrmService<Entity> {
    * @param id
    * @param options
    */
-  public async readById(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
+  public async readById(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     const entities = await this.read(id, options);
     return entities[0];
   }
@@ -111,7 +111,7 @@ export abstract class OrmService<Entity> {
    * @param id
    * @param options
    */
-  public async readByIdOrFail(id: string, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
+  public async readByIdOrFail(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     options.findOrFail = true;
     return this.readById(id, options);
   }
@@ -287,7 +287,7 @@ export abstract class OrmService<Entity> {
    * @param data
    * @param options
    */
-  public async updateById(id: string, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { }): Promise<Entity> {
+  public async updateById(id: string | number, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { }): Promise<Entity> {
     const entity = await this.readByIdOrFail(id);
     const updatedEntity = await this.update({ entity, data }, options);
     return updatedEntity[0];
@@ -461,7 +461,7 @@ export abstract class OrmService<Entity> {
    * Remove a single entity by its ID.
    * @param id
    */
-  public async removeById(id: string): Promise<Entity> {
+  public async removeById(id: string | number): Promise<Entity> {
     const entity = await this.readByIdOrFail(id);
     await this.remove(entity);
     return entity;
