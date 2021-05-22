@@ -1,3 +1,10 @@
+## [2.8.8](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.7...v2.8.8) (2021-05-22)
+
+
+### Bug Fixes
+
+* allow id to be numeric ([438616c](https://github.com/etienne-bechara/nestjs-orm/commit/438616c2645a19d3529b356e5657952588e1ff60))
+
 ## [2.8.7](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.6...v2.8.7) (2021-05-20)
 
 
