@@ -319,39 +319,43 @@ export abstract class OrmService<Entity> {
     const createData: EntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
 
-    for (const dataItem of dataArray) {
+    // Read existing matching entities
+    const matches = await Promise.all(dataArray.map(async (data) => {
       const populate = [ ];
       const clause = { };
 
-      // Create clause (based on unique key) and population (based on many-to-many)
-      for (const key of uniqueKey) clause[key] = dataItem[key];
-      for (const key in dataItem) Array.isArray(dataItem[key]) ? populate.push(key) : undefined;
-      const matchingEntities = await this.read(clause, { populate });
+      for (const key of uniqueKey) clause[key] = data[key];
+      for (const key in data) Array.isArray(data[key]) ? populate.push(key) : undefined;
+      const entity = await this.read(clause, { populate });
 
+      return { data, entity };
+    }));
+
+    for (const match of matches) {
       // Conflict (error)
-      if (matchingEntities.length > 1) {
+      if (match.entity.length > 1) {
         throw new ConflictException({
           message: 'unique constraint references more than one entity',
           uniqueKey,
-          matches: matchingEntities.map((e) => e['id']),
+          matches: match.entity.map((e) => e['id']),
         });
       }
 
       // Match (create or update)
-      if (matchingEntities.length === 1) {
+      if (match.entity.length === 1) {
         if (options.allowUpdate) {
           resultMap.push({ index: updateParams.length, target: 'update' });
-          updateParams.push({ entity: matchingEntities[0], data: dataItem });
+          updateParams.push({ entity: match.entity[0], data: match.data });
         }
         else {
           resultMap.push({ index: existingEntities.length, target: 'read' });
-          existingEntities.push(matchingEntities[0]);
+          existingEntities.push(match.entity[0]);
         }
       }
       // Missing (create)
       else {
         resultMap.push({ index: createData.length, target: 'create' });
-        createData.push(dataItem);
+        createData.push(match.data);
       }
     }
 
