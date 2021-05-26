@@ -1,3 +1,10 @@
+## [2.8.9](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.8...v2.8.9) (2021-05-22)
+
+
+### Bug Fixes
+
+* match upsert entities asynchronously ([31c05df](https://github.com/etienne-bechara/nestjs-orm/commit/31c05dffd652f9c2165f4de2b4c048d0d4943039))
+
 ## [2.8.8](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.7...v2.8.8) (2021-05-22)
 
 
