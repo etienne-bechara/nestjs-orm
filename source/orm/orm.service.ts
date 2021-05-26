@@ -441,6 +441,7 @@ export abstract class OrmService<Entity> {
    * @param entities
    */
   public async remove(entities: Entity | Entity[]): Promise<Entity[]> {
+    if (!entities) return [ ];
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
 
     for (const [ index, entity ] of entityArray.entries()) {
