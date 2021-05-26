@@ -1,6 +1,8 @@
-import { AnyEntity, BaseEntity, Index, Property } from '@mikro-orm/core';
+import { Index, Property } from '@mikro-orm/core';
 
-export abstract class OrmTimestampEntity extends BaseEntity<AnyEntity, 'id'> {
+import { OrmBaseEntity } from './orm.base.entity';
+
+export abstract class OrmTimestampEntity extends OrmBaseEntity {
 
   @Index()
   @Property({ columnType: 'timestamp', onUpdate: () => new Date(), nullable: true })

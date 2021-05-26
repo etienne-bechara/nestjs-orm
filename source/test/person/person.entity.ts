@@ -1,12 +1,12 @@
 import { Collection, Entity, ManyToMany, OneToMany, Property, Unique } from '@mikro-orm/core';
 
-import { OrmUuidEntity } from '../../orm/orm.entity';
+import { OrmUuidTimestampEntity } from '../../orm/orm.entity';
 import { CompanyEntity } from '../company/company.entity';
 import { ContactEntity } from '../contact/contact.entity';
 
 @Entity({ tableName: 'person' })
 @Unique({ properties: [ 'name' ] })
-export class PersonEntity extends OrmUuidEntity {
+export class PersonEntity extends OrmUuidTimestampEntity {
 
   @Property()
   public name: string;

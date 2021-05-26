@@ -4,7 +4,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 
 import { SyncModuleOptions } from '../sync/sync.interface';
 import { SyncModule } from '../sync/sync.module';
-import { OrmIdEntity, OrmTimestampEntity, OrmUuidEntity } from './orm.entity';
+import { OrmBaseEntity, OrmBigIntEntity, OrmBigIntTimestampEntity, OrmIntEntity, OrmIntTimestampEntity, OrmTimestampEntity, OrmUuidEntity, OrmUuidTimestampEntity } from './orm.entity';
 import { OrmInjectionToken } from './orm.enum';
 import { OrmAsyncModuleOptions, OrmModuleOptions } from './orm.interface';
 
@@ -27,9 +27,14 @@ export class OrmModule {
       ]);
 
     const rootEntities = [
-      OrmIdEntity,
-      OrmUuidEntity,
+      OrmBaseEntity,
       OrmTimestampEntity,
+      OrmIntEntity,
+      OrmIntTimestampEntity,
+      OrmBigIntEntity,
+      OrmBigIntTimestampEntity,
+      OrmUuidEntity,
+      OrmUuidTimestampEntity,
       ...entities,
     ];
 
