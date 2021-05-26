@@ -1,3 +1,10 @@
+## [2.8.10](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.9...v2.8.10) (2021-05-26)
+
+
+### Bug Fixes
+
+* interrupt remove if no entity provided ([30dfaaa](https://github.com/etienne-bechara/nestjs-orm/commit/30dfaaadb3ba42a97fc45b7bb54afc48250ebc46))
+
 ## [2.8.9](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.8...v2.8.9) (2021-05-22)
 
 
