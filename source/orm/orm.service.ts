@@ -322,7 +322,7 @@ export abstract class OrmService<Entity> {
     // Read existing matching entities
     const matches = await Promise.all(dataArray.map(async (data) => {
       const populate = [ ];
-      const clause = { };
+      const clause: Record<keyof Entity, any> = { } as any;
 
       for (const key of uniqueKey) clause[key] = data[key];
       for (const key in data) Array.isArray(data[key]) ? populate.push(key) : undefined;
@@ -485,9 +485,9 @@ export abstract class OrmService<Entity> {
    * Returns provided unique key or default (whichever is valid).
    * @param uniqueKey
    */
-  protected getValidUniqueKey(uniqueKey?: string[]): string[] {
+  protected getValidUniqueKey(uniqueKey?: (keyof Entity)[]): (keyof Entity)[] {
     const defaultKey = this.serviceOptions.defaultUniqueKey;
-    let validKey: string[];
+    let validKey: (keyof Entity)[];
 
     if (uniqueKey && Array.isArray(uniqueKey) && uniqueKey.length > 0) {
       validKey = uniqueKey;
