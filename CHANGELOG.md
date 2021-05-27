@@ -1,3 +1,10 @@
+## [2.8.11](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.10...v2.8.11) (2021-05-26)
+
+
+### Bug Fixes
+
+* add more base entities options ([cf2c869](https://github.com/etienne-bechara/nestjs-orm/commit/cf2c869d4c68081ceb4ccd2812e142964d922fa8))
+
 ## [2.8.10](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.9...v2.8.10) (2021-05-26)
 
 
