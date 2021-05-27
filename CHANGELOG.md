@@ -1,3 +1,10 @@
+## [2.8.12](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.11...v2.8.12) (2021-05-27)
+
+
+### Bug Fixes
+
+* add typing to unique key ([7a58d57](https://github.com/etienne-bechara/nestjs-orm/commit/7a58d57db9cb669fcb83fea0f75f7feef43c573e))
+
 ## [2.8.11](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.10...v2.8.11) (2021-05-26)
 
 
