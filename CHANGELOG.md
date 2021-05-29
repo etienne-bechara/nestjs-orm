@@ -1,3 +1,10 @@
+## [2.8.13](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.12...v2.8.13) (2021-05-29)
+
+
+### Bug Fixes
+
+* improve read performance for multiple upsert ([d38ad08](https://github.com/etienne-bechara/nestjs-orm/commit/d38ad08a27db09a486d977fdd5d44fe2bbd839ae))
+
 ## [2.8.12](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.11...v2.8.12) (2021-05-27)
 
 
