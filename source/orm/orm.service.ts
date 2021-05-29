@@ -334,9 +334,19 @@ export abstract class OrmService<Entity> {
 
     // Remap matches to original ordering
     const matches = dataArray.map((data, i) => {
-      const entity = matchingEntities.filter((e) => {
+      const entity = matchingEntities.filter((e: any) => {
         for (const key in clauses[i]) {
-          if (e[key] !== clauses[i][key]) return false;
+          if (e[key]?.id) {
+            if (clauses[i][key]?.id) {
+              if (e[key].id !== clauses[i][key].id) return false;
+            }
+            else {
+              if (e[key].id !== clauses[i][key]) return false;
+            }
+          }
+          else {
+            if (e[key] !== clauses[i][key]) return false;
+          }
         }
 
         return true;
