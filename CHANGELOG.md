@@ -1,3 +1,10 @@
+## [2.8.14](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.13...v2.8.14) (2021-05-29)
+
+
+### Bug Fixes
+
+* upsert remap with nested entities ([1146901](https://github.com/etienne-bechara/nestjs-orm/commit/11469019f9e8d749d8386b4bc390d7ba30208cad))
+
 ## [2.8.13](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.12...v2.8.13) (2021-05-29)
 
 
