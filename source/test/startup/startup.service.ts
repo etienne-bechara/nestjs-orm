@@ -26,22 +26,25 @@ export class StartupService {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // John, Jane and Robert
-      const [ john, jane, robert ] = await this.personService.readOrCreate([
+      const [ johnDoe, johnSmith, robertDoe ] = await this.personService.readOrCreate([
         {
-          name: 'John Doe',
+          name: 'John',
+          surname: 'Doe',
           age: 15,
           height: 179.5,
           weight: 76.4,
           preferences: { color: 'blue' },
         },
         {
-          name: 'Jane Doe',
+          name: 'John',
+          surname: 'Smith',
           age: 27,
           height: 164.3,
           weight: 63.8,
         },
         {
-          name: 'Robert Doe',
+          name: 'Robert',
+          surname: 'Doe',
           age: 34,
           height: 172.9,
           weight: 87.1,
@@ -58,45 +61,45 @@ export class StartupService {
         {
           name: 'FACEBOOK LLC',
           capital: 76543210,
-          employees: [ robert ],
+          employees: [ robertDoe ],
         },
         {
           name: 'GOOGLE BRASIL LTDA',
           headquarter: googleHq,
           capital: 987654,
-          employees: [ john, jane ],
+          employees: [ johnDoe, johnSmith ],
         },
         {
           name: 'GOOGLE MEXICO LTDA',
           headquarter: googleHq,
           capital: 765443,
-          employees: [ jane ],
+          employees: [ johnSmith ],
         },
       ]);
 
-      // John has 3 contact methods
+      // John Doe has 3 contact methods
       await this.contactService.upsert([
         {
           type: ContactType.EMAIL,
           value: 'john.doe@google.com',
-          person: john,
+          person: johnDoe,
         },
         {
           type: ContactType.EMAIL,
           value: 'john.doe@facebook.com',
-          person: john,
+          person: johnDoe,
         },
         {
           type: ContactType.PHONE,
           value: '5511999999999',
           primary: true,
-          person: john,
+          person: johnDoe,
         },
-        // Jane has 1 contact method
+        // John Smith has 1 contact method
         {
           type: ContactType.EMAIL,
-          value: 'jane.doe@facebook.com',
-          person: jane,
+          value: 'john.smith@facebook.com',
+          person: johnSmith,
         },
       ]);
 

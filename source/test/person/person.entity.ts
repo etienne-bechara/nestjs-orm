@@ -5,11 +5,14 @@ import { CompanyEntity } from '../company/company.entity';
 import { ContactEntity } from '../contact/contact.entity';
 
 @Entity({ tableName: 'person' })
-@Unique({ properties: [ 'name' ] })
+@Unique({ properties: [ 'name', 'surname' ] })
 export class PersonEntity extends OrmUuidTimestampEntity {
 
   @Property()
   public name: string;
+
+  @Property()
+  public surname: string;
 
   @Property()
   public age: number;

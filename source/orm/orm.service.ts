@@ -319,17 +319,31 @@ export abstract class OrmService<Entity> {
     const createData: EntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
 
-    // Read existing matching entities
-    const matches = await Promise.all(dataArray.map(async (data) => {
-      const populate = [ ];
+    // Create clauses to match existing entities
+    const clauses = dataArray.map((data) => {
       const clause: Record<keyof Entity, any> = { } as any;
-
       for (const key of uniqueKey) clause[key] = data[key];
-      for (const key in data) Array.isArray(data[key]) ? populate.push(key) : undefined;
-      const entity = await this.read(clause, { populate });
+      return clause;
+    });
+
+    // Find matching data
+    const populate = [ ];
+    const sampleData = dataArray[0];
+    for (const key in sampleData) Array.isArray(sampleData[key]) ? populate.push(key) : undefined;
+    const matchingEntities = await this.read({ $or: clauses }, { populate });
+
+    // Remap matches to original ordering
+    const matches = dataArray.map((data, i) => {
+      const entity = matchingEntities.filter((e) => {
+        for (const key in clauses[i]) {
+          if (e[key] !== clauses[i][key]) return false;
+        }
+
+        return true;
+      });
 
       return { data, entity };
-    }));
+    });
 
     for (const match of matches) {
       // Conflict (error)
