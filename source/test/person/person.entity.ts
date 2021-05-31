@@ -32,4 +32,16 @@ export class PersonEntity extends OrmUuidTimestampEntity {
   @ManyToMany(() => CompanyEntity, company => company.employees)
   public employers = new Collection<CompanyEntity>(this);
 
+  /**
+   * Join names.
+   * @param person
+   */
+  protected beforeSerialization(person: PersonEntity): any {
+    const output: any = { ...person };
+    output.fullName = `${output.name} ${output.surname}`;
+    delete output.name;
+    delete output.surname;
+    return output;
+  }
+
 }
