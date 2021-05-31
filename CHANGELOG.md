@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.14...v2.9.0) (2021-05-31)
+
+
+### Features
+
+* add before serialization hook ([161a3ab](https://github.com/etienne-bechara/nestjs-orm/commit/161a3ab509ba811b82f10b1fe0818f548d4064a7))
+
 ## [2.8.14](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.13...v2.8.14) (2021-05-29)
 
 
