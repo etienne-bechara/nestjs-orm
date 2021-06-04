@@ -54,25 +54,25 @@ export class StartupService {
       // Google has a headquarter and 2 branches
       const googleHq = await this.companyService.upsertOne({
         name: 'GOOGLE LLC',
-        capital: 123456789,
+        capital: 123_456_789,
       });
 
       await this.companyService.upsert([
         {
           name: 'FACEBOOK LLC',
-          capital: 76543210,
+          capital: 76_543_210,
           employees: [ robertDoe ],
         },
         {
           name: 'GOOGLE BRASIL LTDA',
           headquarter: googleHq,
-          capital: 987654,
+          capital: 987_654,
           employees: [ johnDoe, johnSmith ],
         },
         {
           name: 'GOOGLE MEXICO LTDA',
           headquarter: googleHq,
-          capital: 765443,
+          capital: 765_443,
           employees: [ johnSmith ],
         },
       ]);
