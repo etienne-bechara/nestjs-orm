@@ -5,6 +5,9 @@ export class PersonCreateDto {
   @IsString() @IsNotEmpty()
   public name: string;
 
+  @IsString() @IsNotEmpty()
+  public surname: string;
+
   @IsInt() @Min(0)
   public age: number;
 

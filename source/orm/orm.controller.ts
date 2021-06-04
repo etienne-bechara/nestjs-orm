@@ -12,26 +12,26 @@ export abstract class OrmController<Entity> {
   ) { }
 
   /**
-   * Given a request query object:
-   * - Split properties between params and options
-   * - Reorganize filter operator to expected ORM format
-   * - Validate filter operators.
+   * Given a request query, split properties between params and options.
    * @param query
    */
   protected getReadArguments(query: any): OrmReadArguments<Entity> {
     if (!query || typeof query !== 'object') return;
 
     const optionsProperties = new Set([ 'sort', 'order', 'limit', 'offset' ]);
+    const params = { };
     const options = { };
 
     for (const key in query) {
       if (optionsProperties.has(key)) {
         options[key] = query[key];
-        delete query[key];
+      }
+      else {
+        params[key] = query[key];
       }
     }
 
-    return { options, params: query };
+    return { options, params };
   }
 
 }
