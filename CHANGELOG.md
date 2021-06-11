@@ -1,3 +1,10 @@
+## [2.9.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.1...v2.9.2) (2021-06-11)
+
+
+### Bug Fixes
+
+* on update only force initialization of collections ([621d1d3](https://github.com/etienne-bechara/nestjs-orm/commit/621d1d358f0211347a4eac9f89dad7ed72566bbc))
+
 ## [2.9.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.0...v2.9.1) (2021-06-04)
 
 
