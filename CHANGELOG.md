@@ -1,3 +1,11 @@
+## [2.9.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.0...v2.9.1) (2021-06-04)
+
+
+### Bug Fixes
+
+* get read arguments when usign class dtos ([1c89829](https://github.com/etienne-bechara/nestjs-orm/commit/1c89829af3ca8d173c2b567f47014a1f411cad36))
+* lint ([98af89b](https://github.com/etienne-bechara/nestjs-orm/commit/98af89bb30b6530ee8c58ff36822d59b7562fe87))
+
 # [2.9.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.8.14...v2.9.0) (2021-05-31)
 
 
