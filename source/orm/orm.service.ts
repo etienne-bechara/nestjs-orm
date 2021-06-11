@@ -239,7 +239,7 @@ export abstract class OrmService<Entity> {
 
   /**
    * Update target entities based on provided data.
-   * In cane of multiple, target amount must match data amount.
+   * In case of multiple, target amount must match data amount.
    * @param params
    * @param options
    */
@@ -250,11 +250,11 @@ export abstract class OrmService<Entity> {
       paramsArray[index] = await this.beforeUpdate(param);
     }
 
-    // Before assignment, ensure collections were populated
+    // Before assignment, ensure one to many and many to many collections were populated
     const assignedEntities = await Promise.all(
       paramsArray.map(async ({ entity, data }) => {
         for (const key in entity as any) {
-          if (data?.[key] && entity[key]?.isInitialized && !entity[key].isInitialized()) {
+          if (data?.[key] && entity[key]?.isInitialized && entity[key]?.toArray && !entity[key].isInitialized()) {
             await entity[key].init();
           }
         }
