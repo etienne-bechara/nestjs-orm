@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable jsdoc/require-jsdoc */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable max-len */
@@ -37,6 +38,7 @@ export abstract class OrmService<Entity> {
    * @param populate
    */
   public async populate(entities: Entity | Entity[], populate: Populate<Entity>): Promise<void> {
+    if (!entities || Array.isArray(entities) && entities.length === 0) return;
     await this.entityRepository.populate(entities, populate);
   }
 
@@ -47,6 +49,10 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
+    if (!params || Object.keys(params).length === 0) {
+      throw new InternalServerErrorException('read params must contain valid criteria');
+    }
+
     options.populate ??= this.serviceOptions.defaultPopulate ?? false;
     options.refresh = true;
     let readEntities: Entity[];
@@ -81,13 +87,17 @@ export abstract class OrmService<Entity> {
 
   /**
    * Count entities matching given criteria.
-   * @param options
+   * @param params
    */
-  public async count(options: OrmReadParams<Entity>): Promise<number> {
+  public async count(params: OrmReadParams<Entity>): Promise<number> {
     let count: number;
 
+    if (!params || Object.keys(params).length === 0) {
+      throw new InternalServerErrorException('count params must contain valid criteria');
+    }
+
     try {
-      count = await this.entityRepository.count(options as FilterQuery<Entity>);
+      count = await this.entityRepository.count(params as FilterQuery<Entity>);
     }
     catch (e) {
       this.queryExceptionHandler(e);
@@ -202,6 +212,7 @@ export abstract class OrmService<Entity> {
    */
   public async create(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity[]> {
     const dataArray = Array.isArray(data) ? data : [ data ];
+    if (!data || dataArray.length === 0) return [ ];
 
     for (const [ index, dataItem ] of dataArray.entries()) {
       dataArray[index] = await this.beforeCreate(dataItem);
@@ -245,6 +256,7 @@ export abstract class OrmService<Entity> {
    */
   public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions<Entity> = { }): Promise<Entity[]> {
     const paramsArray = Array.isArray(params) ? params : [ params ];
+    if (!params || paramsArray.length === 0) return [ ];
 
     for (const [ index, param ] of paramsArray.entries()) {
       paramsArray[index] = await this.beforeUpdate(param);
@@ -311,10 +323,11 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   private async readCreateOrUpdate(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity[]> {
-    const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
     const dataArray = Array.isArray(data) ? data : [ data ];
-    const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
+    if (!data || dataArray.length === 0) return [ ];
 
+    const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
+    const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
     const updateParams: OrmUpdateParams<Entity>[] = [ ];
     const createData: EntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
@@ -465,8 +478,8 @@ export abstract class OrmService<Entity> {
    * @param entities
    */
   public async remove(entities: Entity | Entity[]): Promise<Entity[]> {
-    if (!entities) return [ ];
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
+    if (!entities || entityArray.length === 0) return [ ];
 
     for (const [ index, entity ] of entityArray.entries()) {
       entityArray[index] = await this.beforeRemove(entity);
