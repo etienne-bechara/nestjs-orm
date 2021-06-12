@@ -1,3 +1,10 @@
+## [2.9.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.2...v2.9.3) (2021-06-12)
+
+
+### Bug Fixes
+
+* prevent accidental huge read operations ([e26081f](https://github.com/etienne-bechara/nestjs-orm/commit/e26081f2ba5726eeaf3723e75d0b53555e8ec88f))
+
 ## [2.9.2](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.1...v2.9.2) (2021-06-11)
 
 
