@@ -49,9 +49,7 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    if (!params || Object.keys(params).length === 0) {
-      throw new InternalServerErrorException('read params must contain valid criteria');
-    }
+    if (!params || Array.isArray(params) && params.length === 0) return [ ];
 
     options.populate ??= this.serviceOptions.defaultPopulate ?? false;
     options.refresh = true;
@@ -90,11 +88,8 @@ export abstract class OrmService<Entity> {
    * @param params
    */
   public async count(params: OrmReadParams<Entity>): Promise<number> {
+    if (!params || Array.isArray(params) && params.length === 0) return 0;
     let count: number;
-
-    if (!params || Object.keys(params).length === 0) {
-      throw new InternalServerErrorException('count params must contain valid criteria');
-    }
 
     try {
       count = await this.entityRepository.count(params as FilterQuery<Entity>);
