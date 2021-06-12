@@ -1,3 +1,10 @@
+## [2.9.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.3...v2.9.4) (2021-06-12)
+
+
+### Bug Fixes
+
+* read and count invalid conditions ([0b39b3b](https://github.com/etienne-bechara/nestjs-orm/commit/0b39b3be61edd91bf04467da48eac4630ce4ab7c))
+
 ## [2.9.3](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.2...v2.9.3) (2021-06-12)
 
 
