@@ -340,12 +340,14 @@ export abstract class OrmService<Entity> {
     for (const key in sampleData) Array.isArray(sampleData[key]) ? populate.push(key) : undefined;
     const matchingEntities = await this.read({ $or: clauses }, { populate });
 
-    // Remap matches to original ordering
+    // Find matching entities for each item on original data
     const matches = dataArray.map((data, i) => {
       const entity = matchingEntities.filter((e: any) => {
+        // Iterate each property of unique key definition
         for (const key in clauses[i]) {
-          if (e[key]?.id) {
-            if (clauses[i][key]?.id) {
+          // If it references a nested entity, allow to match its .id directly with property
+          if (e[key]?.id || e[key]?.id === 0) {
+            if (clauses[i][key]?.id || clauses[i][key]?.id === 0) {
               if (e[key].id !== clauses[i][key].id) return false;
             }
             else {
