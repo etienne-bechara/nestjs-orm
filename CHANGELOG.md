@@ -1,3 +1,10 @@
+## [2.9.5](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.4...v2.9.5) (2021-06-14)
+
+
+### Bug Fixes
+
+* allow id = 0 in upsert ([5ac4855](https://github.com/etienne-bechara/nestjs-orm/commit/5ac4855cc399911490267678a5217fe2ff676228))
+
 ## [2.9.4](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.3...v2.9.4) (2021-06-12)
 
 
