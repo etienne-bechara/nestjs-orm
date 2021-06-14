@@ -59,9 +59,7 @@ export abstract class OrmService<Entity> {
       options.orderBy = { [options.sort]: options.order };
     }
 
-    const findParams = typeof params === 'string' || typeof params === 'number'
-      ? { id: params }
-      : await this.beforeRead(params);
+    const findParams = await this.beforeRead(params);
 
     try {
       readEntities = await this.entityRepository.find(findParams as EntityData<Entity>, options);
@@ -107,7 +105,7 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async readById(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
-    const entities = await this.read(id, options);
+    const entities = await this.read({ id }, options);
     return entities[0];
   }
 
