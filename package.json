@@ -37,7 +37,8 @@
     "@bechara/nestjs-core": "^2.0.0"
   },
   "dependencies": {
-    "@mikro-orm/core": "4.5.5",
+    "@mikro-orm/core": "4.5.7",
+    "@mikro-orm/mysql": "4.5.7",
     "@mikro-orm/nestjs": "4.2.0",
     "class-transformer": "0.4.0",
     "class-validator": "0.13.1",
@@ -47,19 +48,18 @@
   },
   "devDependencies": {
     "@bechara/eslint-config-bechara-ts": "1.1.5",
-    "@bechara/nestjs-core": "2.3.3",
+    "@bechara/nestjs-core": "2.3.7",
     "@commitlint/cli": "12.1.4",
     "@commitlint/config-conventional": "12.1.4",
-    "@mikro-orm/mysql": "4.5.5",
-    "@nestjs/testing": "7.6.17",
+    "@nestjs/testing": "7.6.18",
     "@types/jest": "26.0.23",
-    "@types/node": "15.12.0",
-    "eslint": "7.27.0",
-    "husky": "6.0.0",
-    "jest": "27.0.4",
+    "@types/node": "15.14.0",
+    "eslint": "7.29.0",
+    "husky": "7.0.0",
+    "jest": "27.0.6",
     "lint-staged": "11.0.0",
-    "ts-jest": "27.0.2",
-    "ts-node-dev": "1.1.6",
-    "typescript": "4.3.2"
+    "ts-jest": "27.0.3",
+    "ts-node-dev": "1.1.8",
+    "typescript": "4.3.5"
   }
 }
