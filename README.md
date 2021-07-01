@@ -21,17 +21,6 @@ If not, please refer to documentation above before proceeding.
 npm i @bechara/nestjs-orm
 ```
 
-Followed by the corresponding driver of your database type:
-
-```
-npm i @mikro-orm/mongodb
-npm i @mikro-orm/mysql
-npm i @mikro-orm/mariadb
-npm i @mikro-orm/postgresql
-npm i @mikro-orm/sqlite
-```
-
-
 2\. Add these example variables to your `.env` (adjust accordingly):
 
 ```
@@ -101,9 +90,7 @@ Then, you should call its super method passing this instance as well as an optio
 Example:
 
 ```ts
-import { OrmService } from '@bechara/nestjs-orm';
-import { EntityRepository } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { OrmService, EntityRepository, InjectRepository } from '@bechara/nestjs-orm';
 import { Injectable } from '@bechara/nestjs-core';
 
 // This entity is whatever you defined in the previous step 

@@ -38,8 +38,10 @@
   },
   "dependencies": {
     "@mikro-orm/core": "4.5.7",
+    "@mikro-orm/mongodb": "4.5.7",
     "@mikro-orm/mysql": "4.5.7",
     "@mikro-orm/nestjs": "4.2.0",
+    "@mikro-orm/postgresql": "4.5.7",
     "class-transformer": "0.4.0",
     "class-validator": "0.13.1",
     "flat": "5.0.2",
