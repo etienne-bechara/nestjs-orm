@@ -1,3 +1,7 @@
+⚠️ **Disclaimer**: This project is opinionated and intended for personal use.
+
+---
+
 # NestJS ORM Component
 
 This package acts as a plugin for [NestJS Core Components](https://github.com/etienne-bechara/nestjs-core) and adds ORM capabilities including service functionalities and controllers.
