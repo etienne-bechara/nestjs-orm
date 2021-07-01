@@ -1,3 +1,10 @@
+## [2.9.6](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.5...v2.9.6) (2021-06-14)
+
+
+### Bug Fixes
+
+* allow reading by id = 0 ([e41a07c](https://github.com/etienne-bechara/nestjs-orm/commit/e41a07c3c45734c615e761745f9269d78b7e14f8))
+
 ## [2.9.5](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.4...v2.9.5) (2021-06-14)
 
 
