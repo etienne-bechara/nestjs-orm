@@ -1,3 +1,10 @@
+## [2.9.7](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.6...v2.9.7) (2021-07-01)
+
+
+### Bug Fixes
+
+* force driver versioning ([706a688](https://github.com/etienne-bechara/nestjs-orm/commit/706a688ed5c677fe6edf954fbaa46955ad2ef05c))
+
 ## [2.9.6](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.5...v2.9.6) (2021-06-14)
 
 
