@@ -33,6 +33,21 @@ export abstract class OrmService<Entity> {
   protected async afterRemove(entity: Entity): Promise<Entity> { return entity; }
 
   /**
+   * Returns custom primary key or 'id'.
+   */
+  private getPrimaryKey(): string {
+    return this.serviceOptions.primaryKey || 'id';
+  }
+
+  /**
+   * Returns custom nested primary keys including id.
+   */
+  private getNestedPrimaryKeys(): string[] {
+    this.serviceOptions.nestedPrimaryKeys ??= [];
+    return [ 'id', ...this.serviceOptions.nestedPrimaryKeys ];
+  }
+
+  /**
    * Execute ORM smart nested population on target entities.
    * @param entities
    * @param populate
@@ -105,7 +120,8 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async readById(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
-    const entities = await this.read({ id }, options);
+    const pk = this.getPrimaryKey();
+    const entities = await this.read({ [pk]: id }, options);
     return entities[0];
   }
 
@@ -158,7 +174,7 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async readAndCount(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<OrmPagination<Entity>> {
-    options.sort ??= 'id';
+    options.sort ??= this.getPrimaryKey();
     options.order ??= OrmQueryOrder.ASC;
     options.limit ||= 100;
     options.offset ??= 0;
@@ -180,14 +196,15 @@ export abstract class OrmService<Entity> {
    * @param options
    */
   public async reload(entities: Entity[], options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    const entityIds = entities.map((e) => e['id']);
+    const pk = this.getPrimaryKey();
+    const entityIds = entities.map((e) => e[pk]);
     const orderedEntities: Entity[] = [ ];
 
     const reloadedEntities = await this.read(entityIds, options);
 
     for (const id of entityIds) {
       for (const [ index, entity ] of reloadedEntities.entries()) {
-        if (entity['id'] === id) {
+        if (entity[pk] === id) {
           orderedEntities.push(entity);
           reloadedEntities.splice(index, 1);
           continue;
@@ -319,8 +336,11 @@ export abstract class OrmService<Entity> {
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
 
-    const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
     const uniqueKey = this.getValidUniqueKey(options.uniqueKey);
+    const nestedPks = this.getNestedPrimaryKeys();
+    const pk = this.getPrimaryKey();
+
+    const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
     const updateParams: OrmUpdateParams<Entity>[] = [ ];
     const createData: EntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
@@ -332,7 +352,7 @@ export abstract class OrmService<Entity> {
       return clause;
     });
 
-    // Find matching data
+    // Find matching data, ensure to populate array data which most likely are 1:m or m:n relations
     const populate = [ ];
     const sampleData = dataArray[0];
     for (const key in sampleData) Array.isArray(sampleData[key]) ? populate.push(key) : undefined;
@@ -341,17 +361,30 @@ export abstract class OrmService<Entity> {
     // Find matching entities for each item on original data
     const matches = dataArray.map((data, i) => {
       const entity = matchingEntities.filter((e: any) => {
-        // Iterate each property of unique key definition
+        // Iterate each clause of unique key definition
         for (const key in clauses[i]) {
-          // If it references a nested entity, allow to match its .id directly with property
-          if (e[key]?.id || e[key]?.id === 0) {
-            if (clauses[i][key]?.id || clauses[i][key]?.id === 0) {
-              if (e[key].id !== clauses[i][key].id) return false;
-            }
-            else {
-              if (e[key].id !== clauses[i][key]) return false;
+          // Check if matching a nested entity
+          let isNestedEntity = false;
+          let matchingNestedPk: string;
+
+          for (const nestedPk of nestedPks) {
+            if (e[key]?.[nestedPk] || e[key]?.[nestedPk] === 0) {
+              matchingNestedPk = nestedPk;
+              isNestedEntity = true;
+              break;
             }
           }
+
+          // Match nested entities
+          if (isNestedEntity) {
+            if (clauses[i][key]?.[matchingNestedPk] || clauses[i][key]?.[matchingNestedPk] === 0) {
+              if (e[key][matchingNestedPk] !== clauses[i][key][matchingNestedPk]) return false;
+            }
+            else {
+              if (e[key][matchingNestedPk] !== clauses[i][key]) return false;
+            }
+          }
+          // Match direct value
           else {
             if (e[key] !== clauses[i][key]) return false;
           }
@@ -369,7 +402,7 @@ export abstract class OrmService<Entity> {
         throw new ConflictException({
           message: 'unique constraint references more than one entity',
           uniqueKey,
-          matches: match.entity.map((e) => e['id']),
+          matches: match.entity.map((e) => e[pk]),
         });
       }
 
