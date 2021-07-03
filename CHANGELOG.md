@@ -1,3 +1,10 @@
+## [2.9.8](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.7...v2.9.8) (2021-07-01)
+
+
+### Bug Fixes
+
+* add overrides for specific repos ([3d6cf42](https://github.com/etienne-bechara/nestjs-orm/commit/3d6cf42bb38bae29e42731f4d362b905721600ba))
+
 ## [2.9.7](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.6...v2.9.7) (2021-07-01)
 
 
