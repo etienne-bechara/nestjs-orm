@@ -1,3 +1,10 @@
+## [2.9.10](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.9...v2.9.10) (2021-07-06)
+
+
+### Bug Fixes
+
+* allow non-promise on hooks ([e7e692c](https://github.com/etienne-bechara/nestjs-orm/commit/e7e692c5d06c0c806de227ae86e38f8437743237))
+
 ## [2.9.9](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.8...v2.9.9) (2021-07-03)
 
 
