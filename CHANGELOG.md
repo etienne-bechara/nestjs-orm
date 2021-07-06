@@ -1,3 +1,10 @@
+## [2.9.9](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.8...v2.9.9) (2021-07-03)
+
+
+### Bug Fixes
+
+* support custom primary keys ([9639471](https://github.com/etienne-bechara/nestjs-orm/commit/9639471cefafb4b584ddd8f8472d713d888bacc9))
+
 ## [2.9.8](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.7...v2.9.8) (2021-07-01)
 
 
