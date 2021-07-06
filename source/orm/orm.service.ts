@@ -1,8 +1,6 @@
+/* eslint-disable jsdoc/require-param */
 /* eslint-disable complexity */
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable max-len */
-/* eslint-disable unicorn/no-fn-reference-in-iterator */
 import { BadRequestException, ConflictException, InternalServerErrorException, NotFoundException, NotImplementedException } from '@bechara/nestjs-core';
 import { EntityData, EntityRepository, FilterQuery, Populate } from '@mikro-orm/core';
 
@@ -19,18 +17,25 @@ export abstract class OrmService<Entity> {
     protected readonly serviceOptions: OrmServiceOptions<Entity> = { },
   ) { }
 
-  /* Extendable Hooks */
-  protected async beforeRead(params: OrmReadParams<Entity>): Promise<OrmReadParams<Entity>> { return params; }
-  protected async afterRead(entity: Entity): Promise<Entity> { return entity; }
+  /** Before Read Hook. */
+  protected beforeRead(params: OrmReadParams<Entity>): OrmReadParams<Entity> | Promise<OrmReadParams<Entity>> { return params; }
+  /** After Read Hook. */
+  protected afterRead(entity: Entity): Entity | Promise<Entity> { return entity; }
 
-  protected async beforeCreate(data: EntityData<Entity>): Promise<EntityData<Entity>> { return data; }
-  protected async afterCreate(entity: Entity): Promise<Entity> { return entity; }
+  /** Before Create Hook. */
+  protected beforeCreate(data: EntityData<Entity>): EntityData<Entity>| Promise<EntityData<Entity>> { return data; }
+  /** After Create Hook. */
+  protected afterCreate(entity: Entity): Entity | Promise<Entity> { return entity; }
 
-  protected async beforeUpdate(params: OrmUpdateParams<Entity>): Promise<OrmUpdateParams<Entity>> { return params; }
-  protected async afterUpdate(entity: Entity): Promise<Entity> { return entity; }
+  /** Before Update Hook. */
+  protected beforeUpdate(params: OrmUpdateParams<Entity>): OrmUpdateParams<Entity> | Promise<OrmUpdateParams<Entity>> { return params; }
+  /** After Update Hook. */
+  protected afterUpdate(entity: Entity): Entity | Promise<Entity> { return entity; }
 
-  protected async beforeRemove(entity: Entity): Promise<Entity> { return entity; }
-  protected async afterRemove(entity: Entity): Promise<Entity> { return entity; }
+  /** Before Remove Hook. */
+  protected beforeRemove(entity: Entity): Entity | Promise<Entity> { return entity; }
+  /** After Remove Hook. */
+  protected afterRemove(entity: Entity): Entity | Promise<Entity> { return entity; }
 
   /**
    * Returns custom primary key or 'id'.
@@ -77,6 +82,7 @@ export abstract class OrmService<Entity> {
     const findParams = await this.beforeRead(params);
 
     try {
+      // eslint-disable-next-line unicorn/no-array-method-this-argument
       readEntities = await this.entityRepository.find(findParams as EntityData<Entity>, options);
       readEntities ??= [ ];
     }
