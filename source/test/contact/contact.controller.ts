@@ -1,4 +1,3 @@
-/* eslint-disable jsdoc/require-jsdoc */
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@bechara/nestjs-core';
 
 import { OrmController } from '../../orm/orm.controller';

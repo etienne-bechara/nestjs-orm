@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { AnyEntity, BaseEntity, wrap } from '@mikro-orm/core';
 
 export abstract class OrmBaseEntity extends BaseEntity<AnyEntity, 'id'> {
@@ -15,6 +14,7 @@ export abstract class OrmBaseEntity extends BaseEntity<AnyEntity, 'id'> {
    * Overwrites built-in serialization method to add hook.
    * @param args
    */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   public toJSON(...args: any[]): any {
     const object = wrap(this, true).toObject(...args);
     return this.beforeSerialization(object);
