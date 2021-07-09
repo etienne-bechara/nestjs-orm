@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@bechara/eslint-config-bechara-ts": "1.2.0",
-    "@bechara/nestjs-core": "2.5.0",
+    "@bechara/nestjs-core": "2.5.1",
     "@commitlint/cli": "12.1.4",
     "@commitlint/config-conventional": "12.1.4",
     "@nestjs/testing": "8.0.1",
