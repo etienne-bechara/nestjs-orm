@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Min } from '@bechara/nestjs-core';
 
 export class PersonCreateDto {
 

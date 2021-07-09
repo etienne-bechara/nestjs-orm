@@ -1,5 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@bechara/nestjs-core';
-import { map } from 'rxjs/operators';
+import { CallHandler, ExecutionContext, Injectable, map, NestInterceptor } from '@bechara/nestjs-core';
 
 @Injectable()
 export class OrmEntitySerializer implements NestInterceptor {

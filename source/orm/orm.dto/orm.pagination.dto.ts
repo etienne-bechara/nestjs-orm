@@ -1,5 +1,4 @@
-import { Transform } from 'class-transformer';
-import { IsDefined, IsIn, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsDefined, IsIn, IsNumber, IsOptional, IsString, Max, Min, Transform } from '@bechara/nestjs-core';
 
 import { OrmQueryOrder } from '../orm.enum';
 

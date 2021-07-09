@@ -1,4 +1,4 @@
-import { IsOptional } from 'class-validator';
+import { IsOptional } from '@bechara/nestjs-core';
 
 import { CompanyCreateDto } from './company.create.dto';
 

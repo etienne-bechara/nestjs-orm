@@ -1,5 +1,4 @@
-import { AppEnvironment, Injectable, InjectSecret } from '@bechara/nestjs-core';
-import { IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
+import { AppEnvironment, Injectable, InjectSecret, IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from '@bechara/nestjs-core';
 
 @Injectable()
 export class OrmConfig {
