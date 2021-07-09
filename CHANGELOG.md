@@ -1,3 +1,15 @@
+# [2.10.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.10...v2.10.0) (2021-07-09)
+
+
+### Bug Fixes
+
+* bump core ([cd0234d](https://github.com/etienne-bechara/nestjs-orm/commit/cd0234d96a1b1bb1befa5278e697b616f6e0cf03))
+
+
+### Features
+
+* bump core ([66ec17a](https://github.com/etienne-bechara/nestjs-orm/commit/66ec17ac1b6ae0b7187c8e961e0eaeda4a7fdb61))
+
 ## [2.9.10](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.9...v2.9.10) (2021-07-06)
 
 
