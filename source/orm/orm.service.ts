@@ -15,7 +15,9 @@ export abstract class OrmService<Entity> {
   public constructor(
     private readonly entityRepository: EntityRepository<Entity>,
     protected readonly serviceOptions: OrmServiceOptions<Entity> = { },
-  ) { }
+  ) {
+    this.serviceOptions.entityName ??= 'entity';
+  }
 
   /** Before Read Hook. */
   protected beforeRead(params: OrmReadParams<Entity>): OrmReadParams<Entity> | Promise<OrmReadParams<Entity>> { return params; }
@@ -91,8 +93,7 @@ export abstract class OrmService<Entity> {
     }
 
     if (!readEntities[0] && options.findOrFail) {
-      const entityError = typeof params === 'string' || typeof params === 'number' ? 'id' : 'params';
-      throw new NotFoundException(`entity with given ${entityError} does not exist`);
+      throw new NotFoundException(`${this.serviceOptions.entityName} does not exist`);
     }
 
     for (const [ index, entity ] of readEntities.entries()) {
@@ -152,7 +153,7 @@ export abstract class OrmService<Entity> {
 
     if (entities.length > 1) {
       throw new ConflictException({
-        message: 'unique constraint references more than one entity',
+        message: `unique constraint references more than one ${this.serviceOptions.entityName}`,
         params,
         entities,
       });
@@ -406,7 +407,7 @@ export abstract class OrmService<Entity> {
       // Conflict (error)
       if (match.entity.length > 1) {
         throw new ConflictException({
-          message: 'unique constraint references more than one entity',
+          message: `unique constraint references more than one ${this.serviceOptions.entityName}`,
           uniqueKey,
           matches: match.entity.map((e) => e[pk]),
         });
@@ -584,8 +585,8 @@ export abstract class OrmService<Entity> {
     if (/duplicate entry/gi.test(e.message)) {
       const violation = /entry '(.+?)' for/gi.exec(e.message);
       throw new ConflictException({
-        message: 'entity already exists',
-        key: violation ? violation[1] : null,
+        message: `${this.serviceOptions.entityName} already exists`,
+        constraint: violation ? violation[1] : null,
       });
     }
 
