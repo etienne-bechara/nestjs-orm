@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.10.0...v2.10.1) (2021-07-16)
+
+
+### Bug Fixes
+
+* custom entity name in errors ([af4fde9](https://github.com/etienne-bechara/nestjs-orm/commit/af4fde9d8b229003d80d1aa769d77be9c5f7717d))
+
 # [2.10.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.9.10...v2.10.0) (2021-07-09)
 
 
