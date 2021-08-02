@@ -1,6 +1,7 @@
-import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, UtilModule } from '@bechara/nestjs-core';
-import { MikroORMOptions } from '@mikro-orm/core';
+import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, Scope, UtilModule } from '@bechara/nestjs-core';
+import { EntityManager, MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { AsyncLocalStorage } from 'async_hooks';
 
 import { SyncModuleOptions } from '../sync/sync.interface';
 import { SyncModule } from '../sync/sync.module';
@@ -44,7 +45,12 @@ export class OrmModule {
       imports: [
         MikroOrmModule.forRootAsync({
           inject: [ OrmInjectionToken.ORM_PROVIDER_OPTIONS ],
-          useFactory: (mikroOrmOptions: OrmModuleOptions) => mikroOrmOptions,
+          scope: Scope.REQUEST,
+          useFactory: (mikroOrmOptions: OrmModuleOptions) => ({
+            ...mikroOrmOptions,
+            registerRequestContext: false,
+            context: (): EntityManager => new AsyncLocalStorage<EntityManager>().getStore(),
+          }),
         }),
 
         SyncModule.registerAsync({
