@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.1...v3.1.2) (2021-08-03)
+
+
+### Bug Fixes
+
+* simplify ssl var naming ([102c323](https://github.com/etienne-bechara/nestjs-orm/commit/102c3238936360793b119ab0dd6a17d471b915fc))
+
 ## [3.1.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.0...v3.1.1) (2021-08-03)
 
 
