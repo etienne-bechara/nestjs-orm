@@ -16,38 +16,38 @@ export class CompanyController extends OrmController<CompanyEntity> {
   }
 
   @Get()
-  public async get(@Query() query: CompanyReadDto): Promise<OrmPagination<CompanyEntity>> {
+  public get(@Query() query: CompanyReadDto): Promise<OrmPagination<CompanyEntity>> {
     const { params, options } = this.getReadArguments(query);
     return this.entityService.readAndCount(params, options);
   }
 
   @Get(':id')
-  public async getById(@Param('id') id: string): Promise<CompanyEntity> {
+  public getById(@Param('id') id: string): Promise<CompanyEntity> {
     return this.entityService.readByIdOrFail(id);
   }
 
   @Post()
-  public async post(@Body() body: CompanyCreateDto): Promise<CompanyEntity> {
+  public post(@Body() body: CompanyCreateDto): Promise<CompanyEntity> {
     return this.entityService.createOne(body);
   }
 
   @Put()
-  public async put(@Body() body: CompanyCreateDto): Promise<CompanyEntity> {
+  public put(@Body() body: CompanyCreateDto): Promise<CompanyEntity> {
     return this.entityService.upsertOne(body);
   }
 
   @Put(':id')
-  public async putById(@Param('id') id: string, @Body() body: CompanyCreateDto): Promise<CompanyEntity> {
+  public putById(@Param('id') id: string, @Body() body: CompanyCreateDto): Promise<CompanyEntity> {
     return this.entityService.updateById(id, body);
   }
 
   @Patch(':id')
-  public async patchById(@Param('id') id: string, @Body() body: CompanyUpdateDto): Promise<CompanyEntity> {
+  public patchById(@Param('id') id: string, @Body() body: CompanyUpdateDto): Promise<CompanyEntity> {
     return this.entityService.updateById(id, body);
   }
 
   @Delete(':id')
-  public async deleteById(@Param('id') id: string): Promise<CompanyEntity> {
+  public deleteById(@Param('id') id: string): Promise<CompanyEntity> {
     return this.entityService.removeById(id);
   }
 
