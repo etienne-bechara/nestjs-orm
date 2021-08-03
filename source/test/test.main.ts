@@ -46,13 +46,13 @@ void AppModule.bootServer({
           enable: true,
           safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,
         },
-        driverOptions: ormConfig.ORM_SSL_SERVER_CA
+        driverOptions: ormConfig.ORM_SERVER_CA
           ? {
             connection: {
               ssl: {
-                ca: Buffer.from(ormConfig.ORM_SSL_SERVER_CA, 'base64'),
-                cert: Buffer.from(ormConfig.ORM_SSL_CLIENT_CERTIFICATE, 'base64'),
-                key: Buffer.from(ormConfig.ORM_SSL_CLIENT_KEY, 'base64'),
+                ca: Buffer.from(ormConfig.ORM_SERVER_CA, 'base64'),
+                cert: Buffer.from(ormConfig.ORM_CLIENT_CERTIFICATE, 'base64'),
+                key: Buffer.from(ormConfig.ORM_CLIENT_KEY, 'base64'),
               },
             },
           }

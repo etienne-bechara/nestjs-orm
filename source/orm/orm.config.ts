@@ -41,16 +41,16 @@ export class OrmConfig {
   @IsOptional()
   @InjectSecret()
   @IsBase64()
-  public readonly ORM_SSL_SERVER_CA: string;
+  public readonly ORM_SERVER_CA: string;
 
   @IsOptional()
   @InjectSecret()
   @IsBase64()
-  public readonly ORM_SSL_CLIENT_CERTIFICATE: string;
+  public readonly ORM_CLIENT_CERTIFICATE: string;
 
   @IsOptional()
   @InjectSecret()
   @IsBase64()
-  public readonly ORM_SSL_CLIENT_KEY: string;
+  public readonly ORM_CLIENT_KEY: string;
 
 }
