@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.10.1...v2.11.0) (2021-08-02)
+
+
+### Features
+
+* use async local storage by default ([e4d353f](https://github.com/etienne-bechara/nestjs-orm/commit/e4d353fb28bb15b95cfc34cf0e4f45c0c816d525))
+
 ## [2.10.1](https://github.com/etienne-bechara/nestjs-orm/compare/v2.10.0...v2.10.1) (2021-07-16)
 
 
