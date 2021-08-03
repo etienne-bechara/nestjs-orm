@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.0...v3.1.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* bound interceptor globally instead of per controller ([2d2cc24](https://github.com/etienne-bechara/nestjs-orm/commit/2d2cc24508788cdecdd73a0dcd52f3e7857c76d5))
+
 # [3.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.0.1...v3.1.0) (2021-08-03)
 
 
