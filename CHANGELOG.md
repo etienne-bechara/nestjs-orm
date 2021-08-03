@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.0.1...v3.1.0) (2021-08-03)
+
+
+### Features
+
+* ssl ([1ec4282](https://github.com/etienne-bechara/nestjs-orm/commit/1ec42822437f9fc5e9c2a2b40e3b260c55e5285e))
+
 ## [3.0.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.0.0...v3.0.1) (2021-08-03)
 
 
