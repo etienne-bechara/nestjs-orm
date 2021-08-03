@@ -236,7 +236,6 @@ export class UserController extends OrmController<UserEntity> {
   }
 
 }
-
 ```
 
 
