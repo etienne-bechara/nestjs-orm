@@ -5,7 +5,7 @@ import { BadRequestException, ConflictException, InternalServerErrorException, N
 import { EntityData, EntityRepository, FilterQuery, Populate } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from './orm.enum';
-import { OrmCreateOptions, OrmPagination, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from './orm.interface';
+import { OrmCreateOptions, OrmPagination, OrmReadArguments, OrmReadOptions, OrmReadParams, OrmServiceOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from './orm.interface';
 
 /**
  * Creates an abstract service tied with a repository.
@@ -52,6 +52,29 @@ export abstract class OrmService<Entity> {
   private getNestedPrimaryKeys(): string[] {
     this.serviceOptions.nestedPrimaryKeys ??= [];
     return [ 'id', ...this.serviceOptions.nestedPrimaryKeys ];
+  }
+
+  /**
+   * Given a request query, split properties between params and options.
+   * @param query
+   */
+  public getReadArguments(query: any): OrmReadArguments<Entity> {
+    if (!query || typeof query !== 'object') return;
+
+    const optionsProperties = new Set([ 'sort', 'order', 'limit', 'offset' ]);
+    const params = { };
+    const options = { };
+
+    for (const key in query) {
+      if (optionsProperties.has(key)) {
+        options[key] = query[key];
+      }
+      else {
+        params[key] = query[key];
+      }
+    }
+
+    return { options, params };
   }
 
   /**

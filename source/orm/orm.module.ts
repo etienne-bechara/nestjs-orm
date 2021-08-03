@@ -1,4 +1,4 @@
-import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, RequestStorage, UtilModule } from '@bechara/nestjs-core';
+import { APP_INTERCEPTOR, AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, RequestStorage, UtilModule } from '@bechara/nestjs-core';
 import { EntityManager, MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
@@ -6,6 +6,7 @@ import { SyncModuleOptions } from '../sync/sync.interface';
 import { SyncModule } from '../sync/sync.module';
 import { OrmBaseEntity, OrmBigIntEntity, OrmBigIntTimestampEntity, OrmIntEntity, OrmIntTimestampEntity, OrmTimestampEntity, OrmUuidEntity, OrmUuidTimestampEntity } from './orm.entity';
 import { OrmInjectionToken } from './orm.enum';
+import { OrmEntityManager } from './orm.interceptor';
 import { OrmAsyncModuleOptions, OrmModuleOptions } from './orm.interface';
 
 @Module({ })
@@ -61,6 +62,10 @@ export class OrmModule {
 
       providers: [
         AppConfig,
+        {
+          provide: APP_INTERCEPTOR,
+          useClass: OrmEntityManager,
+        },
         {
           provide: OrmInjectionToken.ORM_MODULE_OPTIONS,
           inject: options.inject || [ ],
