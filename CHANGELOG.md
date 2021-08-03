@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.0.0...v3.0.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* remove unnecessary async ([ed68078](https://github.com/etienne-bechara/nestjs-orm/commit/ed680788822961410dd9b0d9512eb46ce987f7bb))
+
 # [3.0.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.11.0...v3.0.0) (2021-08-03)
 
 
