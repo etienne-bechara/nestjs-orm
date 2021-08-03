@@ -1,15 +1,27 @@
-import { CallHandler, ExecutionContext, Injectable, map, NestInterceptor } from '@bechara/nestjs-core';
+import { CallHandler, ExecutionContext, Injectable, map, NestInterceptor, RequestService } from '@bechara/nestjs-core';
+import { MikroORM } from '@mikro-orm/core';
 
 @Injectable()
-export class OrmEntitySerializer implements NestInterceptor {
+export class OrmEntityManager implements NestInterceptor {
+
+  public constructor(
+    private readonly mikroOrm: MikroORM,
+    private readonly requestService: RequestService,
+  ) { }
 
   /**
-   * If returning data contain entity classes, calls their stringify method
-   * to prevent sending private data or exceeding call stack size.
+   * Before a new request arrives at controller, creates a fresh entity
+   * manager for manipulation.
+   *
+   * After processing, if returning data contain entity classes, call
+   * their stringify method as well as remove reference recursion.
    * @param context
    * @param next
    */
   public intercept(context: ExecutionContext, next: CallHandler): any {
+    const store = this.requestService.getStore();
+    store.set('em', this.mikroOrm.em.fork(true, true));
+
     return next
       .handle()
       .pipe(

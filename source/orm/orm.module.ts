@@ -1,7 +1,6 @@
-import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, Scope, UtilModule } from '@bechara/nestjs-core';
+import { AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, RequestStorage, UtilModule } from '@bechara/nestjs-core';
 import { EntityManager, MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { AsyncLocalStorage } from 'async_hooks';
 
 import { SyncModuleOptions } from '../sync/sync.interface';
 import { SyncModule } from '../sync/sync.module';
@@ -14,8 +13,8 @@ export class OrmModule {
 
   /**
    * Configure the underlying ORM component with the following additions:
-   * • Adds built-in logger service for debugging (local only)
-   * • Adds programmatically schema sync.
+   * - Adds built-in logger service for debugging (local only)
+   * - Adds programmatically schema sync.
    * @param options
    */
   public static registerAsync(options: OrmAsyncModuleOptions): DynamicModule {
@@ -45,11 +44,10 @@ export class OrmModule {
       imports: [
         MikroOrmModule.forRootAsync({
           inject: [ OrmInjectionToken.ORM_PROVIDER_OPTIONS ],
-          scope: Scope.REQUEST,
           useFactory: (mikroOrmOptions: OrmModuleOptions) => ({
             ...mikroOrmOptions,
             registerRequestContext: false,
-            context: (): EntityManager => new AsyncLocalStorage<EntityManager>().getStore(),
+            context: (): EntityManager => RequestStorage.getStore()?.get('em'),
           }),
         }),
 

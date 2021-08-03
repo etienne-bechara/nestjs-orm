@@ -1,10 +1,10 @@
 import { UseInterceptors } from '@bechara/nestjs-core';
 
-import { OrmEntitySerializer } from './orm.interceptor';
+import { OrmEntityManager } from './orm.interceptor';
 import { OrmReadArguments } from './orm.interface';
 import { OrmService } from './orm.service';
 
-@UseInterceptors(OrmEntitySerializer)
+@UseInterceptors(OrmEntityManager)
 export abstract class OrmController<Entity> {
 
   public constructor(

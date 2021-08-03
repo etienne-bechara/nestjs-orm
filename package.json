@@ -34,7 +34,7 @@
     "test": "jest --verbose --forceExit --passWithNoTests --config .config/jest/jest.config.js"
   },
   "peerDependencies": {
-    "@bechara/nestjs-core": "^2.0.0"
+    "@bechara/nestjs-core": "^3.0.0"
   },
   "dependencies": {
     "@mikro-orm/core": "4.5.7",
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@bechara/eslint-config-bechara-ts": "1.2.0",
-    "@bechara/nestjs-core": "2.8.2",
+    "@bechara/nestjs-core": "3.0.0",
     "@commitlint/cli": "13.1.0",
     "@commitlint/config-conventional": "13.1.0",
     "@nestjs/testing": "8.0.5",

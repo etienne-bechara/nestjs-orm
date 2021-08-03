@@ -1,1 +1,1 @@
-export * from './orm.entity.serializer';
+export * from './orm.entity.manager';
