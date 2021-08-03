@@ -1,3 +1,16 @@
+# [3.0.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.11.0...v3.0.0) (2021-08-03)
+
+
+### Features
+
+* add ssl support ([70873f4](https://github.com/etienne-bechara/nestjs-orm/commit/70873f47e891da82ab7ad86779dfadeab0b3a227))
+* use async local storage as singleton ([2220cf6](https://github.com/etienne-bechara/nestjs-orm/commit/2220cf6bf4866165dbbe82782cbdda22cfc17d65))
+
+
+### BREAKING CHANGES
+
+* use async local storage as singleton
+
 # [2.11.0](https://github.com/etienne-bechara/nestjs-orm/compare/v2.10.1...v2.11.0) (2021-08-02)
 
 
