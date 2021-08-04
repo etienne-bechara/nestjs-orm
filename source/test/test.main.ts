@@ -2,11 +2,11 @@ import { AppEnvironment, AppModule } from '@bechara/nestjs-core';
 
 import { OrmConfig } from '../orm/orm.config';
 import { OrmModule } from '../orm/orm.module';
-import { CompanyEntity } from './company/company.entity';
+import { Company } from './company/company.entity';
 import { CompanyModule } from './company/company.module';
-import { ContactEntity } from './contact/contact.entity';
+import { Contact } from './contact/contact.entity';
 import { ContactModule } from './contact/contact.module';
-import { PersonEntity } from './person/person.entity';
+import { Person } from './person/person.entity';
 import { PersonModule } from './person/person.module';
 import { StartupModule } from './startup/startup.module';
 
@@ -26,9 +26,9 @@ void AppModule.bootServer({
     OrmModule.registerAsync({
       disableEntityScan: true,
       entities: [
-        ContactEntity,
-        CompanyEntity,
-        PersonEntity,
+        Contact,
+        Company,
+        Person,
       ],
       inject: [ OrmConfig ],
       useFactory: (ormConfig: OrmConfig) => ({

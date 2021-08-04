@@ -23,13 +23,19 @@ npm i @bechara/nestjs-orm
 
 2\. Add these example variables to your `.env` (adjust accordingly):
 
-```
+```bash
+# Standard connection
 ORM_TYPE='mysql'
 ORM_HOST='localhost'
 ORM_PORT=3306
 ORM_USERNAME='root'
-ORM_PASSWORD='1234'
+ORM_PASSWORD=''
 ORM_DATABASE='test'
+
+# SSL options
+ORM_SERVER_CA=''
+ORM_CLIENT_CERTIFICATE=''
+ORM_CLIENT_KEY=''
 ```
 
 It is recommended that you have a local database in order to test connectivity.
@@ -92,38 +98,36 @@ We may simplify the process of adding data storage functionality as:
 
 Please refer to the official [Defining Entities](https://mikro-orm.io/docs/defining-entities) documentation from MikroORM.
 
-### Creating an Entity Service
+### Creating an Entity Repository
 
-In order to create a new entity service, extend the provided abstract service from this package and inject an repository instance.
+In order to create a new entity repository, extend the provided abstract repository from this package.
 
 Then, you should call its super method passing this instance as well as an optional object with further customizations.
 
 Example:
 
 ```ts
-import { OrmService, EntityRepository, InjectRepository } from '@bechara/nestjs-orm';
-import { Injectable } from '@bechara/nestjs-core';
+import { EntityManager, EntityName, OrmRepository, Repository } from '@bechara/nestjs-orm';
 
-// This entity is whatever you defined in the previous step 
-import { UserEntity } from './user.entity';
+import { User } from './user.entity';
 
-@Injectable()
-export class UserService extends OrmService<UserEntity> {
+@Repository(User)
+export class UserRepository extends OrmRepository<User> {
 
   public constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: EntityRepository<UserEntity>,
+    protected readonly entityManager: EntityManager,
+    protected readonly entityName: EntityName<User>,
   ) {
-    super(userRepository, {
-      defaultUniqueKey: [ 'name' ], // [Optional] Combination of fields to enable entity upsert
-      defaultPopulate: [ 'employers' ], // [Optional] Nested entities to automatic load when no 'populate' option is provided
+    super(entityManager, entityName, {
+      entityName: 'user',
+      defaultUniqueKey: [ 'name', 'surname' ],
     });
   }
 
 }
 ```
 
-At this point, you may inject you `UserService` in any order provider and have its methods available to you:
+At this point, an injectable `UserRepository` will be available throughout the application, exposing extra ORM functionalities:
 
 ```ts
 // Read entities
@@ -134,13 +138,14 @@ readByIdOrFail(): Promise<Entity>;
 readUnique(): Promise<Entity>;
 readUniqueOrFail(): Promise<Entity>;
 readAndCount(): Promise<OrmPaginatedResponse<Entity>>;
+load(): Promise<void>
 reload(): Promise<Entity[]>;
 
 // Create entities
-create(): Promise<Entity[]>;
-createOne(): Promise<Entity>;
-readOrCreate(): Promise<Entity[]>;
-readOrCreateOne(): Promise<Entity>;
+insert(): Promise<Entity[]>;
+insertOne(): Promise<Entity>;
+readOrInsert(): Promise<Entity[]>;
+readOrInsertOne(): Promise<Entity>;
 
 // Update entities
 update(): Promise<Entity[]>;
@@ -150,30 +155,48 @@ upsert(): Promise<Entity[]>;
 upsertOne(): Promise<Entity>;
 
 // Remove entities
-remove(): Promise<Entity[]>;
-removeOne(): Promise<Entity>;
-removeById(id: string): Promise<Entity>;
+delete(): Promise<Entity[]>;
+deleteOne(): Promise<Entity>;
+deleteById(id: string): Promise<Entity>;
 ```
 
-You may also extending the functionality of these built-in methods with these provided hooks:
+### Creating an Subscriber
+
+If you would like to create hooks when triggering certain operations, it is possible by defining an injectable subscriber:
 
 ```ts
-beforeRead(): Promise<OrmReadParams<Entity>>;
-afterRead(): Promise<Entity>;
+import { Injectable, LoggerService } from '@bechara/nestjs-core';
+import { EntityManager, OrmSubscriber, OrmSubscriberParams } from '@bechara/nestjs-orm';
 
-beforeCreate(): Promise<EntityData<Entity>>;
-afterCreate(): Promise<Entity>;
+import { User } from './user.entity';
 
-beforeUpdate(): Promise<OrmUpdateParams<Entity>>;
-afterUpdate(): Promise<Entity>;
+@Injectable()
+export class UserSubscriber implements OrmSubscriber<User> {
 
-beforeRemove(): Promise<Entity>;
-afterRemove(): Promise<Entity>;
+  public constructor(
+    private readonly entityManager: EntityManager,
+    private readonly loggerService: LoggerService,
+  ) {
+    entityManager.getEventManager().registerSubscriber(this);
+  }
+
+  /**
+   * Before update hook example.
+   * @param params
+   */
+  public beforeUpdate(params: OrmSubscriberParams<User>): Promise<void> {
+    const { changeSet } = params;
+    this.loggerService.warning('beforeUpdate: changeSet', changeSet);
+    return;
+  }
+
+}
 ```
+
 
 ### Creating an Entity Controller
 
-Finally, expose a controller injecting your service as dependency to allow manipulation through HTTP requests.
+Finally, expose a controller injecting your repository as dependency to allow manipulation through HTTP requests.
 
 If you are looking for CRUD functionality you may copy exactly as the template below.
 
@@ -189,50 +212,48 @@ import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
 @Controller('user')
-export class UserController extends OrmController<UserEntity> {
+export class UserController {
 
   public constructor(
-    private readonly userService: UserService,
-  ) {
-    super(userService);
-  }
+    private readonly userRepository: UserRepository,
+  ) { }
 
   @Get()
   public async get(@Query() query: UserReadDto): Promise<OrmPagination<UserEntity>> {
     // getReadArguments() is a built-in method that extracts pagination
     // properties like sort, order, limit and offset
     const { params, options } = this.getReadArguments(query);
-    return this.entityService.readAndCount(params, options);
+    return this.userRepository.readAndCount(params, options);
   }
 
   @Get(':id')
   public async getById(@Param('id') id: string): Promise<UserEntity> {
-    return this.entityService.readByIdOrFail(id);
+    return this.userRepository.readByIdOrFail(id);
   }
 
   @Post()
   public async post(@Body() body: UserCreateDto): Promise<UserEntity> {
-    return this.entityService.createOne(body);
+    return this.userRepository.insertOne(body);
   }
 
   @Put()
   public async put(@Body() body: UserCreateDto): Promise<UserEntity> {
-    return this.entityService.upsertOne(body);
+    return this.userRepository.upsertOne(body);
   }
 
   @Put(':id')
   public async putById(@Param('id') id: string, @Body() body: UserCreateDto): Promise<UserEntity> {
-    return this.entityService.updateById(id, body);
+    return this.userRepository.updateById(id, body);
   }
 
   @Patch(':id')
   public async patchById(@Param('id') id: string, @Body() body: UserUpdateDto): Promise<UserEntity> {
-    return this.entityService.updateById(id, body);
+    return this.userRepository.updateById(id, body);
   }
 
   @Delete(':id')
   public async deleteById(@Param('id') id: string): Promise<UserEntity> {
-    return this.entityService.removeById(id);
+    return this.userRepository.deleteById(id);
   }
 
 }

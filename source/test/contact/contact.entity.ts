@@ -1,12 +1,12 @@
 import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
 
 import { OrmUuidTimestampEntity } from '../../orm/orm.entity';
-import { PersonEntity } from '../person/person.entity';
+import { Person } from '../person/person.entity';
 import { ContactType } from './contact.enum';
 
-@Entity({ tableName: 'contact' })
+@Entity()
 @Unique({ properties: [ 'value' ] })
-export class ContactEntity extends OrmUuidTimestampEntity {
+export class Contact extends OrmUuidTimestampEntity {
 
   @Enum(() => ContactType)
   public type: ContactType;
@@ -17,7 +17,7 @@ export class ContactEntity extends OrmUuidTimestampEntity {
   @Property()
   public primary: boolean = false;
 
-  @ManyToOne(() => PersonEntity)
-  public person: PersonEntity;
+  @ManyToOne(() => Person)
+  public person: Person;
 
 }

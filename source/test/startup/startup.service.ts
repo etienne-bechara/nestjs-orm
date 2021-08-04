@@ -1,18 +1,18 @@
 import { Injectable, LoggerService } from '@bechara/nestjs-core';
 
-import { CompanyService } from '../company/company.service';
+import { CompanyRepository } from '../company/company.repository';
 import { ContactType } from '../contact/contact.enum';
-import { ContactService } from '../contact/contact.service';
-import { PersonService } from '../person/person.service';
+import { ContactRepository } from '../contact/contact.repository';
+import { PersonRepository } from '../person/person.repository';
 
 @Injectable()
 export class StartupService {
 
   public constructor(
-    private readonly contactService: ContactService,
-    private readonly companyService: CompanyService,
+    private readonly contactRepository: ContactRepository,
+    private readonly companyRepository: CompanyRepository,
     private readonly loggerService: LoggerService,
-    private readonly personService: PersonService,
+    private readonly personRepository: PersonRepository,
   ) {
     void this.createBaseEntities();
   }
@@ -26,7 +26,7 @@ export class StartupService {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // John, Jane and Robert
-      const [ johnDoe, johnSmith, robertDoe ] = await this.personService.readOrCreate([
+      const [ johnDoe, johnSmith, robertDoe ] = await this.personRepository.readOrInsert([
         {
           name: 'John',
           surname: 'Doe',
@@ -52,12 +52,12 @@ export class StartupService {
       ]);
 
       // Google has a headquarter and 2 branches
-      const googleHq = await this.companyService.upsertOne({
+      const googleHq = await this.companyRepository.upsertOne({
         name: 'GOOGLE LLC',
         capital: 123_456_789,
       });
 
-      await this.companyService.upsert([
+      await this.companyRepository.upsert([
         {
           name: 'FACEBOOK LLC',
           capital: 76_543_210,
@@ -78,7 +78,7 @@ export class StartupService {
       ]);
 
       // John Doe has 3 contact methods
-      await this.contactService.upsert([
+      await this.contactRepository.upsert([
         {
           type: ContactType.EMAIL,
           value: 'john.doe@google.com',

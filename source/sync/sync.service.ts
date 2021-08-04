@@ -36,7 +36,7 @@ export class SyncService {
    * configured entities.
    * @param options
    */
-  public async syncSchema(options: SyncModuleOptions): Promise<SyncSchemaResult> {
+  public async syncSchema(options: SyncModuleOptions = { }): Promise<SyncSchemaResult> {
     this.loggerService.info('[OrmService] Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();

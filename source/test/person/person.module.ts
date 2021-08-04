@@ -1,11 +1,14 @@
 import { Module } from '@bechara/nestjs-core';
 
 import { PersonController } from './person.controller';
-import { PersonService } from './person.service';
+import { PersonSubscriber } from './person.subscriber';
 
 @Module({
-  controllers: [ PersonController ],
-  providers: [ PersonService ],
-  exports: [ PersonService ],
+  controllers: [
+    PersonController,
+  ],
+  providers: [
+    PersonSubscriber,
+  ],
 })
 export class PersonModule { }

@@ -1,11 +1,11 @@
 import { Collection, Entity, ManyToMany, ManyToOne, OneToMany, Property, Unique } from '@mikro-orm/core';
 
 import { OrmUuidTimestampEntity } from '../../orm/orm.entity';
-import { PersonEntity } from '../person/person.entity';
+import { Person } from '../person/person.entity';
 
-@Entity({ tableName: 'company' })
+@Entity()
 @Unique({ properties: [ 'name' ] })
-export class CompanyEntity extends OrmUuidTimestampEntity {
+export class Company extends OrmUuidTimestampEntity {
 
   @Property()
   public name: string;
@@ -13,13 +13,13 @@ export class CompanyEntity extends OrmUuidTimestampEntity {
   @Property()
   public capital: number;
 
-  @ManyToOne(() => CompanyEntity, { nullable: true })
-  public headquarter: CompanyEntity;
+  @ManyToOne(() => Company, { nullable: true })
+  public headquarter: Company;
 
-  @ManyToMany(() => PersonEntity, user => user.employers, { owner: true, pivotTable: 'company_employee' })
-  public employees = new Collection<PersonEntity>(this);
+  @ManyToMany(() => Person, user => user.employers, { owner: true, pivotTable: 'company_employee' })
+  public employees = new Collection<Person>(this);
 
-  @OneToMany(() => CompanyEntity, company => company.headquarter)
-  public branches = new Collection<PersonEntity>(this);
+  @OneToMany(() => Company, company => company.headquarter)
+  public branches = new Collection<Person>(this);
 
 }

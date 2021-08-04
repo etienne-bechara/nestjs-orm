@@ -1,12 +1,12 @@
 import { Collection, Entity, ManyToMany, OneToMany, Property, Unique } from '@mikro-orm/core';
 
 import { OrmUuidTimestampEntity } from '../../orm/orm.entity';
-import { CompanyEntity } from '../company/company.entity';
-import { ContactEntity } from '../contact/contact.entity';
+import { Company } from '../company/company.entity';
+import { Contact } from '../contact/contact.entity';
 
-@Entity({ tableName: 'person' })
+@Entity()
 @Unique({ properties: [ 'name', 'surname' ] })
-export class PersonEntity extends OrmUuidTimestampEntity {
+export class Person extends OrmUuidTimestampEntity {
 
   @Property()
   public name: string;
@@ -26,17 +26,17 @@ export class PersonEntity extends OrmUuidTimestampEntity {
   @Property({ nullable: true })
   public preferences: Record<string, any>;
 
-  @OneToMany(() => ContactEntity, contact => contact.person)
-  public contacts = new Collection<ContactEntity>(this);
+  @OneToMany(() => Contact, contact => contact.person)
+  public contacts = new Collection<Contact>(this);
 
-  @ManyToMany(() => CompanyEntity, company => company.employees)
-  public employers = new Collection<CompanyEntity>(this);
+  @ManyToMany(() => Company, company => company.employees)
+  public employers = new Collection<Company>(this);
 
   /**
    * Join names.
    * @param person
    */
-  protected beforeSerialization(person: PersonEntity): any {
+  protected beforeSerialization(person: Person): any {
     const output: any = { ...person };
     output.fullName = `${output.name} ${output.surname}`;
     delete output.name;

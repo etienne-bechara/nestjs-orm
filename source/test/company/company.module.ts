@@ -1,11 +1,10 @@
 import { Module } from '@bechara/nestjs-core';
 
 import { CompanyController } from './company.controller';
-import { CompanyService } from './company.service';
 
 @Module({
-  controllers: [ CompanyController ],
-  providers: [ CompanyService ],
-  exports: [ CompanyService ],
+  controllers: [
+    CompanyController,
+  ],
 })
 export class CompanyModule { }

@@ -1,6 +1,6 @@
 import { Populate } from '@mikro-orm/core';
 
-export interface OrmServiceOptions<Entity> {
+export interface OrmRepositoryOptions<Entity> {
   entityName?: string;
   primaryKey?: string;
   nestedPrimaryKeys?: string[];
