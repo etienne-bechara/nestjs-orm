@@ -1,3 +1,10 @@
+## [3.1.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.2...v3.1.3) (2021-08-04)
+
+
+### Bug Fixes
+
+* bump core ([f23acc7](https://github.com/etienne-bechara/nestjs-orm/commit/f23acc73c24d4b34cc51c99535cc773b05105c09))
+
 ## [3.1.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.1...v3.1.2) (2021-08-03)
 
 
