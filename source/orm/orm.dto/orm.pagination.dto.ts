@@ -13,12 +13,12 @@ export abstract class OrmPaginationDto {
   public order?: string;
 
   @IsOptional()
-  @Transform((o) => Number.parseInt(o.value))
+  @Transform((o) => Number(o.value), { toClassOnly: true })
   @IsNumber() @Min(1) @Max(1000)
   public limit?: number;
 
   @IsOptional()
-  @Transform((o) => Number.parseInt(o.value))
+  @Transform((o) => Number(o.value), { toClassOnly: true })
   @IsNumber() @Min(0)
   public offset?: number;
 
