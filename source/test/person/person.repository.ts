@@ -11,7 +11,7 @@ export class PersonRepository extends OrmRepository<Person> {
     protected readonly entityName: EntityName<Person>,
   ) {
     super(entityManager, entityName, {
-      entityName: 'person',
+      displayName: 'person',
       defaultUniqueKey: [ 'name', 'surname' ],
     });
   }

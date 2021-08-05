@@ -11,7 +11,7 @@ export class ContactRepository extends OrmRepository<Contact> {
     protected readonly entityName: EntityName<Contact>,
   ) {
     super(entityManager, entityName, {
-      entityName: 'contact',
+      displayName: 'contact',
       defaultUniqueKey: [ 'value' ],
       defaultPopulate: [ 'person' ],
     });

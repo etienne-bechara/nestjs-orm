@@ -11,7 +11,7 @@ export class CompanyRepository extends OrmRepository<Company> {
     protected readonly entityName: EntityName<Company>,
   ) {
     super(entityManager, entityName, {
-      entityName: 'company',
+      displayName: 'company',
       defaultUniqueKey: [ 'name' ],
       defaultPopulate: [ 'headquarter', 'branches' ],
     });

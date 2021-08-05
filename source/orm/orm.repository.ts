@@ -11,7 +11,7 @@ export abstract class OrmRepository<T> extends OrmDeleteRepository<T> {
     protected readonly repositoryOptions: OrmRepositoryOptions<T> = { },
   ) {
     super(entityManager, entityName, repositoryOptions);
-    this.repositoryOptions.entityName ??= 'entity';
+    this.repositoryOptions.displayName ??= 'entity';
   }
 
 }

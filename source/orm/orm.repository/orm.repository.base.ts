@@ -60,7 +60,7 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
     if (/duplicate entry/gi.test(e.message)) {
       const violation = /entry '(.+?)' for/gi.exec(e.message);
       throw new ConflictException({
-        message: `${this.repositoryOptions.entityName} already exists`,
+        message: `${this.repositoryOptions.displayName} already exists`,
         constraint: violation ? violation[1] : null,
       });
     }
