@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.2.0...v3.2.1) (2021-08-05)
+
+
+### Bug Fixes
+
+* interface name conflict ([f8cb7f3](https://github.com/etienne-bechara/nestjs-orm/commit/f8cb7f3e8c302f3e83b28d42eb26db744f736e7d))
+
 # [3.2.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.3...v3.2.0) (2021-08-04)
 
 
