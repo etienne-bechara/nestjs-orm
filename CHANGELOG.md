@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.3...v3.2.0) (2021-08-04)
+
+
+### Features
+
+* refactor extendable service to be repository based ([2748a2a](https://github.com/etienne-bechara/nestjs-orm/commit/2748a2af6694d83c9c7b157a893bfa5f85cb4a4e))
+
 ## [3.1.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.1.2...v3.1.3) (2021-08-04)
 
 
