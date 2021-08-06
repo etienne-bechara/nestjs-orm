@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.2.1...v3.2.2) (2021-08-05)
+
+
+### Bug Fixes
+
+* pagination dto transformation ([77cff06](https://github.com/etienne-bechara/nestjs-orm/commit/77cff067d3c64c2bdf75d6cd1560a1fa812a4aa5))
+
 ## [3.2.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.2.0...v3.2.1) (2021-08-05)
 
 
