@@ -26,7 +26,7 @@ export class StartupService {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // John, Jane and Robert
-      const [ johnDoe, johnSmith, robertDoe ] = await this.personRepository.readOrInsert([
+      const [ johnDoe, johnSmith, robertDoe ] = await this.personRepository.upsert([
         {
           name: 'John',
           surname: 'Doe',
