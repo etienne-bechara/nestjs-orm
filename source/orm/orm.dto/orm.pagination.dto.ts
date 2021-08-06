@@ -1,4 +1,4 @@
-import { IsDefined, IsIn, IsNumber, IsOptional, IsString, Max, Min, Transform } from '@bechara/nestjs-core';
+import { IsDefined, IsIn, IsNumber, IsOptional, IsString, Max, Min, ToNumber } from '@bechara/nestjs-core';
 
 import { OrmQueryOrder } from '../orm.enum';
 
@@ -13,12 +13,12 @@ export abstract class OrmPaginationDto {
   public order?: string;
 
   @IsOptional()
-  @Transform((o) => Number(o.value), { toClassOnly: true })
+  @ToNumber()
   @IsNumber() @Min(1) @Max(1000)
   public limit?: number;
 
   @IsOptional()
-  @Transform((o) => Number(o.value), { toClassOnly: true })
+  @ToNumber()
   @IsNumber() @Min(0)
   public offset?: number;
 
