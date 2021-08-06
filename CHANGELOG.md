@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.2.3...v3.3.0) (2021-08-06)
+
+
+### Features
+
+* add a subscriber helper class ([9c9336a](https://github.com/etienne-bechara/nestjs-orm/commit/9c9336a9ac372f0f1f27232611b6fa71b80b6320))
+
 ## [3.2.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.2.2...v3.2.3) (2021-08-06)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@bechara/nestjs-orm",
-  "version": "3.2.3",
+  "version": "3.3.0",
   "description": "ORM Module Component for NestJS Projects",
   "author": {
     "name": "Etienne Bechara",
