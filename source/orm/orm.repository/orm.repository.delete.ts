@@ -18,10 +18,14 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param entities
    * @param options
    */
-  public async delete(entities: Entity | Entity[], options: OrmDeleteOptions = { }): Promise<Entity[]> {
-    const { disableFlush } = options;
+  public async delete(entities: Entity | Entity[], options: OrmDeleteOptions<Entity> = { }): Promise<Entity[]> {
+    const { disableFlush, populate } = options;
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     if (!entities || entityArray.length === 0) return [ ];
+
+    if (populate) {
+      await this.populate(entityArray, populate);
+    }
 
     try {
       disableFlush
@@ -40,7 +44,7 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param id
    * @param options
    */
-  public async deleteById(id: string | number, options: OrmDeleteOptions = { }): Promise<Entity> {
+  public async deleteById(id: string | number, options: OrmDeleteOptions<Entity> = { }): Promise<Entity> {
     const entity = await this.readByIdOrFail(id);
     await this.delete(entity, options);
     return entity;
@@ -51,7 +55,7 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param entity
    * @param options
    */
-  public async deleteOne(entity: Entity, options: OrmDeleteOptions = { }): Promise<Entity> {
+  public async deleteOne(entity: Entity, options: OrmDeleteOptions<Entity> = { }): Promise<Entity> {
     const [ deletedEntity ] = await this.delete(entity, options);
     return deletedEntity;
   }
