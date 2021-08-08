@@ -1,3 +1,10 @@
+## [3.3.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.3.0...v3.3.1) (2021-08-08)
+
+
+### Bug Fixes
+
+* add populate support for delete ([ece90a1](https://github.com/etienne-bechara/nestjs-orm/commit/ece90a1b97a2fe8167a685e94a340de90c032682))
+
 # [3.3.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.2.3...v3.3.0) (2021-08-06)
 
 
