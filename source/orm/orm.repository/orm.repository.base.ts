@@ -1,5 +1,7 @@
 import { BadRequestException, ConflictException, InternalServerErrorException, NotImplementedException, RequestStorage } from '@bechara/nestjs-core';
 import { AnyEntity, Connection, EntityManager, EntityName, EntityRepository, IDatabaseDriver } from '@mikro-orm/core';
+import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
+import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
 import { OrmStoreKey } from '../orm.enum';
 import { OrmRepositoryOptions } from '../orm.interface/orm.repository.options';
@@ -83,6 +85,13 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   public remove(entity: AnyEntity<any>): EntityManager<IDatabaseDriver<Connection>> {
     this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
     return super.remove(entity);
+  }
+
+  /**
+   * Creates a query builder instance .
+   */
+  public createQueryBuilder(): MySqlQueryBuilder<Entity> | PostgreSqlQueryBuilder<Entity> {
+    return this.entityManager['createQueryBuilder'](this.entityName);
   }
 
   /**
