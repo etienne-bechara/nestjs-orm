@@ -1,6 +1,7 @@
 import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmCreateOptions, OrmRepositoryOptions } from '../orm.interface';
+import { OrmBaseRepository } from './orm.repository.base';
 import { OrmReadRepository } from './orm.repository.read';
 
 export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Entity> {
@@ -19,24 +20,24 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
    * @param options
    */
   public async insert(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity[]> {
-    const { disableReload, disableFlush } = options;
+    const { reload, flush } = options;
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
 
     const newEntities = dataArray.map((d) => super.create(d));
 
     try {
-      disableFlush
-        ? this.persist(newEntities)
-        : await this.persistAndFlush(newEntities);
+      flush
+        ? await this.persistAndFlush(newEntities)
+        : this.persist(newEntities);
     }
     catch (e) {
-      this.handleException(e, newEntities);
+      OrmBaseRepository.handleException(e, newEntities);
     }
 
-    const insertedEntities = disableReload
-      ? newEntities
-      : await this.reload(newEntities, options);
+    const insertedEntities = reload
+      ? await this.reload(newEntities, options)
+      : newEntities;
 
     return insertedEntities;
   }

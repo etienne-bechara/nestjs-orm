@@ -1,6 +1,6 @@
 import { Populate } from '@mikro-orm/core';
 
 export interface OrmDeleteOptions<Entity> {
-  disableFlush?: boolean;
+  flush?: boolean;
   populate?: Populate<Entity>;
 }

@@ -1,5 +1,8 @@
-import { CallHandler, ExecutionContext, Injectable, map, NestInterceptor, RequestService } from '@bechara/nestjs-core';
+import { CallHandler, ExecutionContext, Injectable, mergeMap, NestInterceptor, RequestService } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
+
+import { OrmStoreKey } from '../orm.enum';
+import { OrmBaseRepository } from '../orm.repository/orm.repository.base';
 
 @Injectable()
 export class OrmEntityManager implements NestInterceptor {
@@ -20,12 +23,26 @@ export class OrmEntityManager implements NestInterceptor {
    */
   public intercept(context: ExecutionContext, next: CallHandler): any {
     const store = this.requestService.getStore();
-    store.set('em', this.mikroOrm.em.fork(true, true));
+    const entityManager = this.mikroOrm.em.fork(true, true);
+    store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
 
     return next
       .handle()
       .pipe(
-        map((data) => this.stringifyEntities(data)) as any,
+        mergeMap(async (data) => {
+          const flushPending = store.get(OrmStoreKey.FLUSH_PENDING);
+
+          if (flushPending) {
+            try {
+              await entityManager.flush();
+            }
+            catch (e) {
+              OrmBaseRepository.handleException(e);
+            }
+          }
+
+          return this.stringifyEntities(data);
+        }),
       );
   }
 

@@ -5,7 +5,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { SyncModuleOptions } from '../sync/sync.interface';
 import { SyncModule } from '../sync/sync.module';
 import { OrmBaseEntity, OrmBigIntEntity, OrmBigIntTimestampEntity, OrmIntEntity, OrmIntTimestampEntity, OrmTimestampEntity, OrmUuidEntity, OrmUuidTimestampEntity } from './orm.entity';
-import { OrmInjectionToken } from './orm.enum';
+import { OrmInjectionToken, OrmStoreKey } from './orm.enum';
 import { OrmEntityManager } from './orm.interceptor';
 import { OrmAsyncModuleOptions, OrmModuleOptions } from './orm.interface';
 
@@ -48,7 +48,7 @@ export class OrmModule {
           useFactory: (mikroOrmOptions: OrmModuleOptions) => ({
             ...mikroOrmOptions,
             registerRequestContext: false,
-            context: (): EntityManager => RequestStorage.getStore()?.get('em'),
+            context: (): EntityManager => RequestStorage.getStore()?.get(OrmStoreKey.ENTITY_MANAGER),
           }),
         }),
 

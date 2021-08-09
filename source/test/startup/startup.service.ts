@@ -103,6 +103,7 @@ export class StartupService {
         },
       ]);
 
+      await this.companyRepository.flush();
       this.loggerService.notice('[StartupService] Mock data successfully created');
     }
     catch (e) {

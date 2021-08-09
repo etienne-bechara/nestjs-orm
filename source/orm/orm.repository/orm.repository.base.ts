@@ -1,6 +1,7 @@
-import { BadRequestException, ConflictException, InternalServerErrorException, NotImplementedException } from '@bechara/nestjs-core';
-import { EntityData, EntityManager, EntityName, EntityRepository } from '@mikro-orm/core';
+import { BadRequestException, ConflictException, InternalServerErrorException, NotImplementedException, RequestStorage } from '@bechara/nestjs-core';
+import { AnyEntity, Connection, EntityManager, EntityName, EntityRepository, IDatabaseDriver } from '@mikro-orm/core';
 
+import { OrmStoreKey } from '../orm.enum';
 import { OrmRepositoryOptions } from '../orm.interface/orm.repository.options';
 
 export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity> {
@@ -52,15 +53,49 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
+   * Acquires current request storage.
+   */
+  private getStore(): Map<string, any> {
+    return RequestStorage.getStore();
+  }
+
+  /**
+   * When flushing remove pending flush flag.
+   */
+  public async flush(): Promise<void> {
+    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, false);
+    return super.flush();
+  }
+
+  /**
+   * When persisting, set pending flush flag.
+   * @param entity
+   */
+  public persist(entity: AnyEntity<any> | AnyEntity<any>[]): EntityManager<IDatabaseDriver<Connection>> {
+    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
+    return super.persist(entity);
+  }
+
+  /**
+   * When removing, set pending flush flag.
+   * @param entity
+   */
+  public remove(entity: AnyEntity<any>): EntityManager<IDatabaseDriver<Connection>> {
+    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
+    return super.remove(entity);
+  }
+
+  /**
    * Handle all query exceptions.
    * @param e
    * @param data
    */
-  protected handleException(e: Error, data?: EntityData<Entity> | any): void {
+  public static handleException(e: Error, data?: any): void {
     if (/duplicate entry/gi.test(e.message)) {
+      const entityName = /key '(.+?)\./gi.exec(e.message);
       const violation = /entry '(.+?)' for/gi.exec(e.message);
       throw new ConflictException({
-        message: `${this.repositoryOptions.displayName} already exists`,
+        message: `${entityName ? entityName[1] : 'entity'} already exists`,
         constraint: violation ? violation[1] : null,
       });
     }

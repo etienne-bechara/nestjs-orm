@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException } from '@bechara/nestjs-core';
-import { EntityData, EntityManager, EntityName, Populate } from '@mikro-orm/core';
+import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmQueryOrder } from '../orm.enum';
 import { OrmPagination, OrmReadArguments, OrmReadOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
@@ -25,7 +25,6 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     if (!params || Array.isArray(params) && params.length === 0) return [ ];
 
     options.populate ??= this.repositoryOptions.defaultPopulate ?? false;
-    options.refresh = true;
     let readEntities: Entity[];
 
     if (options.sort && options.order) {
@@ -38,7 +37,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       readEntities ??= [ ];
     }
     catch (e) {
-      this.handleException(e, readEntities);
+      OrmBaseRepository.handleException(e, readEntities);
     }
 
     if (!readEntities[0] && options.findOrFail) {
@@ -60,7 +59,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       count = await super.count(params as EntityData<Entity>);
     }
     catch (e) {
-      this.handleException(e);
+      OrmBaseRepository.handleException(e);
     }
 
     return count;
@@ -141,17 +140,6 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       count: await this.count(params),
       records: await this.read(params, options),
     };
-  }
-
-  /**
-   * Execute ORM smart nested population on target entities,
-   * ensures empty operations are not executed.
-   * @param entities
-   * @param populate
-   */
-  public async load(entities: Entity | Entity[], populate: Populate<Entity>): Promise<void> {
-    if (!entities || Array.isArray(entities) && entities.length === 0) return;
-    await super.populate(entities, populate);
   }
 
   /**

@@ -1,0 +1,4 @@
+export enum OrmStoreKey {
+  ENTITY_MANAGER = 'ORM_ENTITY_MANAGER',
+  FLUSH_PENDING = 'ORM_FLUSH_PENDING',
+}

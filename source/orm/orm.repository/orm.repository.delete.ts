@@ -1,6 +1,7 @@
 import { EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmDeleteOptions, OrmRepositoryOptions } from '../orm.interface';
+import { OrmBaseRepository } from './orm.repository.base';
 import { OrmUpdateRepository } from './orm.repository.update';
 
 export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<Entity> {
@@ -19,7 +20,7 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param options
    */
   public async delete(entities: Entity | Entity[], options: OrmDeleteOptions<Entity> = { }): Promise<Entity[]> {
-    const { disableFlush, populate } = options;
+    const { flush, populate } = options;
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     if (!entities || entityArray.length === 0) return [ ];
 
@@ -28,12 +29,12 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     }
 
     try {
-      disableFlush
-        ? this.remove(entityArray)
-        : await this.removeAndFlush(entityArray);
+      flush
+        ? await this.removeAndFlush(entityArray)
+        : this.remove(entityArray);
     }
     catch (e) {
-      this.handleException(e, entities);
+      OrmBaseRepository.handleException(e, entities);
     }
 
     return entityArray;

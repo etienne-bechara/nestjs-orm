@@ -2,6 +2,7 @@ import { ConflictException } from '@bechara/nestjs-core';
 import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmRepositoryOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from '../orm.interface';
+import { OrmBaseRepository } from './orm.repository.base';
 import { OrmCreateRepository } from './orm.repository.create';
 
 export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<Entity> {
@@ -23,7 +24,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
   public async update(
     params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions<Entity> = { },
   ): Promise<Entity[]> {
-    const { disableFlush, disableReload } = options;
+    const { flush, reload } = options;
     const paramsArray = Array.isArray(params) ? params : [ params ];
     if (!params || paramsArray.length === 0) return [ ];
 
@@ -41,17 +42,17 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     );
 
     try {
-      disableFlush
-        ? this.persist(assignedEntities)
-        : await this.persistAndFlush(assignedEntities);
+      flush
+        ? await this.persistAndFlush(assignedEntities)
+        : this.persist(assignedEntities);
     }
     catch (e) {
-      this.handleException(e, params);
+      OrmBaseRepository.handleException(e, params);
     }
 
-    const updatedEntities = disableReload
-      ? assignedEntities
-      : await this.reload(assignedEntities, options);
+    const updatedEntities = reload
+      ? await this.reload(assignedEntities, options)
+      : assignedEntities;
 
     return updatedEntities;
   }
