@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.0...v3.4.1) (2021-08-09)
+
+
+### Bug Fixes
+
+* add query builder method ([8d7e284](https://github.com/etienne-bechara/nestjs-orm/commit/8d7e284b94b435f1caf5202cfb1b5635193ea03b))
+
 # [3.4.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.3.1...v3.4.0) (2021-08-09)
 
 
