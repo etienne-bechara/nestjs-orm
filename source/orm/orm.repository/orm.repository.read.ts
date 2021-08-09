@@ -143,32 +143,6 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
   }
 
   /**
-   * Update target entities according to configuration,
-   * keeps original sorting.
-   * @param entities
-   * @param options
-   */
-  public async reload(entities: Entity[], options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
-    const pk = this.getPrimaryKey();
-    const entityIds = entities.map((e) => e[pk]);
-    const orderedEntities: Entity[] = [ ];
-
-    const reloadedEntities = await this.read(entityIds, options);
-
-    for (const id of entityIds) {
-      for (const [ index, entity ] of reloadedEntities.entries()) {
-        if (entity[pk] === id) {
-          orderedEntities.push(entity);
-          reloadedEntities.splice(index, 1);
-          continue;
-        }
-      }
-    }
-
-    return orderedEntities;
-  }
-
-  /**
    * Given a record object (usually a http query), split properties
    * between read params and read options.
    * @param query

@@ -24,7 +24,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
   public async update(
     params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions<Entity> = { },
   ): Promise<Entity[]> {
-    const { flush, reload } = options;
+    const { flush } = options;
     const paramsArray = Array.isArray(params) ? params : [ params ];
     if (!params || paramsArray.length === 0) return [ ];
 
@@ -50,11 +50,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       OrmBaseRepository.handleException(e, params);
     }
 
-    const updatedEntities = reload
-      ? await this.reload(assignedEntities, options)
-      : assignedEntities;
-
-    return updatedEntities;
+    return assignedEntities;
   }
 
   /**
@@ -202,13 +198,9 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       ? await this.update(updateParams, options)
       : [ ];
 
-    const reloadedEntities = existingEntities.length > 0
-      ? await this.reload(existingEntities, options)
-      : [ ];
-
     const resultEntities = resultMap.map((i) => {
       switch (i.target) {
-        case 'read': return reloadedEntities[i.index];
+        case 'read': return existingEntities[i.index];
         case 'create': return createdEntities[i.index];
         case 'update': return updatedEntities[i.index];
       }

@@ -20,7 +20,7 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
    * @param options
    */
   public async insert(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity[]> {
-    const { reload, flush } = options;
+    const { flush } = options;
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
 
@@ -35,11 +35,7 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
       OrmBaseRepository.handleException(e, newEntities);
     }
 
-    const insertedEntities = reload
-      ? await this.reload(newEntities, options)
-      : newEntities;
-
-    return insertedEntities;
+    return newEntities;
   }
 
   /**

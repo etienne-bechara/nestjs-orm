@@ -138,8 +138,6 @@ readByIdOrFail(): Promise<Entity>;
 readUnique(): Promise<Entity>;
 readUniqueOrFail(): Promise<Entity>;
 readAndCount(): Promise<OrmPaginatedResponse<Entity>>;
-load(): Promise<void>
-reload(): Promise<Entity[]>;
 
 // Create entities
 insert(): Promise<Entity[]>;
