@@ -1,3 +1,15 @@
+# [3.4.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.3.1...v3.4.0) (2021-08-09)
+
+
+### Bug Fixes
+
+* remove the need of reload ([c54d458](https://github.com/etienne-bechara/nestjs-orm/commit/c54d458e732f164789d4b74cf0f2f5c7970637d5))
+
+
+### Features
+
+* add flush by interceptor ([a3f6cd7](https://github.com/etienne-bechara/nestjs-orm/commit/a3f6cd78eb4df8d4a37b8af8015c5db9a20a4b41))
+
 ## [3.3.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.3.0...v3.3.1) (2021-08-08)
 
 
