@@ -17,6 +17,54 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
+   * Acquires current request storage.
+   */
+  private getStore(): Map<string, any> {
+    return RequestStorage.getStore();
+  }
+
+  /**
+   * Clear all persisted entities.
+   */
+  public clear(): void {
+    const em: EntityManager = this.getStore().get(OrmStoreKey.ENTITY_MANAGER);
+    em.clear();
+  }
+
+  /**
+   * Flush persisted entities and remove pending flag.
+   */
+  public async flush(): Promise<void> {
+    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, false);
+    return super.flush();
+  }
+
+  /**
+   * Persist entities and set pending flag.
+   * @param entity
+   */
+  public persist(entity: AnyEntity<any> | AnyEntity<any>[]): EntityManager<IDatabaseDriver<Connection>> {
+    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
+    return super.persist(entity);
+  }
+
+  /**
+   * Mark entities for removal and set pending flag.
+   * @param entity
+   */
+  public remove(entity: AnyEntity<any>): EntityManager<IDatabaseDriver<Connection>> {
+    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
+    return super.remove(entity);
+  }
+
+  /**
+   * Creates a query builder instance .
+   */
+  public createQueryBuilder(): MySqlQueryBuilder<Entity> | PostgreSqlQueryBuilder<Entity> {
+    return this.entityManager['createQueryBuilder'](this.entityName);
+  }
+
+  /**
    * Returns custom primary key or 'id'.
    */
   protected getPrimaryKey(): string {
@@ -52,46 +100,6 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
     }
 
     return validKey;
-  }
-
-  /**
-   * Acquires current request storage.
-   */
-  private getStore(): Map<string, any> {
-    return RequestStorage.getStore();
-  }
-
-  /**
-   * When flushing remove pending flush flag.
-   */
-  public async flush(): Promise<void> {
-    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, false);
-    return super.flush();
-  }
-
-  /**
-   * When persisting, set pending flush flag.
-   * @param entity
-   */
-  public persist(entity: AnyEntity<any> | AnyEntity<any>[]): EntityManager<IDatabaseDriver<Connection>> {
-    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
-    return super.persist(entity);
-  }
-
-  /**
-   * When removing, set pending flush flag.
-   * @param entity
-   */
-  public remove(entity: AnyEntity<any>): EntityManager<IDatabaseDriver<Connection>> {
-    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
-    return super.remove(entity);
-  }
-
-  /**
-   * Creates a query builder instance .
-   */
-  public createQueryBuilder(): MySqlQueryBuilder<Entity> | PostgreSqlQueryBuilder<Entity> {
-    return this.entityManager['createQueryBuilder'](this.entityName);
   }
 
   /**
