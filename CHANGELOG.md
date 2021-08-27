@@ -1,3 +1,10 @@
+## [3.4.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.1...v3.4.2) (2021-08-27)
+
+
+### Bug Fixes
+
+* expose em clear ([5b7a96a](https://github.com/etienne-bechara/nestjs-orm/commit/5b7a96ab55032e31aec5c2e70424c3ba03e59f26))
+
 ## [3.4.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.0...v3.4.1) (2021-08-09)
 
 
