@@ -23,7 +23,7 @@ export class OrmEntityManager implements NestInterceptor {
    */
   public intercept(context: ExecutionContext, next: CallHandler): any {
     const store = this.requestService.getStore();
-    const entityManager = this.mikroOrm.em.fork(true, true);
+    let entityManager = this.mikroOrm.em.fork(true, true);
     store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
 
     return next
@@ -34,6 +34,7 @@ export class OrmEntityManager implements NestInterceptor {
 
           if (flushPending) {
             try {
+              entityManager = store.get(OrmStoreKey.ENTITY_MANAGER);
               await entityManager.flush();
             }
             catch (e) {

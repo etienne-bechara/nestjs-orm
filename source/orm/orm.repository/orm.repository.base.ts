@@ -24,11 +24,11 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
-   * Clear all persisted entities.
+   * Resets the entity manager.
    */
-  public clear(): void {
-    const em: EntityManager = this.getStore().get(OrmStoreKey.ENTITY_MANAGER);
-    em.clear();
+  public reset(): void {
+    const cleanEntityManager = this.entityManager.fork(true);
+    this.getStore().set(OrmStoreKey.ENTITY_MANAGER, cleanEntityManager);
   }
 
   /**
