@@ -1,3 +1,10 @@
+## [3.4.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.2...v3.4.3) (2021-08-27)
+
+
+### Bug Fixes
+
+* refactor em reset ([01ffa2d](https://github.com/etienne-bechara/nestjs-orm/commit/01ffa2d7b667395c7b3ced2054eebb1acc5cfc52))
+
 ## [3.4.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.1...v3.4.2) (2021-08-27)
 
 
