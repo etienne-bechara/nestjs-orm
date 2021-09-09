@@ -109,7 +109,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     });
 
     // Find matching data, ensure to populate array data which most likely are 1:m or m:n relations
-    const populate = [ ];
+    const populate = Array.isArray(options.populate) ? options.populate : [ ];
     const sampleData = dataArray[0];
     for (const key in sampleData) Array.isArray(sampleData[key]) ? populate.push(key) : undefined;
     const matchingEntities = await this.read({ $or: clauses }, { populate });
