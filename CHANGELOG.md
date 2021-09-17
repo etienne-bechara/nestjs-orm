@@ -1,3 +1,10 @@
+## [3.4.5](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.4...v3.4.5) (2021-09-17)
+
+
+### Bug Fixes
+
+* bump core to support nest v8 ([b0e3379](https://github.com/etienne-bechara/nestjs-orm/commit/b0e33799350f376a6148727b0b787f9799b7db5f))
+
 ## [3.4.4](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.3...v3.4.4) (2021-09-09)
 
 
