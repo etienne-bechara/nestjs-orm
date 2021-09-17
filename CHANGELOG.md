@@ -1,3 +1,10 @@
+## [3.4.4](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.3...v3.4.4) (2021-09-09)
+
+
+### Bug Fixes
+
+* add missing populate on upsert ([5bb6927](https://github.com/etienne-bechara/nestjs-orm/commit/5bb692703e9182e18fbca8d5fc8b5f379fcff514))
+
 ## [3.4.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.2...v3.4.3) (2021-08-27)
 
 
