@@ -1,8 +1,8 @@
 import { Injectable, LoggerService } from '@bechara/nestjs-core';
 import { EntityManager } from '@mikro-orm/core';
 
-import { OrmSubscriberParams } from '../../orm/orm.interface';
-import { OrmSubscriber } from '../../orm/orm.subscriber';
+import { OrmSubscriberParams } from '../../source/orm/orm.interface';
+import { OrmSubscriber } from '../../source/orm/orm.subscriber';
 import { Person } from './person.entity';
 
 @Injectable()

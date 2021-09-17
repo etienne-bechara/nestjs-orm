@@ -1,7 +1,7 @@
 import { AppEnvironment, AppModule } from '@bechara/nestjs-core';
 
-import { OrmConfig } from '../orm/orm.config';
-import { OrmModule } from '../orm/orm.module';
+import { OrmConfig } from '../source/orm/orm.config';
+import { OrmModule } from '../source/orm/orm.module';
 import { Company } from './company/company.entity';
 import { CompanyModule } from './company/company.module';
 import { Contact } from './contact/contact.entity';
@@ -10,17 +10,11 @@ import { Person } from './person/person.entity';
 import { PersonModule } from './person/person.module';
 import { StartupModule } from './startup/startup.module';
 
-void AppModule.bootServer({
+void AppModule.boot({
   disableConfigScan: true,
   disableModuleScan: true,
   configs: [
     OrmConfig,
-  ],
-  modules: [
-    ContactModule,
-    CompanyModule,
-    PersonModule,
-    StartupModule,
   ],
   imports: [
     OrmModule.registerAsync({
@@ -59,6 +53,10 @@ void AppModule.bootServer({
           : undefined,
       }),
     }),
+    ContactModule,
+    CompanyModule,
+    PersonModule,
+    StartupModule,
   ],
   providers: [
     OrmConfig,
@@ -66,5 +64,9 @@ void AppModule.bootServer({
   exports: [
     OrmConfig,
     OrmModule,
+    ContactModule,
+    CompanyModule,
+    PersonModule,
+    StartupModule,
   ],
 });

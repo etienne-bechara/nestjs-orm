@@ -1,6 +1,6 @@
 import { IsOptional } from '@bechara/nestjs-core';
 
-import { OrmPaginationDto } from '../../../orm/orm.dto';
+import { OrmPaginationDto } from '../../../source/orm/orm.dto';
 import { Company } from '../company.entity';
 
 export class CompanyReadDto extends OrmPaginationDto {

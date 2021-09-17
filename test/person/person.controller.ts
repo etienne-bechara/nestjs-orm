@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@bechara/nestjs-core';
 
-import { OrmPagination } from '../../orm/orm.interface';
+import { OrmPagination } from '../../source/orm/orm.interface';
 import { PersonCreateDto, PersonReadDto, PersonUpdateDto } from './person.dto';
 import { Person } from './person.entity';
 import { PersonRepository } from './person.repository';

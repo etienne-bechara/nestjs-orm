@@ -1,6 +1,6 @@
 import { EntityManager, EntityName, Repository } from '@mikro-orm/core';
 
-import { OrmRepository } from '../../orm/orm.repository';
+import { OrmRepository } from '../../source/orm/orm.repository';
 import { Person } from './person.entity';
 
 @Repository(Person)

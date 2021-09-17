@@ -21,11 +21,7 @@ export class OrmModule {
   public static registerAsync(options: OrmAsyncModuleOptions): DynamicModule {
     const entities = options.disableEntityScan
       ? options.entities || [ ]
-      : UtilModule.globRequire([
-        's*rc*/**/*.entity.{js,ts}',
-        '!**/orm*entity.{js,ts}',
-        '!**/*test*',
-      ]);
+      : UtilModule.globRequire([ 's*rc*/**/*.entity.{js,ts}' ]);
 
     const rootEntities = [
       OrmBaseEntity,

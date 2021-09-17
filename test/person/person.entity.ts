@@ -1,6 +1,6 @@
 import { Collection, Entity, ManyToMany, OneToMany, Property, Unique } from '@mikro-orm/core';
 
-import { OrmUuidTimestampEntity } from '../../orm/orm.entity';
+import { OrmUuidTimestampEntity } from '../../source/orm/orm.entity';
 import { Company } from '../company/company.entity';
 import { Contact } from '../contact/contact.entity';
 
