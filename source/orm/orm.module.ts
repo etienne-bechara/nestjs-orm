@@ -1,4 +1,4 @@
-import { APP_INTERCEPTOR, AppConfig, AppEnvironment, DynamicModule, LoggerService, Module, RequestStorage, UtilModule } from '@bechara/nestjs-core';
+import { APP_INTERCEPTOR, AppConfig, AppEnvironment, ContextStorage, DynamicModule, LoggerService, Module, UtilModule } from '@bechara/nestjs-core';
 import { EntityManager, MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
@@ -44,7 +44,7 @@ export class OrmModule {
           useFactory: (mikroOrmOptions: OrmModuleOptions) => ({
             ...mikroOrmOptions,
             registerRequestContext: false,
-            context: (): EntityManager => RequestStorage.getStore()?.get(OrmStoreKey.ENTITY_MANAGER),
+            context: (): EntityManager => ContextStorage.getStore()?.get(OrmStoreKey.ENTITY_MANAGER),
           }),
         }),
 

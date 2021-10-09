@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, InternalServerErrorException, NotImplementedException, RequestStorage } from '@bechara/nestjs-core';
+import { BadRequestException, ConflictException, ContextStorage, InternalServerErrorException, NotImplementedException } from '@bechara/nestjs-core';
 import { AnyEntity, Connection, EntityManager, EntityName, EntityRepository, IDatabaseDriver } from '@mikro-orm/core';
 import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
@@ -20,7 +20,7 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    * Acquires current request storage.
    */
   private getStore(): Map<string, any> {
-    return RequestStorage.getStore();
+    return ContextStorage.getStore();
   }
 
   /**

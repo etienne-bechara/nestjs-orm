@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, mergeMap, NestInterceptor, RequestService } from '@bechara/nestjs-core';
+import { CallHandler, ContextService, ExecutionContext, Injectable, mergeMap, NestInterceptor } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
 
 import { OrmStoreKey } from '../orm.enum';
@@ -9,7 +9,7 @@ export class OrmEntityManager implements NestInterceptor {
 
   public constructor(
     private readonly mikroOrm: MikroORM,
-    private readonly requestService: RequestService,
+    private readonly contextService: ContextService,
   ) { }
 
   /**
@@ -22,7 +22,7 @@ export class OrmEntityManager implements NestInterceptor {
    * @param next
    */
   public intercept(context: ExecutionContext, next: CallHandler): any {
-    const store = this.requestService.getStore();
+    const store = this.contextService.getStore();
     let entityManager = this.mikroOrm.em.fork(true, true);
     store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
 
