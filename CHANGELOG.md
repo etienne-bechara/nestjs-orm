@@ -1,3 +1,10 @@
+## [3.4.6](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.5...v3.4.6) (2021-10-09)
+
+
+### Bug Fixes
+
+* request to context naming ([e1cdc9f](https://github.com/etienne-bechara/nestjs-orm/commit/e1cdc9f0db21f86e4aab8810cf20a3395de3d9b7))
+
 ## [3.4.5](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.4...v3.4.5) (2021-09-17)
 
 
