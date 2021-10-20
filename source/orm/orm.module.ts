@@ -2,8 +2,8 @@ import { APP_INTERCEPTOR, AppConfig, AppEnvironment, ContextStorage, DynamicModu
 import { EntityManager, MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
-import { SyncModuleOptions } from '../sync/sync.interface';
-import { SyncModule } from '../sync/sync.module';
+import { SchemaModuleOptions } from '../schema/schema.interface';
+import { SchemaModule } from '../schema/schema.module';
 import { OrmBaseEntity, OrmBigIntEntity, OrmBigIntTimestampEntity, OrmIntEntity, OrmIntTimestampEntity, OrmTimestampEntity, OrmUuidEntity, OrmUuidTimestampEntity } from './orm.entity';
 import { OrmInjectionToken, OrmStoreKey } from './orm.enum';
 import { OrmEntityManager } from './orm.interceptor';
@@ -48,9 +48,9 @@ export class OrmModule {
           }),
         }),
 
-        SyncModule.registerAsync({
+        SchemaModule.registerAsync({
           inject: [ OrmInjectionToken.ORM_SCHEMA_OPTIONS ],
-          useFactory: (syncModuleOptions: SyncModuleOptions) => syncModuleOptions,
+          useFactory: (syncModuleOptions: SchemaModuleOptions) => syncModuleOptions,
         }),
 
         MikroOrmModule.forFeature({ entities }),
@@ -89,7 +89,7 @@ export class OrmModule {
         {
           provide: OrmInjectionToken.ORM_SCHEMA_OPTIONS,
           inject: [ OrmInjectionToken.ORM_MODULE_OPTIONS ],
-          useFactory: (ormModuleOptions: OrmModuleOptions): SyncModuleOptions => ormModuleOptions.sync,
+          useFactory: (ormModuleOptions: OrmModuleOptions): SchemaModuleOptions => ormModuleOptions.sync,
         },
       ],
 

@@ -1,4 +1,4 @@
-export enum SyncSchemaStatus {
+export enum SchemaSyncStatus {
   UP_TO_DATE = 'UP_TO_DATE',
   MIGRATION_SUCCESSFUL = 'MIGRATION_SUCCESSFUL',
   MIGRATION_FAILED = 'MIGRATION_FAILED',

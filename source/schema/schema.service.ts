@@ -1,21 +1,21 @@
-import { Inject, Injectable, LoggerService } from '@bechara/nestjs-core';
+import { Inject, Injectable, LoggerService, NotFoundException } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
 
-import { SyncInjectionToken, SyncSchemaStatus } from './sync.enum';
-import { SyncModuleOptions, SyncSchemaResult } from './sync.interface';
+import { SchemaInjectionToken, SchemaSyncStatus } from './schema.enum';
+import { SchemaModuleOptions, SchemaSyncResult } from './schema.interface';
 
 @Injectable()
-export class SyncService {
+export class SchemaService {
 
   public constructor(
-    @Inject(SyncInjectionToken.MODULE_OPTIONS)
-    private readonly syncModuleOptions: SyncModuleOptions = { },
+    @Inject(SchemaInjectionToken.MODULE_OPTIONS)
+    private readonly syncModuleOptions: SchemaModuleOptions = { },
     private readonly mikroOrm: MikroORM,
     private readonly loggerService: LoggerService,
   ) {
     const options = this.syncModuleOptions;
 
-    if (options.enable) {
+    if (options.auto) {
       void this.syncSchema(options);
     }
   }
@@ -25,10 +25,23 @@ export class SyncService {
    * @param queries
    * @param options
    */
-  private removeBlacklistedQueries(queries: string, options: SyncModuleOptions): string {
+  private removeBlacklistedQueries(queries: string, options: SchemaModuleOptions): string {
     options.blacklist ??= [ ];
     queries = queries.replace(/\n+/g, '\n');
     return queries.split('\n').filter((q) => !options.blacklist.includes(q)).join('\n');
+  }
+
+  /**
+   * Sync database schema from an external trigger.
+   */
+  public syncSchemaFromController(): Promise<SchemaSyncResult> {
+    const { controller } = this.syncModuleOptions;
+
+    if (!controller) {
+      throw new NotFoundException('Cannot GET /schema/sync');
+    }
+
+    return this.syncSchema();
   }
 
   /**
@@ -36,7 +49,7 @@ export class SyncService {
    * configured entities.
    * @param options
    */
-  public async syncSchema(options: SyncModuleOptions = { }): Promise<SyncSchemaResult> {
+  public async syncSchema(options: SchemaModuleOptions = { }): Promise<SchemaSyncResult> {
     this.loggerService.info('[OrmService] Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
@@ -45,10 +58,10 @@ export class SyncService {
 
     if (syncDump.length === 0) {
       this.loggerService.notice('[OrmService] Database schema is up to date');
-      return { status: SyncSchemaStatus.UP_TO_DATE };
+      return { status: SchemaSyncStatus.UP_TO_DATE };
     }
 
-    let status = SyncSchemaStatus.MIGRATION_SUCCESSFUL;
+    let status = SchemaSyncStatus.MIGRATION_SUCCESSFUL;
     let syncQueries = await generator.getUpdateSchemaSQL(true, options.safe);
     syncQueries = this.removeBlacklistedQueries(syncQueries, options);
 
@@ -57,7 +70,7 @@ export class SyncService {
       this.loggerService.notice('[OrmService] Database schema successfully updated');
     }
     catch (e) {
-      status = SyncSchemaStatus.MIGRATION_FAILED;
+      status = SchemaSyncStatus.MIGRATION_FAILED;
       this.loggerService.error('[OrmService] Database schema update failed', e, { syncQueries });
     }
 

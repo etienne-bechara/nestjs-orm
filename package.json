@@ -28,7 +28,7 @@
   "scripts": {
     "prepare": "husky install .config/husky",
     "dev": "tsnd --exit-child --rs --watch *.env --inspect=0.0.0.0:9229 ./test/main.ts",
-    "build": "npx rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && npx ncp ./source ./dist/source && npx rimraf ./source/index.ts",
+    "build": "npx rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && npx rimraf ./source/index.ts",
     "index": "npx rimraf ./source/index.ts && npx barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
     "lint": "eslint **/*.ts --max-warnings=0",
     "test": "jest --verbose --forceExit --passWithNoTests --config .config/jest/jest.config.js"
@@ -46,17 +46,17 @@
   },
   "devDependencies": {
     "@bechara/eslint-config-bechara-ts": "1.2.0",
-    "@bechara/nestjs-core": "3.3.0",
+    "@bechara/nestjs-core": "3.3.1",
     "@commitlint/cli": "13.2.1",
     "@commitlint/config-conventional": "13.2.0",
     "@types/jest": "27.0.2",
-    "@types/node": "16.10.3",
-    "eslint": "7.32.0",
+    "@types/node": "16.11.1",
+    "eslint": "8.0.1",
     "husky": "7.0.2",
-    "jest": "27.2.5",
-    "lint-staged": "11.2.1",
-    "ts-jest": "27.0.5",
+    "jest": "27.3.1",
+    "lint-staged": "11.2.3",
+    "ts-jest": "27.0.7",
     "ts-node-dev": "1.1.8",
-    "typescript": "4.4.3"
+    "typescript": "4.4.4"
   }
 }

@@ -37,7 +37,8 @@ void AppModule.boot({
           max: 25,
         },
         sync: {
-          enable: true,
+          auto: true,
+          controller: true,
           safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,
         },
         driverOptions: ormConfig.ORM_SERVER_CA
