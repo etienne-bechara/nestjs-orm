@@ -50,7 +50,7 @@ export class OrmModule {
 
         SchemaModule.registerAsync({
           inject: [ OrmInjectionToken.ORM_SCHEMA_OPTIONS ],
-          useFactory: (syncModuleOptions: SchemaModuleOptions) => syncModuleOptions,
+          useFactory: (schemaModuleOptions: SchemaModuleOptions) => schemaModuleOptions,
         }),
 
         MikroOrmModule.forFeature({ entities }),
@@ -97,6 +97,7 @@ export class OrmModule {
         OrmInjectionToken.ORM_PROVIDER_OPTIONS,
         OrmInjectionToken.ORM_SCHEMA_OPTIONS,
         MikroOrmModule.forFeature({ entities }),
+        SchemaModule,
       ],
     };
   }

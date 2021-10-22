@@ -1,5 +1,6 @@
 import { Injectable, LoggerService } from '@bechara/nestjs-core';
 
+import { SchemaService } from '../../source/schema/schema.service';
 import { CompanyRepository } from '../company/company.repository';
 import { ContactType } from '../contact/contact.enum';
 import { ContactRepository } from '../contact/contact.repository';
@@ -13,6 +14,7 @@ export class StartupService {
     private readonly companyRepository: CompanyRepository,
     private readonly loggerService: LoggerService,
     private readonly personRepository: PersonRepository,
+    private readonly schemaService: SchemaService,
   ) {
     void this.createBaseEntities();
   }
@@ -23,7 +25,7 @@ export class StartupService {
    */
   private async createBaseEntities(): Promise<void> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await this.schemaService.syncSchema();
 
       // John, Jane and Robert
       const [ johnDoe, johnSmith, robertDoe ] = await this.personRepository.upsert([
