@@ -1,3 +1,10 @@
+## [3.5.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.5.0...v3.5.1) (2021-10-22)
+
+
+### Bug Fixes
+
+* export schema module on orm module ([86afed4](https://github.com/etienne-bechara/nestjs-orm/commit/86afed4af5652d2c134dc7c65ffd509a4c2c67f0))
+
 # [3.5.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.6...v3.5.0) (2021-10-20)
 
 
