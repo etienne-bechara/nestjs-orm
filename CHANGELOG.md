@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.6...v3.5.0) (2021-10-20)
+
+
+### Features
+
+* add schema sync controller ([e3436c7](https://github.com/etienne-bechara/nestjs-orm/commit/e3436c7cec9f8e8e5a4ce6521b25faca5ffb084b))
+
 ## [3.4.6](https://github.com/etienne-bechara/nestjs-orm/compare/v3.4.5...v3.4.6) (2021-10-09)
 
 
