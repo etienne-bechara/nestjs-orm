@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.5.1...v3.6.0) (2021-10-25)
+
+
+### Features
+
+* improve repository methods ([2d2d396](https://github.com/etienne-bechara/nestjs-orm/commit/2d2d396fdced7702c6d13f4b5aa2bcb8613e3425))
+
 ## [3.5.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.5.0...v3.5.1) (2021-10-22)
 
 
