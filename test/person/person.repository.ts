@@ -1,9 +1,8 @@
-import { EntityManager, EntityName, Repository } from '@mikro-orm/core';
+import { EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmRepository } from '../../source/orm/orm.repository';
 import { Person } from './person.entity';
 
-@Repository(Person)
 export class PersonRepository extends OrmRepository<Person> {
 
   public constructor(

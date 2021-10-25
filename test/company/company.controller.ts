@@ -15,7 +15,7 @@ export class CompanyController {
   @Get()
   public get(@Query() query: CompanyReadDto): Promise<OrmPagination<Company>> {
     const { params, options } = this.companyRepository.getReadArguments(query);
-    return this.companyRepository.readAndCount(params, options);
+    return this.companyRepository.readAndCountBy(params, options);
   }
 
   @Get(':id')
@@ -25,7 +25,7 @@ export class CompanyController {
 
   @Post()
   public post(@Body() body: CompanyCreateDto): Promise<Company> {
-    return this.companyRepository.insertOne(body);
+    return this.companyRepository.createOne(body);
   }
 
   @Put()

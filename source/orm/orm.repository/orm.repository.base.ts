@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, ContextStorage, InternalServerErrorException, NotImplementedException } from '@bechara/nestjs-core';
-import { AnyEntity, Connection, EntityManager, EntityName, EntityRepository, IDatabaseDriver } from '@mikro-orm/core';
+import { AnyEntity, EntityData, EntityManager, EntityName, EntityRepository, New, Populate } from '@mikro-orm/core';
 import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
@@ -24,37 +24,81 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
-   * Resets the entity manager.
+   * Sets pending commit flag.
    */
-  public reset(): void {
+  private setCommitPending(): void {
+    this.getStore()?.set(OrmStoreKey.COMMIT_PENDING, true);
+  }
+
+  /**
+   * Clears pending commit flag.
+   */
+  private clearCommitPending(): void {
+    this.getStore()?.set(OrmStoreKey.COMMIT_PENDING, false);
+  }
+
+  /**
+   * Execute all pending entity changes.
+   */
+  private async sync(): Promise<void> {
+    this.clearCommitPending();
+
+    try {
+      await this.entityManager.flush();
+    }
+    catch (e) {
+      OrmBaseRepository.handleException(e);
+    }
+  }
+
+  /**
+   * Validates if provided data is valid as single or multiple entities.
+   * @param entities
+   */
+  protected isValidEntity(entities: Entity | Entity[]): boolean {
+    return Array.isArray(entities) ? entities.length > 0 : !!entities;
+  }
+
+  /**
+   * Mark entities changes to be removed on the next commit call.
+   * @param entities
+   */
+  protected removeAsync(entities: Entity | Entity[]): void {
+    if (!this.isValidEntity(entities)) return;
+    this.entityManager.remove(entities);
+    this.setCommitPending();
+  }
+
+  /**
+   * Mark entities changes to be persisted on the next commit call.
+   * @param entities
+   */
+  public commitAsync(entities: Entity | Entity[]): void {
+    if (!this.isValidEntity(entities)) return;
+    this.entityManager.persist(entities);
+    this.setCommitPending();
+  }
+
+  /**
+   * Persist all entities changes, if any entity is provided
+   * mark it for persistance prior to committing.
+   * @param entities
+   */
+  public async commit(entities?: Entity | Entity[]): Promise<void> {
+    if (entities) {
+      this.commitAsync(entities);
+    }
+
+    await this.sync();
+  }
+
+  /**
+   * Clear all pending operations on entity manager.
+   */
+  public rollback(): void {
     const cleanEntityManager = this.entityManager.fork(true);
     this.getStore().set(OrmStoreKey.ENTITY_MANAGER, cleanEntityManager);
-  }
-
-  /**
-   * Flush persisted entities and remove pending flag.
-   */
-  public async flush(): Promise<void> {
-    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, false);
-    return super.flush();
-  }
-
-  /**
-   * Persist entities and set pending flag.
-   * @param entity
-   */
-  public persist(entity: AnyEntity<any> | AnyEntity<any>[]): EntityManager<IDatabaseDriver<Connection>> {
-    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
-    return super.persist(entity);
-  }
-
-  /**
-   * Mark entities for removal and set pending flag.
-   * @param entity
-   */
-  public remove(entity: AnyEntity<any>): EntityManager<IDatabaseDriver<Connection>> {
-    this.getStore()?.set(OrmStoreKey.FLUSH_PENDING, true);
-    return super.remove(entity);
+    this.clearCommitPending();
   }
 
   /**
@@ -145,6 +189,123 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
       message: e.message,
       data,
     });
+  }
+
+  /**
+   * Use `readBy()`.
+   * @deprecated
+   */
+  public find(): Promise<any> { return; }
+
+  /**
+   * Use `readBy()`.
+   * @deprecated
+   */
+  public findAll(): Promise<any> { return; }
+
+  /**
+   * Use `readOne()`.
+   * @deprecated
+   */
+  public findOne(): Promise<any> { return; }
+
+  /**
+   * Use `readOneOrFail()`.
+   * @deprecated
+   */
+  public findOneOrFail(): Promise<any> { return; }
+
+  /**
+   * Use `countBy()`.
+   * @deprecated
+   */
+  public count(): Promise<any> { return; }
+
+  /**
+   * Use `readAndCountBy()`.
+   * @deprecated
+   */
+  public findAndCount(): Promise<any> { return; }
+
+  /**
+   * Use `deleteBy()`.
+   * @deprecated
+   */
+  public nativeDelete(): Promise<any> { return; }
+
+  /**
+   * Use `createFrom()`.
+   * @deprecated
+   */
+  public nativeInsert(): Promise<any> { return; }
+
+  /**
+   * Use `updateBy()`.
+   * @deprecated
+   */
+  public nativeUpdate(): Promise<any> { return; }
+
+  /**
+   * Use `commitAsync()`.
+   * @param entity
+   * @deprecated
+   */
+  public persist(entity: AnyEntity | AnyEntity[]): EntityManager {
+    return super.persist(entity);
+  }
+
+  /**
+   * Use `commit()`.
+   * @deprecated
+   */
+  public async flush(): Promise<void> {
+    return super.flush();
+  }
+
+  /**
+   * Use `commit()`.
+   * @param entity
+   * @deprecated
+   */
+  public async persistAndFlush(entity: AnyEntity | AnyEntity[]): Promise<void> {
+    return super.persistAndFlush(entity);
+  }
+
+  /**
+   * Use `deleteAsync()`.
+   * @param entity
+   * @deprecated
+   */
+  public remove(entity: AnyEntity | AnyEntity[]): EntityManager {
+    return super.remove(entity);
+  }
+
+  /**
+   * Use `delete()`.
+   * @param entity
+   * @deprecated
+   */
+  public async removeAndFlush(entity: AnyEntity | AnyEntity[]): Promise<void> {
+    return super.removeAndFlush(entity);
+  }
+
+  /**
+   * Use `createFrom()`.
+   * @param data
+   * @deprecated
+   */
+  public create<P extends Populate<Entity> = string[]>(data: EntityData<Entity>): New<Entity, P> {
+    return super.create(data);
+  }
+
+  /**
+   * Use `update()`.
+   * @param entity
+   * @param data
+   * @deprecated
+   */
+  public assign(entity: Entity, data: EntityData<Entity>): Entity {
+    return super.assign(entity, data);
   }
 
 }

@@ -15,7 +15,7 @@ export class PersonController {
   @Get()
   public get(@Query() query: PersonReadDto): Promise<OrmPagination<Person>> {
     const { params, options } = this.personRepository.getReadArguments(query);
-    return this.personRepository.readAndCount(params, options);
+    return this.personRepository.readAndCountBy(params, options);
   }
 
   @Get(':id')
@@ -25,7 +25,7 @@ export class PersonController {
 
   @Post()
   public post(@Body() body: PersonCreateDto): Promise<Person> {
-    return this.personRepository.insertOne(body);
+    return this.personRepository.createOne(body);
   }
 
   @Put()

@@ -21,7 +21,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param options
    */
-  public async read(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
+  public async readBy(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
     if (!params || Array.isArray(params) && params.length === 0) return [ ];
 
     options.populate ??= this.repositoryOptions.defaultPopulate ?? false;
@@ -32,8 +32,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     }
 
     try {
-      // eslint-disable-next-line unicorn/no-array-method-this-argument
-      readEntities = await this.find(params as EntityData<Entity>, options);
+      readEntities = await this.entityManager.find(this.entityName, params as EntityData<Entity>, options);
       readEntities ??= [ ];
     }
     catch (e) {
@@ -48,31 +47,13 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
   }
 
   /**
-   * Count entities matching given criteria.
-   * @param params
-   */
-  public async count(params: OrmReadParams<Entity>): Promise<number> {
-    if (!params || Array.isArray(params) && params.length === 0) return 0;
-    let count: number;
-
-    try {
-      count = await super.count(params as EntityData<Entity>);
-    }
-    catch (e) {
-      OrmBaseRepository.handleException(e);
-    }
-
-    return count;
-  }
-
-  /**
    * Read a single entity by its ID.
    * @param id
    * @param options
    */
   public async readById(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     const pk = this.getPrimaryKey();
-    const entities = await this.read({ [pk]: id }, options);
+    const entities = await this.readBy({ [pk]: id }, options);
     return entities[0];
   }
 
@@ -81,9 +62,11 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param id
    * @param options
    */
-  public async readByIdOrFail(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
-    options.findOrFail = true;
-    return this.readById(id, options);
+  public async readByIdOrFail(
+    id: string | number,
+    options: Omit<OrmReadOptions<Entity>, 'findOrFail'> = { },
+  ): Promise<Entity> {
+    return this.readById(id, { ...options, findOrFail: true });
   }
 
   /**
@@ -93,7 +76,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param options
    */
   public async readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
-    const entities = await this.read(params, options);
+    const entities = await this.readBy(params, options);
 
     if (entities.length > 1) {
       throw new ConflictException({
@@ -112,9 +95,29 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param options
    */
-  public async readUniqueOrFail(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
-    options.findOrFail = true;
-    return this.readUnique(params, options);
+  public async readUniqueOrFail(
+    params: OrmReadParams<Entity>,
+    options: Omit<OrmReadOptions<Entity>, 'findOrFail'> = { },
+  ): Promise<Entity> {
+    return this.readUnique(params, { ...options, findOrFail: true });
+  }
+
+  /**
+   * Count entities matching given criteria.
+   * @param params
+   */
+  public async countBy(params: OrmReadParams<Entity>): Promise<number> {
+    if (!params || Array.isArray(params) && params.length === 0) return 0;
+    let count: number;
+
+    try {
+      count = await this.entityManager.count(this.entityName, params as EntityData<Entity>);
+    }
+    catch (e) {
+      OrmBaseRepository.handleException(e);
+    }
+
+    return count;
   }
 
   /**
@@ -124,7 +127,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param options
    */
-  public async readAndCount(
+  public async readAndCountBy(
     params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
   ): Promise<OrmPagination<Entity>> {
     options.sort ??= this.getPrimaryKey();
@@ -137,8 +140,8 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       order: options.order,
       limit: options.limit,
       offset: options.offset,
-      count: await this.count(params),
-      records: await this.read(params, options),
+      count: await this.countBy(params),
+      records: await this.readBy(params, options),
     };
   }
 

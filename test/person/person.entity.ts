@@ -3,8 +3,9 @@ import { Collection, Entity, ManyToMany, OneToMany, Property, Unique } from '@mi
 import { OrmUuidTimestampEntity } from '../../source/orm/orm.entity';
 import { Company } from '../company/company.entity';
 import { Contact } from '../contact/contact.entity';
+import { PersonRepository } from './person.repository';
 
-@Entity()
+@Entity({ customRepository: () => PersonRepository })
 @Unique({ properties: [ 'name', 'surname' ] })
 export class Person extends OrmUuidTimestampEntity {
 

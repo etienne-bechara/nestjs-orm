@@ -60,7 +60,8 @@ void AppModule.bootServer({
         password: ormConfig.ORM_PASSWORD,
         pool: { min: 1, max: 25 },
         sync: {
-          enable: true,
+          auto: true,
+          controller: true,
           safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,
         },
         driverOptions: ormConfig.ORM_SERVER_CA
@@ -127,35 +128,48 @@ export class UserRepository extends OrmRepository<User> {
 }
 ```
 
-At this point, an injectable `UserRepository` will be available throughout the application, exposing extra ORM functionalities:
+At this point, an injectable `UserRepository` will be available throughout the application, exposing extra ORM functionalities.
 
 ```ts
-// Read entities
-read(): Promise<Entity[]>;
-count(): Promise<number>;
+// Read operations
+populate(): Promise<void>;
+readBy(): Promise<Entity[]>;
 readById(): Promise<Entity>;
 readByIdOrFail(): Promise<Entity>;
 readUnique(): Promise<Entity>;
 readUniqueOrFail(): Promise<Entity>;
-readAndCount(): Promise<OrmPaginatedResponse<Entity>>;
+countBy(): Promise<number>;
+readAndCountBy(): Promise<OrmPaginatedResponse<Entity>>;
 
-// Create entities
-insert(): Promise<Entity[]>;
-insertOne(): Promise<Entity>;
-readOrInsert(): Promise<Entity[]>;
-readOrInsertOne(): Promise<Entity>;
-
-// Update entities
+// Sync operations (instantly committed)
+create(): Promise<Entity[]>;
+createOne(): Promise<Entity>;
 update(): Promise<Entity[]>;
-updateOne(): Promise<Entity>;
+updateBy(): Promise<Entity[]>;
 updateById(): Promise<Entity>;
+updateOne(): Promise<Entity>;
 upsert(): Promise<Entity[]>;
 upsertOne(): Promise<Entity>;
-
-// Remove entities
 delete(): Promise<Entity[]>;
-deleteOne(): Promise<Entity>;
+deleteBy(): Promise<Entity[]>;
 deleteById(id: string): Promise<Entity>;
+deleteOne(): Promise<Entity>;
+
+// Async operations (committed before HTTP response)
+createAsync(): Entity[];
+createOneAsync(): Entity;
+updateAsync(): Entity[];
+updateByIdAsync(): Entity;
+updateOneAsync(): Entity;
+upsertAsync(): Entity[];
+upsertOneAsync(): Entity;
+deleteAsync(): Entity[];
+deleteById(id: string): Entity;
+deleteOneAsync(): Entity;
+
+// Async manipulation (optional)
+commit(): Promise<void>
+rollback(): Promise<void>
 ```
 
 ### Creating an Subscriber
@@ -231,7 +245,7 @@ export class UserController {
 
   @Post()
   public async post(@Body() body: UserCreateDto): Promise<UserEntity> {
-    return this.userRepository.insertOne(body);
+    return this.userRepository.createOne(body);
   }
 
   @Put()

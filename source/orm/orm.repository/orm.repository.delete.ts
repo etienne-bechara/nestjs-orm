@@ -1,7 +1,6 @@
 import { EntityManager, EntityName } from '@mikro-orm/core';
 
-import { OrmDeleteOptions, OrmRepositoryOptions } from '../orm.interface';
-import { OrmBaseRepository } from './orm.repository.base';
+import { OrmDeleteOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
 import { OrmUpdateRepository } from './orm.repository.update';
 
 export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<Entity> {
@@ -15,12 +14,23 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
   }
 
   /**
+   * Remove target entities and returns their reference, persist changes on next commit call.
+   * @param entities
+   */
+  public deleteAsync(entities: Entity | Entity[]): Entity[] {
+    const entityArray = Array.isArray(entities) ? entities : [ entities ];
+    if (!entities || entityArray.length === 0) return [ ];
+    this.removeAsync(entities);
+    return entityArray;
+  }
+
+  /**
    * Remove target entities and returns their reference.
    * @param entities
    * @param options
    */
   public async delete(entities: Entity | Entity[], options: OrmDeleteOptions<Entity> = { }): Promise<Entity[]> {
-    const { flush, populate } = options;
+    const { populate } = options;
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     if (!entities || entityArray.length === 0) return [ ];
 
@@ -28,16 +38,29 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
       await this.populate(entityArray, populate);
     }
 
-    try {
-      flush
-        ? await this.removeAndFlush(entityArray)
-        : this.remove(entityArray);
-    }
-    catch (e) {
-      OrmBaseRepository.handleException(e, entities);
-    }
+    this.deleteAsync(entityArray);
+    await this.commit();
 
     return entityArray;
+  }
+
+  /**
+   * Remove all entities that match target criteria.
+   * @param params
+   * @param options
+   */
+  public async deleteBy(params: OrmReadParams<Entity>, options: OrmDeleteOptions<Entity> = { }): Promise<Entity[]> {
+    const entities = await this.readBy(params, options);
+    return this.delete(entities, options);
+  }
+
+  /**
+   * Remove a single entity by its ID, persist changes on next commit call.
+   * @param id
+   */
+  public deleteByIdAsync(id: string | number): void {
+    const pk = this.getPrimaryKey();
+    this.deleteAsync({ [pk]: id } as any);
   }
 
   /**
@@ -49,6 +72,15 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     const entity = await this.readByIdOrFail(id);
     await this.delete(entity, options);
     return entity;
+  }
+
+  /**
+   * Remove a single entity, persist changes on next commit call.
+   * @param entity
+   */
+  public deleteOneAsync(entity: Entity): Entity {
+    const [ deletedEntity ] = this.deleteAsync(entity);
+    return deletedEntity;
   }
 
   /**

@@ -1,7 +1,6 @@
 import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
 
-import { OrmCreateOptions, OrmRepositoryOptions } from '../orm.interface';
-import { OrmBaseRepository } from './orm.repository.base';
+import { OrmRepositoryOptions } from '../orm.interface';
 import { OrmReadRepository } from './orm.repository.read';
 
 export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Entity> {
@@ -15,37 +14,46 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
   }
 
   /**
-   * Create multiple entities based on provided data.
+   * Create multiple entities based on provided data, persist changes on next commit call.
    * @param data
-   * @param options
    */
-  public async insert(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity[]> {
-    const { flush } = options;
+  public createFromAsync(data: EntityData<Entity> | EntityData<Entity>[]): Entity[] {
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
 
-    const newEntities = dataArray.map((d) => super.create(d));
-
-    try {
-      flush
-        ? await this.persistAndFlush(newEntities)
-        : this.persist(newEntities);
-    }
-    catch (e) {
-      OrmBaseRepository.handleException(e, newEntities);
-    }
+    const newEntities = dataArray.map((d) => this.entityManager.create(this.entityName, d));
+    this.commitAsync(newEntities);
 
     return newEntities;
   }
 
   /**
-   * Create a single entity based on provided data.
+   * Create multiple entities based on provided data.
    * @param data
-   * @param options
    */
-  public async insertOne(data: EntityData<Entity>, options: OrmCreateOptions<Entity> = { }): Promise<Entity> {
-    const [ insertedEntity ] = await this.insert(data, options);
-    return insertedEntity;
+  public async createFrom(data: EntityData<Entity> | EntityData<Entity>[]): Promise<Entity[]> {
+    const newEntities = this.createFromAsync(data);
+    await this.commit();
+    return newEntities;
+  }
+
+  /**
+   * Create a single entity based on provided data, persist changes on next commit call.
+   * @param data
+   */
+  public createOneAsync(data: EntityData<Entity>): Entity {
+    const [ newEntity ] = this.createFromAsync(data);
+    return newEntity;
+  }
+
+  /**
+   * Create a single entity based on provided data, persist changes on next commit call.
+   * @param data
+   */
+  public async createOne(data: EntityData<Entity>): Promise<Entity> {
+    const newEntity = this.createOneAsync(data);
+    await this.commit();
+    return newEntity;
   }
 
 }

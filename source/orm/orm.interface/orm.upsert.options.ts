@@ -1,7 +1,8 @@
-import { OrmUpdateOptions } from './orm.update.options';
+import { Populate } from '@mikro-orm/core';
 
-export interface OrmUpsertOptions<Entity> extends OrmUpdateOptions<Entity> {
+export interface OrmUpsertOptions<Entity> {
+  populate?: Populate<Entity>;
   uniqueKey?: (keyof Entity)[];
-  allowUpdate?: boolean;
-  disableRetry?: boolean;
+  disallowUpdate?: boolean;
+  disallowRetry?: boolean;
 }

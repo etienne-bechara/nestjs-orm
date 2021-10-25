@@ -15,7 +15,7 @@ export class ContactController {
   @Get()
   public get(@Query() query: ContactReadDto): Promise<OrmPagination<Contact>> {
     const { params, options } = this.contactRepository.getReadArguments(query);
-    return this.contactRepository.readAndCount(params, options);
+    return this.contactRepository.readAndCountBy(params, options);
   }
 
   @Get(':id')
@@ -25,7 +25,7 @@ export class ContactController {
 
   @Post()
   public post(@Body() body: ContactCreateDto): Promise<Contact> {
-    return this.contactRepository.insertOne(body);
+    return this.contactRepository.createOne(body);
   }
 
   @Put()

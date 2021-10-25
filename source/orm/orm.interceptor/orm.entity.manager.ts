@@ -30,9 +30,9 @@ export class OrmEntityManager implements NestInterceptor {
       .handle()
       .pipe(
         mergeMap(async (data) => {
-          const flushPending = store.get(OrmStoreKey.FLUSH_PENDING);
+          const commitPending = store.get(OrmStoreKey.COMMIT_PENDING);
 
-          if (flushPending) {
+          if (commitPending) {
             try {
               entityManager = store.get(OrmStoreKey.ENTITY_MANAGER);
               await entityManager.flush();

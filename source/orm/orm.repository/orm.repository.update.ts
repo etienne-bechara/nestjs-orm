@@ -1,8 +1,7 @@
 import { ConflictException } from '@bechara/nestjs-core';
 import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
 
-import { OrmRepositoryOptions, OrmUpdateOptions, OrmUpdateParams, OrmUpsertOptions } from '../orm.interface';
-import { OrmBaseRepository } from './orm.repository.base';
+import { OrmReadOptions, OrmReadParams, OrmRepositoryOptions, OrmUpdateParams, OrmUpsertOptions } from '../orm.interface';
 import { OrmCreateRepository } from './orm.repository.create';
 
 export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<Entity> {
@@ -15,79 +14,147 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     super(entityManager, entityName, repositoryOptions);
   }
 
+  public updateAsync(entities: Entity | Entity[], data: EntityData<Entity>): Entity[];
+  public updateAsync(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[]): Entity[];
+
   /**
-   * Update target entities based on provided data.
-   * In case of multiple, target amount must match data amount.
+   * Update target entities, data can be provided as an object that applies to all,
+   * or each entity may be combined with its own changeset, persist changes on next
+   * commit call.
    * @param params
-   * @param options
+   * @param data
    */
-  public async update(
-    params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[], options: OrmUpdateOptions<Entity> = { },
-  ): Promise<Entity[]> {
-    const { flush } = options;
+  public updateAsync(
+    params: Entity | Entity[] | OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[],
+    data?: EntityData<Entity>,
+  ): Entity[] {
     const paramsArray = Array.isArray(params) ? params : [ params ];
     if (!params || paramsArray.length === 0) return [ ];
 
+    let assignedEntities: Entity[];
+
+    if (data) {
+      const entityArray: Entity[] = paramsArray as any;
+      assignedEntities = entityArray.map((e) => this.entityManager.assign(e, data));
+    }
+    else {
+      const comboArray: OrmUpdateParams<Entity>[] = paramsArray as any;
+      assignedEntities = comboArray.map(({ entity, data }) => this.entityManager.assign(entity, data));
+    }
+
+    this.commitAsync(assignedEntities);
+    return assignedEntities;
+  }
+
+  public async update(entities: Entity | Entity[], data: EntityData<Entity>): Promise<Entity[]>;
+  public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[]): Promise<Entity[]>;
+
+  /**
+   * Update target entities, data can be provided as an object that applies to all,
+   * or each entity may be combined with its own changeset.
+   * @param params
+   * @param data
+   */
+  public async update(
+    params: Entity | Entity[] | OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[],
+    data?: EntityData<Entity>,
+  ): Promise<Entity[]> {
+    const paramsArray = Array.isArray(params) ? params : [ params ];
+    if (!params || paramsArray.length === 0) return [ ];
+
+    const assignedEntities: Entity[] = [ ];
+    let comboArray: OrmUpdateParams<Entity>[];
+
+    // Normalize update data into the combo standard
+    if (data) {
+      const entityArray: Entity[] = paramsArray as any;
+      comboArray = entityArray.map((e) => ({ entity: e, data }));
+    }
+    else {
+      comboArray = paramsArray as any;
+    }
+
     // Before assignment, ensure one to many and many to many collections were populated
-    const assignedEntities = await Promise.all(
-      paramsArray.map(async ({ entity, data }) => {
+    await Promise.all(
+      comboArray.map(async ({ entity, data }) => {
         for (const key in entity as any) {
           if (data?.[key] && entity[key]?.isInitialized && entity[key]?.toArray && !entity[key].isInitialized()) {
             await entity[key].init();
           }
         }
 
-        return this.assign(entity, data);
+        const [ assignedEntity ] = this.updateAsync({ entity, data });
+        assignedEntities.push(assignedEntity);
       }),
     );
 
-    try {
-      flush
-        ? await this.persistAndFlush(assignedEntities)
-        : this.persist(assignedEntities);
-    }
-    catch (e) {
-      OrmBaseRepository.handleException(e, params);
-    }
-
+    await this.commit();
     return assignedEntities;
   }
 
   /**
-   * Update a singles entity by its ID.
-   * @param id
+   * Update all entities that match target criteria based on provided data.
+   * @param params
    * @param data
    * @param options
    */
-  public async updateById(
-    id: string | number, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { },
-  ): Promise<Entity> {
+  public async updateBy(
+    params: OrmReadParams<Entity>, data: EntityData<Entity>, options: OrmReadOptions<Entity> = { },
+  ): Promise<Entity[]> {
+    const entities = await this.readBy(params, options);
+    return this.update(entities, data);
+  }
+
+  /**
+   * Update an entity by its ID based on provided data, persist changes on next commit call.
+   * @param id
+   * @param data
+   */
+  public updateByIdAsync(id: string | number, data: EntityData<Entity>): Entity {
+    const pk = this.getPrimaryKey();
+    const [ updatedEntity ] = this.updateAsync({ [pk]: id } as any, data);
+    return updatedEntity;
+  }
+
+  /**
+   * Update an entity by its ID based on provided data.
+   * @param id
+   * @param data
+   */
+  public async updateById(id: string | number, data: EntityData<Entity>): Promise<Entity> {
     const entity = await this.readByIdOrFail(id);
-    const updatedEntity = await this.update({ entity, data }, options);
-    return updatedEntity[0];
+    const [ updatedEntity ] = await this.update(entity, data);
+    return updatedEntity;
+  }
+
+  /**
+   * Updates a single entity based on provided data, persist changes on next commit call.
+   * @param entity
+   * @param data
+   */
+  public updateOneAsync(entity: Entity, data: EntityData<Entity>): Entity {
+    const [ updatedEntity ] = this.updateAsync(entity, data);
+    return updatedEntity;
   }
 
   /**
    * Updates a single entity based on provided data.
    * @param entity
    * @param data
-   * @param options
    */
-  public async updateOne(
-    entity: Entity, data: EntityData<Entity>, options: OrmUpdateOptions<Entity> = { },
-  ): Promise<Entity> {
-    const [ updatedEntity ] = await this.update({ entity, data }, options);
+  public async updateOne(entity: Entity, data: EntityData<Entity>): Promise<Entity> {
+    const [ updatedEntity ] = await this.update(entity, data);
     return updatedEntity;
   }
 
   /**
    * Read, create or update according to provided constraints.
-   * An unique key must be specified either at service or method options.
+   * An unique key must be specified at repository or method options.
    * @param data
    * @param options
    */
-  private async readInsertOrUpdate(
-    data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { },
+  public async upsert(
+    data: EntityData<Entity> | EntityData<Entity>[], options: OrmUpsertOptions<Entity> = { },
   ): Promise<Entity[]> {
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
@@ -100,6 +167,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     const updateParams: OrmUpdateParams<Entity>[] = [ ];
     const createData: EntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
+    let createdEntities: Entity[];
 
     // Create clauses to match existing entities
     const clauses = dataArray.map((data) => {
@@ -112,7 +180,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     const populate = Array.isArray(options.populate) ? options.populate : [ ];
     const sampleData = dataArray[0];
     for (const key in sampleData) Array.isArray(sampleData[key]) ? populate.push(key) : undefined;
-    const matchingEntities = await this.read({ $or: clauses }, { populate });
+    const matchingEntities = await this.readBy({ $or: clauses }, { populate });
 
     // Find matching entities for each item on original data
     const matches = dataArray.map((data, i) => {
@@ -152,6 +220,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       return { data, entity };
     });
 
+    // Analyse resulting matches
     for (const match of matches) {
       // Conflict (error)
       if (match.entity.length > 1) {
@@ -164,7 +233,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
 
       // Match (create or update)
       if (match.entity.length === 1) {
-        if (options.allowUpdate) {
+        if (!options.disallowUpdate) {
           resultMap.push({ index: updateParams.length, target: 'update' });
           updateParams.push({ entity: match.entity[0], data: match.data });
         }
@@ -180,22 +249,20 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       }
     }
 
-    // Allow a single retry to handle concurrent creation
-    let createdEntities: Entity[];
-
+    // If two upsert operations run concurrently the second creation will likely fail
+    // Allow a single retry to prevent this scenario unless `disallowRetry` is set
     try {
       createdEntities = createData.length > 0
-        ? await this.insert(createData, options)
+        ? await this.createFrom(createData)
         : [ ];
     }
     catch (e) {
-      if (options.disableRetry) throw e;
-      options.disableRetry = true;
-      return this.readInsertOrUpdate(data, options);
+      if (options.disallowRetry) throw e;
+      return this.upsert(data, { ...options, disallowRetry: true });
     }
 
     const updatedEntities = updateParams.length > 0
-      ? await this.update(updateParams, options)
+      ? await this.update(updateParams)
       : [ ];
 
     const resultEntities = resultMap.map((i) => {
@@ -210,47 +277,14 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
   }
 
   /**
-   * Read or create multiple entities based on provided data.
-   * An unique key must be specified either at service or method options.
-   * @param data
-   * @param options
-   */
-  public async readOrInsert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity[]> {
-    options.allowUpdate = false;
-    return this.readInsertOrUpdate(data, options);
-  }
-
-  /**
-   * Read or create a single entity based on provided data.
-   * An unique key must be specified either at service or method options.
-   * @param data
-   * @param options
-   */
-  public async readOrInsertOne(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
-    const [ entity ] = await this.readOrInsert(data, options);
-    return entity;
-  }
-
-  /**
-   * Creates or updates multiple entities based on provided data.
-   * An unique key must be specified either at service or method options.
-   * @param data
-   * @param options
-   */
-  public async upsert(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity[]> {
-    options.allowUpdate = true;
-    return this.readInsertOrUpdate(data, options);
-  }
-
-  /**
-   * Creates or updates a single entity  based on provided data.
-   * An unique key must be specified either at service or method options.
+   * Read, create or update according to provided constraints.
+   * An unique key must be specified at repository or method options.
    * @param data
    * @param options
    */
   public async upsertOne(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
-    const [ entity ] = await this.upsert(data, options);
-    return entity;
+    const [ resultEntity ] = await this.upsert(data, options);
+    return resultEntity;
   }
 
 }

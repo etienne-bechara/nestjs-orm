@@ -1,4 +1,3 @@
-export * from './orm.create.options';
 export * from './orm.delete.options';
 export * from './orm.module.options';
 export * from './orm.pagination';
@@ -9,6 +8,5 @@ export * from './orm.repository.options';
 export * from './orm.subscriber.changeset';
 export * from './orm.subscriber.options';
 export * from './orm.subscriber.params';
-export * from './orm.update.options';
 export * from './orm.update.params';
 export * from './orm.upsert.options';
