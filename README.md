@@ -142,7 +142,7 @@ countBy(): Promise<number>;
 readAndCountBy(): Promise<OrmPaginatedResponse<Entity>>;
 
 // Sync operations (instantly committed)
-create(): Promise<Entity[]>;
+createFrom(): Promise<Entity[]>;
 createOne(): Promise<Entity>;
 update(): Promise<Entity[]>;
 updateBy(): Promise<Entity[]>;
@@ -156,7 +156,9 @@ deleteById(id: string): Promise<Entity>;
 deleteOne(): Promise<Entity>;
 
 // Async operations (committed before HTTP response)
-createAsync(): Entity[];
+build(): Entity[]
+buildOne(): Entity
+createFromAsync(): Entity[];
 createOneAsync(): Entity;
 updateAsync(): Entity[];
 updateByIdAsync(): Entity;

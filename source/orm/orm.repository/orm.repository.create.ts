@@ -14,16 +14,33 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
   }
 
   /**
+   * Constructs multiples entities without persisting them.
+   * @param data
+   */
+  public build(data: EntityData<Entity> | EntityData<Entity>[]): Entity[] {
+    const dataArray = Array.isArray(data) ? data : [ data ];
+
+    return data && dataArray.length > 0
+      ? dataArray.map((d) => this.entityManager.create(this.entityName, d))
+      : [ ];
+  }
+
+  /**
+   * Constructs a single entity without persisting it.
+   * @param data
+   * @returns
+   */
+  public buildOne(data: EntityData<Entity>): Entity {
+    return this.build(data)[0];
+  }
+
+  /**
    * Create multiple entities based on provided data, persist changes on next commit call.
    * @param data
    */
   public createFromAsync(data: EntityData<Entity> | EntityData<Entity>[]): Entity[] {
-    const dataArray = Array.isArray(data) ? data : [ data ];
-    if (!data || dataArray.length === 0) return [ ];
-
-    const newEntities = dataArray.map((d) => this.entityManager.create(this.entityName, d));
+    const newEntities = this.build(data);
     this.commitAsync(newEntities);
-
     return newEntities;
   }
 

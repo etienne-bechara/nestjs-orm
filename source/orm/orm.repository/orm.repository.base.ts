@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, ContextStorage, InternalServerErrorException, NotImplementedException } from '@bechara/nestjs-core';
-import { AnyEntity, EntityData, EntityManager, EntityName, EntityRepository, New, Populate } from '@mikro-orm/core';
+import { AnyEntity, CountOptions, DeleteOptions, EntityData, EntityManager, EntityName, EntityRepository, FilterQuery, FindOneOptions, Loaded, New, Populate, Primary, QueryOrderMap, UpdateOptions } from '@mikro-orm/core';
 import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
@@ -192,66 +192,32 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
-   * Use `readBy()`.
+   * Use `update()`.
+   * @param entity
+   * @param data
    * @deprecated
    */
-  public find(): Promise<any> { return; }
-
-  /**
-   * Use `readBy()`.
-   * @deprecated
-   */
-  public findAll(): Promise<any> { return; }
-
-  /**
-   * Use `readOne()`.
-   * @deprecated
-   */
-  public findOne(): Promise<any> { return; }
-
-  /**
-   * Use `readOneOrFail()`.
-   * @deprecated
-   */
-  public findOneOrFail(): Promise<any> { return; }
+  public assign(entity: Entity, data: EntityData<Entity>): Entity {
+    return super.assign(entity, data);
+  }
 
   /**
    * Use `countBy()`.
+   * @param where
+   * @param options
    * @deprecated
    */
-  public count(): Promise<any> { return; }
-
-  /**
-   * Use `readAndCountBy()`.
-   * @deprecated
-   */
-  public findAndCount(): Promise<any> { return; }
-
-  /**
-   * Use `deleteBy()`.
-   * @deprecated
-   */
-  public nativeDelete(): Promise<any> { return; }
+  public count(where?: FilterQuery<Entity>, options?: CountOptions<Entity>): Promise<number> {
+    return super.count(where, options);
+  }
 
   /**
    * Use `createFrom()`.
+   * @param data
    * @deprecated
    */
-  public nativeInsert(): Promise<any> { return; }
-
-  /**
-   * Use `updateBy()`.
-   * @deprecated
-   */
-  public nativeUpdate(): Promise<any> { return; }
-
-  /**
-   * Use `commitAsync()`.
-   * @param entity
-   * @deprecated
-   */
-  public persist(entity: AnyEntity | AnyEntity[]): EntityManager {
-    return super.persist(entity);
+  public create<P extends Populate<Entity> = string[]>(data: EntityData<Entity>): New<Entity, P> {
+    return super.create(data);
   }
 
   /**
@@ -260,6 +226,117 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    */
   public async flush(): Promise<void> {
     return super.flush();
+  }
+
+  /**
+   * Use `readBy()`.
+   * @param where
+   * @param populate
+   * @param orderBy
+   * @param limit
+   * @param offset
+   * @deprecated
+   */
+  public find<P extends Populate<Entity> = any>(
+    where: FilterQuery<Entity>, populate?: P, orderBy?: QueryOrderMap, limit?: number, offset?: number,
+  ): Promise<Loaded<Entity, P>[]> {
+    return super.find(where, populate, orderBy, limit, offset);
+  }
+
+  /**
+   * Use `readBy()`.
+   * @param populate
+   * @param orderBy
+   * @param limit
+   * @param offset
+   * @deprecated
+   */
+  public findAll<P extends Populate<Entity> = any>(
+    populate?: P, orderBy?: QueryOrderMap, limit?: number, offset?: number,
+  ): Promise<Loaded<Entity, P>[]> {
+    return super.findAll(populate, orderBy, limit, offset);
+  }
+
+  /**
+   * Use `readOne()`.
+   * @param where
+   * @param populate
+   * @param orderBy
+   * @deprecated
+   */
+  public findOne<P extends Populate<Entity> = any>(
+    where: FilterQuery<Entity>, populate?: FindOneOptions<Entity, P>, orderBy?: QueryOrderMap,
+  ): Promise<Loaded<Entity, P> | null> {
+    return super.findOne(where, populate, orderBy);
+  }
+
+  /**
+   * Use `readOneOrFail()`.
+   * @param where
+   * @param populate
+   * @param orderBy
+   * @deprecated
+   */
+  public findOneOrFail<P extends Populate<Entity> = any>(
+    where: FilterQuery<Entity>, populate?: P, orderBy?: QueryOrderMap,
+  ): Promise<Loaded<Entity, P>> {
+    return super.findOneOrFail(where, populate, orderBy);
+  }
+
+  /**
+   * Use `readAndCountBy()`.
+   * @param where
+   * @param populate
+   * @param orderBy
+   * @param limit
+   * @param offset
+   * @deprecated
+   */
+  public findAndCount<P extends Populate<Entity> = any>(
+    where: FilterQuery<Entity>, populate?: P, orderBy?: QueryOrderMap, limit?: number, offset?: number,
+  ): Promise<[Loaded<Entity, P>[], number]> {
+    return super.findAndCount(where, populate, orderBy, limit, offset);
+  }
+
+  /**
+   * Use `deleteBy()`.
+   * @param where
+   * @param options
+   * @deprecated
+   */
+  public nativeDelete(where: FilterQuery<Entity>, options?: DeleteOptions<Entity>): Promise<number> {
+    return super.nativeDelete(where, options);
+  }
+
+  /**
+   * Use `createFrom()`.
+   * @param data
+   * @deprecated
+   */
+  public nativeInsert(data: EntityData<Entity>): Promise<Primary<Entity>> {
+    return super.nativeInsert(data);
+  }
+
+  /**
+   * Use `updateBy()`.
+   * @param where
+   * @param data
+   * @param options
+   * @deprecated
+   */
+  public nativeUpdate(
+    where: FilterQuery<Entity>, data: EntityData<Entity>, options?: UpdateOptions<Entity>,
+  ): Promise<number> {
+    return super.nativeUpdate(where, data, options);
+  }
+
+  /**
+   * Use `commitAsync()`.
+   * @param entity
+   * @deprecated
+   */
+  public persist(entity: AnyEntity | AnyEntity[]): EntityManager {
+    return super.persist(entity);
   }
 
   /**
@@ -287,25 +364,6 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    */
   public async removeAndFlush(entity: AnyEntity | AnyEntity[]): Promise<void> {
     return super.removeAndFlush(entity);
-  }
-
-  /**
-   * Use `createFrom()`.
-   * @param data
-   * @deprecated
-   */
-  public create<P extends Populate<Entity> = string[]>(data: EntityData<Entity>): New<Entity, P> {
-    return super.create(data);
-  }
-
-  /**
-   * Use `update()`.
-   * @param entity
-   * @param data
-   * @deprecated
-   */
-  public assign(entity: Entity, data: EntityData<Entity>): Entity {
-    return super.assign(entity, data);
   }
 
 }
