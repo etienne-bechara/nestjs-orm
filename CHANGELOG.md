@@ -1,3 +1,15 @@
+# [3.7.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.6.0...v3.7.0) (2021-10-28)
+
+
+### Bug Fixes
+
+* make build available as separate from create ([2f1e454](https://github.com/etienne-bechara/nestjs-orm/commit/2f1e454927c2ab2c19da5d4e8073dbfe07e911c2))
+
+
+### Features
+
+* add auto retry on connection reset ([30e89e0](https://github.com/etienne-bechara/nestjs-orm/commit/30e89e095099a9e1a66e65597d060570ebd61629))
+
 # [3.6.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.5.1...v3.6.0) (2021-10-25)
 
 
