@@ -4,6 +4,7 @@ import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
 import { OrmStoreKey } from '../orm.enum';
+import { OrmExceptionHandlerParams } from '../orm.interface';
 import { OrmRepositoryOptions } from '../orm.interface/orm.repository.options';
 
 export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity> {
@@ -39,15 +40,20 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
 
   /**
    * Execute all pending entity changes.
+   * @param retries
    */
-  private async sync(): Promise<void> {
+  private async sync(retries: number = 0): Promise<void> {
     this.clearCommitPending();
 
     try {
       await this.entityManager.flush();
     }
     catch (e) {
-      OrmBaseRepository.handleException(e);
+      return OrmBaseRepository.handleException({
+        caller: (retries) => this.sync(retries),
+        retries,
+        error: e,
+      });
     }
   }
 
@@ -147,48 +153,55 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
-   * Handle all query exceptions.
-   * @param e
-   * @param data
+   * Handle all query exceptions, check if retry is possible by comparing
+   * known exceptions to the error.
+   *
+   * If not retryable, check against a set of exceptions that should be
+   * throw with their matching http status.
+   *
+   * Finally, if no match, throw as internal error.
+   * @param params
    */
-  public static handleException(e: Error, data?: any): void {
-    if (/duplicate entry/gi.test(e.message)) {
-      const entityName = /key '(.+?)\./gi.exec(e.message);
-      const violation = /entry '(.+?)' for/gi.exec(e.message);
+  public static async handleException(params: OrmExceptionHandlerParams): Promise<any> {
+    const { caller, error, retries } = params;
+    const retryableExceptions = [ 'read ECONNRESET' ];
+    const isRetryable = retryableExceptions.some((r) => error.message.includes(r));
+
+    if (isRetryable && retries < 10) {
+      await new Promise((r) => setTimeout(r, 500));
+      return caller(retries + 1);
+    }
+
+    if (/duplicate entry/gi.test(error.message)) {
+      const entityName = /key '(.+?)\./gi.exec(error.message);
+      const violation = /entry '(.+?)' for/gi.exec(error.message);
       throw new ConflictException({
         message: `${entityName ? entityName[1] : 'entity'} already exists`,
         constraint: violation ? violation[1] : null,
       });
     }
-
-    if (/cannot add.+foreign key.+fails/gi.test(e.message)) {
-      const violation = /references `(.+?)`/gi.exec(e.message);
+    else if (/cannot add.+foreign key.+fails/gi.test(error.message)) {
+      const violation = /references `(.+?)`/gi.exec(error.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new BadRequestException(`${constraint} must reference an existing entity`);
     }
-
-    if (/cannot delete.+foreign key.+fails/gi.test(e.message)) {
-      const violation = /\.`(.+?)`, constraint/gi.exec(e.message);
+    else if (/cannot delete.+foreign key.+fails/gi.test(error.message)) {
+      const violation = /\.`(.+?)`, constraint/gi.exec(error.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new ConflictException(`${constraint} constraint prevents cascade deletion`);
     }
-
-    if (e.message.startsWith('Trying to query by not existing property')) {
-      const violation = /.+ (.+)/gi.exec(e.message);
+    else if (error.message.startsWith('Trying to query by not existing property')) {
+      const violation = /.+ (.+)/gi.exec(error.message);
       const constraint = violation ? violation[1] : 'undefined';
       throw new BadRequestException(`${constraint.replace('Entity', '').toLowerCase()} should not exist`);
     }
-
-    if (e.message.startsWith('Invalid query condition')) {
-      const violation = /condition: (.+)/gi.exec(e.message);
+    else if (error.message.startsWith('Invalid query condition')) {
+      const violation = /condition: (.+)/gi.exec(error.message);
       const constraint = violation ? violation[1] : '{}';
       throw new BadRequestException(`incorrect filter condition ${constraint}`);
     }
 
-    throw new InternalServerErrorException({
-      message: e.message,
-      data,
-    });
+    throw new InternalServerErrorException(error);
   }
 
   /**

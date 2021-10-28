@@ -1,4 +1,5 @@
 export * from './orm.delete.options';
+export * from './orm.exception.handler.params';
 export * from './orm.module.options';
 export * from './orm.pagination';
 export * from './orm.read.arguments';

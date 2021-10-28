@@ -25,6 +25,7 @@ export class StartupService {
    */
   private async createBaseEntities(): Promise<void> {
     try {
+      // await this.schemaService.resetSchema();
       await this.schemaService.syncSchema();
 
       // John, Jane and Robert

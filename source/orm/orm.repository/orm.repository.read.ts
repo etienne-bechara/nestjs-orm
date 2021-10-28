@@ -20,8 +20,11 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * and population options.
    * @param params
    * @param options
+   * @param retries
    */
-  public async readBy(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity[]> {
+  public async readBy(
+    params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }, retries = 0,
+  ): Promise<Entity[]> {
     if (!params || Array.isArray(params) && params.length === 0) return [ ];
 
     options.populate ??= this.repositoryOptions.defaultPopulate ?? false;
@@ -36,7 +39,11 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       readEntities ??= [ ];
     }
     catch (e) {
-      OrmBaseRepository.handleException(e, readEntities);
+      return OrmBaseRepository.handleException({
+        caller: (retries) => this.readBy(params, options, retries),
+        retries,
+        error: e,
+      });
     }
 
     if (!readEntities[0] && options.findOrFail) {
@@ -105,8 +112,9 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
   /**
    * Count entities matching given criteria.
    * @param params
+   * @param retries
    */
-  public async countBy(params: OrmReadParams<Entity>): Promise<number> {
+  public async countBy(params: OrmReadParams<Entity>, retries = 0): Promise<number> {
     if (!params || Array.isArray(params) && params.length === 0) return 0;
     let count: number;
 
@@ -114,7 +122,11 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       count = await this.entityManager.count(this.entityName, params as EntityData<Entity>);
     }
     catch (e) {
-      OrmBaseRepository.handleException(e);
+      return OrmBaseRepository.handleException({
+        caller: (retries) => this.countBy(params, retries),
+        retries,
+        error: e,
+      });
     }
 
     return count;

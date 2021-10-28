@@ -23,28 +23,41 @@ export class OrmEntityManager implements NestInterceptor {
    */
   public intercept(context: ExecutionContext, next: CallHandler): any {
     const store = this.contextService.getStore();
-    let entityManager = this.mikroOrm.em.fork(true, true);
+    const entityManager = this.mikroOrm.em.fork(true, true);
     store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
 
     return next
       .handle()
       .pipe(
         mergeMap(async (data) => {
-          const commitPending = store.get(OrmStoreKey.COMMIT_PENDING);
-
-          if (commitPending) {
-            try {
-              entityManager = store.get(OrmStoreKey.ENTITY_MANAGER);
-              await entityManager.flush();
-            }
-            catch (e) {
-              OrmBaseRepository.handleException(e);
-            }
-          }
-
+          await this.commitPendingChanges(store);
           return this.stringifyEntities(data);
         }),
       );
+  }
+
+  /**
+   * Checks if entity manager contains any pending changes,
+   * if so flushes them to database.
+   * @param store
+   * @param retries
+   */
+  private async commitPendingChanges(store: Map<string, any>, retries = 0): Promise<void> {
+    const commitPending = store.get(OrmStoreKey.COMMIT_PENDING);
+
+    if (commitPending) {
+      try {
+        const entityManager = store.get(OrmStoreKey.ENTITY_MANAGER);
+        await entityManager.flush();
+      }
+      catch (e) {
+        return OrmBaseRepository.handleException({
+          caller: (retries) => this.commitPendingChanges(store, retries),
+          retries,
+          error: e,
+        });
+      }
+    }
   }
 
   /**
