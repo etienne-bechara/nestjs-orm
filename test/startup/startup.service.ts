@@ -109,7 +109,7 @@ export class StartupService {
       this.loggerService.notice('[StartupService] Mock data successfully created');
     }
     catch (e) {
-      this.loggerService.error(e);
+      this.loggerService.error(e as Error);
     }
   }
 

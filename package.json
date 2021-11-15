@@ -28,10 +28,10 @@
   "scripts": {
     "prepare": "husky install .config/husky",
     "dev": "tsnd --exit-child --rs --watch *.env --inspect=0.0.0.0:9229 ./test/main.ts",
-    "build": "npx rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && npx rimraf ./source/index.ts",
-    "index": "npx rimraf ./source/index.ts && npx barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
-    "lint": "eslint **/*.ts --max-warnings=0",
-    "test": "jest --verbose --forceExit --passWithNoTests --config .config/jest/jest.config.js"
+    "build": "pnpx -y rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && pnpx -y rimraf ./source/index.ts",
+    "index": "pnpx -y rimraf ./source/index.ts && pnpx -y barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
+    "lint": "export TIMING=1 || set TIMING=1&& eslint **/*.ts --max-warnings=0",
+    "test": "jest --verbose --forceExit --passWithNoTests --config .config/jest/.jestrc.json"
   },
   "peerDependencies": {
     "@bechara/nestjs-core": "^3.0.0"
@@ -40,21 +40,20 @@
     "@mikro-orm/core": "4.5.9",
     "@mikro-orm/mongodb": "4.5.9",
     "@mikro-orm/mysql": "4.5.9",
-    "@mikro-orm/nestjs": "4.3.0",
+    "@mikro-orm/nestjs": "4.3.1",
     "@mikro-orm/postgresql": "4.5.9",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@bechara/eslint-config-bechara-ts": "1.2.0",
-    "@bechara/nestjs-core": "3.3.1",
-    "@commitlint/cli": "13.2.1",
-    "@commitlint/config-conventional": "13.2.0",
+    "@bechara/eslint-config-bechara-ts": "1.3.0",
+    "@bechara/nestjs-core": "3.3.3",
+    "@commitlint/cli": "14.1.0",
+    "@commitlint/config-conventional": "14.1.0",
     "@types/jest": "27.0.2",
-    "@types/node": "16.11.1",
-    "eslint": "8.0.1",
-    "husky": "7.0.2",
+    "@types/node": "16.11.7",
+    "eslint": "8.2.0",
+    "husky": "7.0.4",
     "jest": "27.3.1",
-    "lint-staged": "11.2.3",
     "ts-jest": "27.0.7",
     "ts-node-dev": "1.1.8",
     "typescript": "4.4.4"

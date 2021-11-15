@@ -71,19 +71,27 @@ export class OrmEntityManager implements NestInterceptor {
     // Array of entities
     if (Array.isArray(data)) {
       data = data.map((d) => d?.toJSON ? d.toJSON() : d);
-      for (const d of data) this.eliminateRecursion(d.id, d);
+
+      for (const d of data) {
+        const dataItem = d as { id: string | number };
+        this.eliminateRecursion(dataItem.id, d);
+      }
     }
 
     // Paginated entity
     if (data.records && Array.isArray(data.records)) {
       data.records = data.records.map((d) => d?.toJSON ? d.toJSON() : d);
-      for (const d of data.records) this.eliminateRecursion(d.id, d);
+
+      for (const d of data.records) {
+        const dataItem = d as { id: string | number };
+        this.eliminateRecursion(dataItem.id, d);
+      }
     }
 
     // Single entity
     if (data.toJSON) {
-      data = data.toJSON();
-      this.eliminateRecursion(data.id, data);
+      const dataItem: { id: string | number } = data.toJSON();
+      this.eliminateRecursion(dataItem.id, data);
     }
 
     return data;
@@ -94,7 +102,7 @@ export class OrmEntityManager implements NestInterceptor {
    * @param parentId
    * @param data
    */
-  private eliminateRecursion(parentId: string, data: any): void {
+  private eliminateRecursion(parentId: string | number, data: any): void {
     if (!data || !parentId || typeof data !== 'object') return;
 
     if (Array.isArray(data)) {

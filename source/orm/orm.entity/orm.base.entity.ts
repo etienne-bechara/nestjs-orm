@@ -16,6 +16,7 @@ export abstract class OrmBaseEntity extends BaseEntity<AnyEntity, 'id'> {
    */
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public toJSON(...args: any[]): any {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const object = wrap(this, true).toObject(...args);
     return this.beforeSerialization(object);
   }

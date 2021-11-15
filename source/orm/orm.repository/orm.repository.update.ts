@@ -112,7 +112,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    */
   public updateByIdAsync(id: string | number, data: EntityData<Entity>): Entity {
     const pk = this.getPrimaryKey();
-    const [ updatedEntity ] = this.updateAsync({ [pk]: id } as any, data);
+    const [ updatedEntity ] = this.updateAsync({ [pk]: id } as unknown as Entity, data);
     return updatedEntity;
   }
 

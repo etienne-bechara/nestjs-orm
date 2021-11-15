@@ -71,7 +71,7 @@ export class SchemaService {
     }
     catch (e) {
       status = SchemaSyncStatus.MIGRATION_FAILED;
-      this.loggerService.error('[OrmService] Database schema update failed', e, { syncQueries });
+      this.loggerService.error('[OrmService] Database schema update failed', e as Error, { syncQueries });
     }
 
     return {

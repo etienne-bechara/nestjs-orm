@@ -60,7 +60,7 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    */
   public deleteByIdAsync(id: string | number): void {
     const pk = this.getPrimaryKey();
-    this.deleteAsync({ [pk]: id } as any);
+    this.deleteAsync({ [pk]: id } as unknown as Entity);
   }
 
   /**
