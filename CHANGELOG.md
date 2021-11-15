@@ -1,3 +1,10 @@
+## [3.7.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.0...v3.7.1) (2021-11-15)
+
+
+### Bug Fixes
+
+* upgrade configs ([a65e961](https://github.com/etienne-bechara/nestjs-orm/commit/a65e9619106022245765aa9fb32a1726751f34c4))
+
 # [3.7.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.6.0...v3.7.0) (2021-10-28)
 
 
