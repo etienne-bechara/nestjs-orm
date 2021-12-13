@@ -279,7 +279,7 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    */
   public findOne<P extends Populate<Entity> = any>(
     where: FilterQuery<Entity>, populate?: FindOneOptions<Entity, P>, orderBy?: QueryOrderMap,
-  ): Promise<Loaded<Entity, P> | null> {
+  ): Promise<Entity> {
     return super.findOne(where, populate, orderBy);
   }
 

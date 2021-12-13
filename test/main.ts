@@ -11,11 +11,7 @@ import { PersonModule } from './person/person.module';
 import { StartupModule } from './startup/startup.module';
 
 void AppModule.boot({
-  disableConfigScan: true,
   disableModuleScan: true,
-  configs: [
-    OrmConfig,
-  ],
   imports: [
     OrmModule.registerAsync({
       disableEntityScan: true,

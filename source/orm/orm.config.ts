@@ -1,6 +1,6 @@
-import { AppEnvironment, Injectable, InjectSecret, IsBase64, IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from '@bechara/nestjs-core';
+import { AppEnvironment, Config, InjectSecret, IsBase64, IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from '@bechara/nestjs-core';
 
-@Injectable()
+@Config()
 export class OrmConfig {
 
   @IsOptional()
