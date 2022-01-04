@@ -1,3 +1,10 @@
+## [3.7.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.1...v3.7.2) (2021-12-13)
+
+
+### Bug Fixes
+
+* bump core to add @Config ([9c8f2da](https://github.com/etienne-bechara/nestjs-orm/commit/9c8f2da982bafd348a6560522a0f1abdfec31627))
+
 ## [3.7.1](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.0...v3.7.1) (2021-11-15)
 
 
