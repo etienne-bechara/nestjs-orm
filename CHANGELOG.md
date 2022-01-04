@@ -1,3 +1,10 @@
+## [3.7.4](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.3...v3.7.4) (2022-01-04)
+
+
+### Bug Fixes
+
+* interceptor stringifyEntities logic ([f6b40e4](https://github.com/etienne-bechara/nestjs-orm/commit/f6b40e4b07b7ebfc1c4d2255f923758e83e54f7e))
+
 ## [3.7.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.2...v3.7.3) (2022-01-04)
 
 
