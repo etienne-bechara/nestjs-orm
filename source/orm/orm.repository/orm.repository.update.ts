@@ -153,6 +153,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    * @param data
    * @param options
    */
+  // eslint-disable-next-line complexity
   public async upsert(
     data: EntityData<Entity> | EntityData<Entity>[], options: OrmUpsertOptions<Entity> = { },
   ): Promise<Entity[]> {
@@ -176,10 +177,16 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       return clause;
     });
 
-    // Find matching data, ensure to populate array data which most likely are 1:m or m:n relations
+    // Find matching data, ensure to populate array data that are 1:m or m:n relations
     const populate = Array.isArray(options.populate) ? options.populate : [ ];
     const sampleData = dataArray[0];
-    for (const key in sampleData) Array.isArray(sampleData[key]) ? populate.push(key) : undefined;
+
+    for (const key in sampleData) {
+      if (Array.isArray(sampleData[key]) && this.canPopulate(key)) {
+        populate.push(key);
+      }
+    }
+
     const matchingEntities = await this.readBy({ $or: clauses }, { populate });
 
     // Find matching entities for each item on original data
