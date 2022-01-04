@@ -1,3 +1,10 @@
+## [3.7.5](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.4...v3.7.5) (2022-01-04)
+
+
+### Bug Fixes
+
+* stringifyEntities when data is not an orm entity ([15c0351](https://github.com/etienne-bechara/nestjs-orm/commit/15c03512a63990b58eeb98c439335dd5dfc65814))
+
 ## [3.7.4](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.3...v3.7.4) (2022-01-04)
 
 
