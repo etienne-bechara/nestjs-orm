@@ -1,3 +1,10 @@
+## [3.7.3](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.2...v3.7.3) (2022-01-04)
+
+
+### Bug Fixes
+
+* check upsert populate ability before adding to population ([034c210](https://github.com/etienne-bechara/nestjs-orm/commit/034c210f58c30f5cb60dab41e64924c26af7c317))
+
 ## [3.7.2](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.1...v3.7.2) (2021-12-13)
 
 
