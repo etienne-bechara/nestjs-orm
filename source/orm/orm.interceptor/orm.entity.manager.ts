@@ -66,37 +66,36 @@ export class OrmEntityManager implements NestInterceptor {
    * @param data
    */
   private stringifyEntities(data: any): any {
-    let stringifiedData;
     if (!data) return;
 
     // Array of entities
     if (Array.isArray(data)) {
-      stringifiedData = data.map((d) => d?.toJSON ? d.toJSON() : d);
+      data = data.map((d) => d?.toJSON ? d.toJSON() : d);
 
-      for (const dataItem of stringifiedData) {
-        this.eliminateRecursion(dataItem['id'] as string | number, dataItem);
+      for (const dataItem of data) {
+        const dataId = dataItem['id'] as string | number;
+        this.eliminateRecursion(dataId, dataItem);
       }
     }
 
     // Paginated entity
     else if (data.records && Array.isArray(data.records)) {
-      stringifiedData = {
-        ...data,
-        records: data.records.map((d) => d?.toJSON ? d.toJSON() : d),
-      };
+      data.records = data.records.map((d) => d?.toJSON ? d.toJSON() : d);
 
-      for (const dataItem of stringifiedData.records) {
-        this.eliminateRecursion(dataItem['id'] as string | number, dataItem);
+      for (const dataItem of data.records) {
+        const dataId = dataItem['id'] as string | number;
+        this.eliminateRecursion(dataId, dataItem);
       }
     }
 
     // Single entity
     else if (data.toJSON) {
-      stringifiedData = data.toJSON();
-      this.eliminateRecursion(stringifiedData['id'] as string | number, stringifiedData);
+      data = data.toJSON();
+      const dataId = data['id'] as string | number;
+      this.eliminateRecursion(dataId, data);
     }
 
-    return stringifiedData;
+    return data;
   }
 
   /**
