@@ -50,14 +50,14 @@ export class SchemaService {
    * @param options
    */
   public async syncSchema(options: SchemaModuleOptions = { }): Promise<SchemaSyncResult> {
-    this.loggerService.info('[OrmService] Starting database schema sync...');
+    this.loggerService.info('Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
     let syncDump = await generator.getUpdateSchemaSQL(false, options.safe);
     syncDump = this.removeBlacklistedQueries(syncDump, options);
 
     if (syncDump.length === 0) {
-      this.loggerService.notice('[OrmService] Database schema is up to date');
+      this.loggerService.notice('Database schema is up to date');
       return { status: SchemaSyncStatus.UP_TO_DATE };
     }
 
@@ -67,11 +67,11 @@ export class SchemaService {
 
     try {
       await generator.execute(syncQueries);
-      this.loggerService.notice('[OrmService] Database schema successfully updated');
+      this.loggerService.notice('Database schema successfully updated');
     }
     catch (e) {
       status = SchemaSyncStatus.MIGRATION_FAILED;
-      this.loggerService.error('[OrmService] Database schema update failed', e as Error, { syncQueries });
+      this.loggerService.error('Database schema update failed', e as Error, { syncQueries });
     }
 
     return {
@@ -84,13 +84,13 @@ export class SchemaService {
    * Erase current database schema and recreate it.
    */
   public async resetSchema(): Promise<void> {
-    this.loggerService.info('[OrmService] Starting database schema reset...');
+    this.loggerService.info('Starting database schema reset...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
     await generator.dropSchema();
     await generator.createSchema();
 
-    this.loggerService.notice('[OrmService] Database schema successfully reset');
+    this.loggerService.notice('Database schema successfully reset');
   }
 
 }

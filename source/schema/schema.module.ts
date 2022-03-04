@@ -1,5 +1,4 @@
-import { DynamicModule, LoggerModule, Module } from '@bechara/nestjs-core';
-import { v4 } from 'uuid';
+import { DynamicModule, LoggerModule, Module, uuidV4 } from '@bechara/nestjs-core';
 
 import { SchemaController } from './schema.controller';
 import { SchemaInjectionToken } from './schema.enum';
@@ -36,7 +35,7 @@ export class SchemaModule {
       providers: [
         {
           provide: SchemaInjectionToken.MODULE_ID,
-          useValue: v4(),
+          useValue: uuidV4(),
         },
         {
           provide: SchemaInjectionToken.MODULE_OPTIONS,
@@ -57,7 +56,7 @@ export class SchemaModule {
       providers: [
         {
           provide: SchemaInjectionToken.MODULE_ID,
-          useValue: v4(),
+          useValue: uuidV4(),
         },
         {
           provide: SchemaInjectionToken.MODULE_OPTIONS,
