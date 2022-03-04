@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.6...v4.0.0) (2022-03-04)
+
+
+### Bug Fixes
+
+* bump core ([1678e72](https://github.com/etienne-bechara/nestjs-orm/commit/1678e7294e644efd94e1fb2495323807720aa11e))
+
+
+### BREAKING CHANGES
+
+* bump core
+
 ## [3.7.6](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.5...v3.7.6) (2022-01-28)
 
 
