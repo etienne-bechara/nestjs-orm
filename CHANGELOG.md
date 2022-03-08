@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.0...v4.0.1) (2022-03-08)
+
+
+### Bug Fixes
+
+* print trace logs  in gray ([6e24ce8](https://github.com/etienne-bechara/nestjs-orm/commit/6e24ce869c26b40c24b78b556daffbf39e6d0af7))
+
 # [4.0.0](https://github.com/etienne-bechara/nestjs-orm/compare/v3.7.6...v4.0.0) (2022-03-04)
 
 
