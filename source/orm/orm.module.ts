@@ -1,4 +1,4 @@
-import { APP_INTERCEPTOR, AppConfig, AppEnvironment, AppModule, ContextStorage, DynamicModule, LoggerService, Module } from '@bechara/nestjs-core';
+import { APP_INTERCEPTOR, AppConfig, AppEnvironment, AppModule, ContextStorage, DynamicModule, LoggerService, LoggerStyle, Module } from '@bechara/nestjs-core';
 import { EntityManager, MikroORMOptions } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
@@ -80,7 +80,7 @@ export class OrmModule {
 
             return {
               debug: appConfig.NODE_ENV === AppEnvironment.LOCAL,
-              logger: (msg): void => loggerService.trace(msg),
+              logger: (msg): void => loggerService.trace(msg.replace(/].+?m/, `] ${LoggerStyle.FG_BRIGHT_BLACK}`)),
               entities: rootEntities,
               ...mikroOrmOptions,
             };
