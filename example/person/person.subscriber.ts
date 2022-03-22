@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@bechara/nestjs-core';
+import { Injectable, LogService } from '@bechara/nestjs-core';
 import { EntityManager } from '@mikro-orm/core';
 
 import { OrmSubscriberParams } from '../../source/orm/orm.interface';
@@ -10,7 +10,7 @@ export class PersonSubscriber extends OrmSubscriber<Person> {
 
   public constructor(
     protected readonly entityManager: EntityManager,
-    private readonly loggerService: LoggerService,
+    private readonly logService: LogService,
   ) {
     super(entityManager, {
       entities: Person,
@@ -23,7 +23,7 @@ export class PersonSubscriber extends OrmSubscriber<Person> {
    */
   public beforeCreate(params: OrmSubscriberParams<Person>): Promise<void> {
     const { entity } = params;
-    this.loggerService.warning('Before create entity:', entity);
+    this.logService.warning('Before create entity:', entity);
     return;
   }
 
@@ -33,7 +33,7 @@ export class PersonSubscriber extends OrmSubscriber<Person> {
    */
   public afterCreate(params: OrmSubscriberParams<Person>): Promise<void> {
     const { entity } = params;
-    this.loggerService.warning('After create entity:', entity);
+    this.logService.warning('After create entity:', entity);
     return;
   }
 
@@ -43,7 +43,7 @@ export class PersonSubscriber extends OrmSubscriber<Person> {
    */
   public beforeUpdate(params: OrmSubscriberParams<Person>): Promise<void> {
     const changeset = this.getChangeset(params);
-    this.loggerService.warning('Before update changeset:', changeset);
+    this.logService.warning('Before update changeset:', changeset);
     return;
   }
 
@@ -53,7 +53,7 @@ export class PersonSubscriber extends OrmSubscriber<Person> {
    */
   public afterUpdate(params: OrmSubscriberParams<Person>): Promise<void> {
     const changeset = this.getChangeset(params);
-    this.loggerService.warning('After update changeset:', changeset);
+    this.logService.warning('After update changeset:', changeset);
     return;
   }
 

@@ -1,55 +1,55 @@
-import { AppEnvironment, Config, InjectSecret, IsBase64, IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from '@bechara/nestjs-core';
+import { AppEnvironment, Config, InjectConfig, IsBase64, IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString } from '@bechara/nestjs-core';
 
 @Config()
 export class OrmConfig {
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsIn(Object.values(AppEnvironment))
   public readonly NODE_ENV: AppEnvironment;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsIn([ 'mongo', 'mysql', 'mariadb', 'postgresql', 'sqlite' ])
   public readonly ORM_TYPE: 'mongo' | 'mysql' | 'mariadb' | 'postgresql' | 'sqlite';
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsString() @IsNotEmpty()
   public readonly ORM_HOST: string;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsNumberString()
   public readonly ORM_PORT: number;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsString() @IsNotEmpty()
   public readonly ORM_USERNAME: string;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsString() @IsNotEmpty()
   public readonly ORM_PASSWORD: string;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsString() @IsNotEmpty()
   public readonly ORM_DATABASE: string;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsBase64()
   public readonly ORM_SERVER_CA: string;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsBase64()
   public readonly ORM_CLIENT_CERTIFICATE: string;
 
   @IsOptional()
-  @InjectSecret()
+  @InjectConfig()
   @IsBase64()
   public readonly ORM_CLIENT_KEY: string;
 

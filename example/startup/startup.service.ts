@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@bechara/nestjs-core';
+import { Injectable, LogService } from '@bechara/nestjs-core';
 
 import { SchemaService } from '../../source/schema/schema.service';
 import { CompanyRepository } from '../company/company.repository';
@@ -12,7 +12,7 @@ export class StartupService {
   public constructor(
     private readonly contactRepository: ContactRepository,
     private readonly companyRepository: CompanyRepository,
-    private readonly loggerService: LoggerService,
+    private readonly logService: LogService,
     private readonly personRepository: PersonRepository,
     private readonly schemaService: SchemaService,
   ) {
@@ -106,10 +106,10 @@ export class StartupService {
         },
       ]);
 
-      this.loggerService.notice('Mock data successfully created');
+      this.logService.notice('Mock data successfully created');
     }
     catch (e) {
-      this.loggerService.error(e as Error);
+      this.logService.error(e as Error);
     }
   }
 

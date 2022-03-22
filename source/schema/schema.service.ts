@@ -1,4 +1,4 @@
-import { Inject, Injectable, LoggerService, NotFoundException } from '@bechara/nestjs-core';
+import { Inject, Injectable, LogService, NotFoundException } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
 
 import { SchemaInjectionToken, SchemaSyncStatus } from './schema.enum';
@@ -11,7 +11,7 @@ export class SchemaService {
     @Inject(SchemaInjectionToken.MODULE_OPTIONS)
     private readonly syncModuleOptions: SchemaModuleOptions = { },
     private readonly mikroOrm: MikroORM,
-    private readonly loggerService: LoggerService,
+    private readonly logService: LogService,
   ) {
     const options = this.syncModuleOptions;
 
@@ -50,14 +50,14 @@ export class SchemaService {
    * @param options
    */
   public async syncSchema(options: SchemaModuleOptions = { }): Promise<SchemaSyncResult> {
-    this.loggerService.info('Starting database schema sync...');
+    this.logService.info('Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
     let syncDump = await generator.getUpdateSchemaSQL(false, options.safe);
     syncDump = this.removeBlacklistedQueries(syncDump, options);
 
     if (syncDump.length === 0) {
-      this.loggerService.notice('Database schema is up to date');
+      this.logService.notice('Database schema is up to date');
       return { status: SchemaSyncStatus.UP_TO_DATE };
     }
 
@@ -67,11 +67,11 @@ export class SchemaService {
 
     try {
       await generator.execute(syncQueries);
-      this.loggerService.notice('Database schema successfully updated');
+      this.logService.notice('Database schema successfully updated');
     }
     catch (e) {
       status = SchemaSyncStatus.MIGRATION_FAILED;
-      this.loggerService.error('Database schema update failed', e as Error, { syncQueries });
+      this.logService.error('Database schema update failed', e as Error, { syncQueries });
     }
 
     return {
@@ -84,13 +84,13 @@ export class SchemaService {
    * Erase current database schema and recreate it.
    */
   public async resetSchema(): Promise<void> {
-    this.loggerService.info('Starting database schema reset...');
+    this.logService.info('Starting database schema reset...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
     await generator.dropSchema();
     await generator.createSchema();
 
-    this.loggerService.notice('Database schema successfully reset');
+    this.logService.notice('Database schema successfully reset');
   }
 
 }

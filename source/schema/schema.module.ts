@@ -1,4 +1,4 @@
-import { DynamicModule, LoggerModule, Module, uuidV4 } from '@bechara/nestjs-core';
+import { DynamicModule, LogModule, Module, uuidV4 } from '@bechara/nestjs-core';
 
 import { SchemaController } from './schema.controller';
 import { SchemaInjectionToken } from './schema.enum';
@@ -7,7 +7,7 @@ import { SchemaService } from './schema.service';
 
 @Module({
   imports: [
-    LoggerModule,
+    LogModule,
   ],
   controllers: [
     SchemaController,
