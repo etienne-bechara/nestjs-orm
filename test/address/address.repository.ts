@@ -1,17 +1,16 @@
 import { EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmRepository } from '../../source/orm/orm.repository';
-import { Person } from './person.entity';
+import { Address } from './address.entity';
 
-export class PersonRepository extends OrmRepository<Person> {
+export class AddressRepository extends OrmRepository<Address> {
 
   public constructor(
     protected readonly entityManager: EntityManager,
-    protected readonly entityName: EntityName<Person>,
+    protected readonly entityName: EntityName<Address>,
   ) {
     super(entityManager, entityName, {
-      displayName: 'person',
-      defaultUniqueKey: [ 'name', 'surname' ],
+      displayName: 'address',
     });
   }
 

@@ -28,11 +28,11 @@
   "scripts": {
     "prepare": "husky install .config/husky",
     "dev": "pnpm mysql && tsnd --exit-child --rs --watch *.env --inspect=0.0.0.0:9229 ./example/main.ts",
-    "mysql": "docker run -d --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=nestjs-orm mysql",
+    "mysql": "docker start mysql || docker run -d --rm --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=nestjs-orm mysql",
     "build": "rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && rimraf ./source/index.ts",
     "index": "rimraf ./source/index.ts && barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
     "lint": "export TIMING=1 || set TIMING=1&& eslint **/*.ts --max-warnings=0",
-    "test": "jest --verbose --forceExit --passWithNoTests --config .config/jest/.jestrc.json"
+    "test": "pnpm mysql && jest --verbose --forceExit --config .config/jest/.jestrc.json"
   },
   "peerDependencies": {
     "@bechara/nestjs-core": "^4.10.0"
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@bechara/eslint-config-bechara-ts": "1.4.0",
-    "@bechara/nestjs-core": "4.10.0",
+    "@bechara/nestjs-core": "4.16.3",
     "@commitlint/cli": "16.2.3",
     "@commitlint/config-conventional": "16.2.1",
     "@types/jest": "27.4.1",

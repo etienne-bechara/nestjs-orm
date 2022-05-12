@@ -1,4 +1,4 @@
-import { uuidV4 } from '@bechara/nestjs-core';
+import { IsInt, IsISO8601, IsUUID, uuidV4 } from '@bechara/nestjs-core';
 import { AnyEntity, BaseEntity, Index, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 
 export abstract class OrmBaseEntity extends BaseEntity<AnyEntity, 'id'> {
@@ -27,6 +27,7 @@ export abstract class OrmBaseEntity extends BaseEntity<AnyEntity, 'id'> {
 export abstract class OrmIntEntity extends OrmBaseEntity {
 
   @PrimaryKey()
+  @IsInt()
   public id: number;
 
 }
@@ -34,6 +35,7 @@ export abstract class OrmIntEntity extends OrmBaseEntity {
 export abstract class OrmBigIntEntity extends OrmBaseEntity {
 
   @PrimaryKey({ columnType: 'bigint' })
+  @IsInt()
   public id: number;
 
 }
@@ -41,6 +43,7 @@ export abstract class OrmBigIntEntity extends OrmBaseEntity {
 export abstract class OrmUuidEntity extends OrmBaseEntity {
 
   @PrimaryKey({ length: 36 })
+  @IsUUID()
   public id: string = uuidV4();
 
 }
@@ -49,10 +52,12 @@ export abstract class OrmTimestampEntity extends OrmBaseEntity {
 
   @Index()
   @Property({ columnType: 'timestamp', onUpdate: () => new Date(), nullable: true })
+  @IsISO8601()
   public updated: Date = new Date();
 
   @Index()
   @Property({ columnType: 'timestamp', nullable: true })
+  @IsISO8601()
   public created: Date = new Date();
 
 }
@@ -60,6 +65,7 @@ export abstract class OrmTimestampEntity extends OrmBaseEntity {
 export abstract class OrmIntTimestampEntity extends OrmTimestampEntity {
 
   @PrimaryKey()
+  @IsInt()
   public id: number;
 
 }
@@ -67,6 +73,7 @@ export abstract class OrmIntTimestampEntity extends OrmTimestampEntity {
 export abstract class OrmBigIntTimestampEntity extends OrmTimestampEntity {
 
   @PrimaryKey({ columnType: 'bigint' })
+  @IsInt()
   public id: number;
 
 }
@@ -74,6 +81,7 @@ export abstract class OrmBigIntTimestampEntity extends OrmTimestampEntity {
 export abstract class OrmUuidTimestampEntity extends OrmTimestampEntity {
 
   @PrimaryKey({ length: 36 })
+  @IsUUID()
   public id: string = uuidV4();
 
 }

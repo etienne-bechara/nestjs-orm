@@ -1,11 +1,11 @@
 import { ModuleMetadata } from '@bechara/nestjs-core';
+
 import { SchemaSyncStatus } from './schema.enum';
 
 export interface SchemaSyncResult {
   status: SchemaSyncStatus;
   queries?: string[];
 }
-
 
 export interface SchemaAsyncModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   inject?: any[];
@@ -21,10 +21,6 @@ export interface SchemaModuleOptions {
    * Remove destructive statements when syncing schema.
    */
   safe?: boolean;
-  /**
-   * Exposes a controller for schema sync at `GET /schema/sync`.
-   */
-  controller?: boolean;
   /**
    * List of queries that should be ignored when syncing schema.
    */

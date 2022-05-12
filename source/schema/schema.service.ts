@@ -1,4 +1,4 @@
-import { Inject, Injectable, LogService, NotFoundException } from '@bechara/nestjs-core';
+import { Inject, Injectable, LogService } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
 
 import { SchemaInjectionToken, SchemaSyncStatus } from './schema.enum';
@@ -29,19 +29,6 @@ export class SchemaService {
     options.blacklist ??= [ ];
     queries = queries.replace(/\n+/g, '\n');
     return queries.split('\n').filter((q) => !options.blacklist.includes(q)).join('\n');
-  }
-
-  /**
-   * Sync database schema from an external trigger.
-   */
-  public syncSchemaFromController(): Promise<SchemaSyncResult> {
-    const { controller } = this.syncModuleOptions;
-
-    if (!controller) {
-      throw new NotFoundException('Cannot GET /schema/sync');
-    }
-
-    return this.syncSchema();
   }
 
   /**
