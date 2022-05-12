@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@bechara/nestjs-core';
 
-import { OrmPagination } from '../../source/orm/orm.interface';
-import { UserCreateDto, UserReadDto, UserUpdateDto } from './user.dto';
+import { UserCreateDto, UserPagination, UserReadDto, UserUpdateDto } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 
@@ -12,8 +11,10 @@ export class UserController {
     private readonly userRepository: UserRepository,
   ) { }
 
-  @Get()
-  public get(@Query() query: UserReadDto): Promise<OrmPagination<User>> {
+  @Get({
+    response: { type: UserPagination },
+  })
+  public get(@Query() query: UserReadDto): Promise<UserPagination> {
     const { params, options } = this.userRepository.getReadArguments(query);
     return this.userRepository.readAndCountBy(params, options);
   }

@@ -26,15 +26,6 @@ export interface OrmExceptionHandlerParams {
   error: Error;
 }
 
-export interface OrmPagination<Entity> {
-  sort: string;
-  order: OrmQueryOrder;
-  limit: number;
-  offset: number;
-  count: number;
-  records: Entity[];
-}
-
 export interface OrmSubscriberChangeset<Entity> {
   before?: EntityData<Entity>;
   after: EntityData<Entity>;

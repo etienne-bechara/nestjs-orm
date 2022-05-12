@@ -1,8 +1,9 @@
 import { ConflictException, NotFoundException } from '@bechara/nestjs-core';
 import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
 
+import { OrmPagination } from '../orm.dto';
 import { OrmQueryOrder } from '../orm.enum';
-import { OrmPagination, OrmReadArguments, OrmReadOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
+import { OrmReadArguments, OrmReadOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
 import { OrmBaseRepository } from './orm.repository.base';
 
 export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity> {
