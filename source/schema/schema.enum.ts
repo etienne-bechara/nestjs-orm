@@ -3,3 +3,8 @@ export enum SchemaSyncStatus {
   MIGRATION_SUCCESSFUL = 'MIGRATION_SUCCESSFUL',
   MIGRATION_FAILED = 'MIGRATION_FAILED',
 }
+
+export enum SchemaInjectionToken {
+  MODULE_ID = 'MODULE_ID',
+  MODULE_OPTIONS = 'MODULE_OPTIONS',
+}

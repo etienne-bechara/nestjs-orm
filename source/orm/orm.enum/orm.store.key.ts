@@ -1,4 +1,0 @@
-export enum OrmStoreKey {
-  ENTITY_MANAGER = 'ORM_ENTITY_MANAGER',
-  COMMIT_PENDING = 'COMMIT_PENDING',
-}

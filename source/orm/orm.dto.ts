@@ -1,6 +1,6 @@
 import { IsDefined, IsIn, IsNumber, IsOptional, IsString, Max, Min, ToNumber } from '@bechara/nestjs-core';
 
-import { OrmQueryOrder } from '../orm.enum';
+import { OrmQueryOrder } from './orm.enum';
 
 export abstract class OrmPaginationDto {
 

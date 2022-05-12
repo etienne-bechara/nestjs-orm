@@ -1,4 +1,11 @@
 import { ModuleMetadata } from '@bechara/nestjs-core';
+import { SchemaSyncStatus } from './schema.enum';
+
+export interface SchemaSyncResult {
+  status: SchemaSyncStatus;
+  queries?: string[];
+}
+
 
 export interface SchemaAsyncModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   inject?: any[];

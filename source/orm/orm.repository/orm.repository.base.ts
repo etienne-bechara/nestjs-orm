@@ -4,8 +4,7 @@ import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
 import { OrmStoreKey } from '../orm.enum';
-import { OrmExceptionHandlerParams } from '../orm.interface';
-import { OrmRepositoryOptions } from '../orm.interface/orm.repository.options';
+import { OrmExceptionHandlerParams, OrmRepositoryOptions } from '../orm.interface';
 
 export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity> {
 

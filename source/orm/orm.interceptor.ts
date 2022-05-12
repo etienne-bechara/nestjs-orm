@@ -1,11 +1,11 @@
 import { CallHandler, ContextService, ExecutionContext, Injectable, mergeMap, NestInterceptor } from '@bechara/nestjs-core';
 import { MikroORM } from '@mikro-orm/core';
 
-import { OrmStoreKey } from '../orm.enum';
-import { OrmBaseRepository } from '../orm.repository/orm.repository.base';
+import { OrmStoreKey } from './orm.enum';
+import { OrmBaseRepository } from './orm.repository/orm.repository.base';
 
 @Injectable()
-export class OrmEntityManager implements NestInterceptor {
+export class OrmInterceptor implements NestInterceptor {
 
   public constructor(
     private readonly mikroOrm: MikroORM,
