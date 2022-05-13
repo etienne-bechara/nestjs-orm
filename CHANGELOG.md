@@ -1,3 +1,11 @@
+# [4.1.0-beta.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.1.0-beta.1...v4.1.0-beta.2) (2022-05-13)
+
+
+### Bug Fixes
+
+* remove displayName ([5bd330a](https://github.com/etienne-bechara/nestjs-orm/commit/5bd330aa74ce37b0f3d4b7cac06b04c9a589475f))
+* test script ([4786257](https://github.com/etienne-bechara/nestjs-orm/commit/4786257fbeb783effdb5cf7c300ac1fd53bf6f53))
+
 # [4.1.0-beta.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.2...v4.1.0-beta.1) (2022-05-13)
 
 
