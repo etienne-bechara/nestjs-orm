@@ -9,9 +9,7 @@ export class ProductRepository extends OrmRepository<Product> {
     protected readonly entityManager: EntityManager,
     protected readonly entityName: EntityName<Product>,
   ) {
-    super(entityManager, entityName, {
-      displayName: 'product',
-    });
+    super(entityManager, entityName);
   }
 
 }

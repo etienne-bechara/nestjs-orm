@@ -232,7 +232,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       // Conflict (error)
       if (match.entity.length > 1) {
         throw new ConflictException({
-          message: `unique constraint references more than one ${this.repositoryOptions.displayName}`,
+          message: 'unique constraint references more than one entity',
           uniqueKey,
           matches: match.entity.map((e) => e[pk]),
         });

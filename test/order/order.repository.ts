@@ -9,9 +9,7 @@ export class OrderRepository extends OrmRepository<Order> {
     protected readonly entityManager: EntityManager,
     protected readonly entityName: EntityName<Order>,
   ) {
-    super(entityManager, entityName, {
-      displayName: 'order',
-    });
+    super(entityManager, entityName);
   }
 
 }

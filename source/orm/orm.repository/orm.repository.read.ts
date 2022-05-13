@@ -48,7 +48,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     }
 
     if (!readEntities[0] && options.findOrFail) {
-      throw new NotFoundException(`${this.repositoryOptions.displayName} does not exist`);
+      throw new NotFoundException('entity does not exist');
     }
 
     return readEntities;
@@ -88,7 +88,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
 
     if (entities.length > 1) {
       throw new ConflictException({
-        message: `unique constraint references more than one ${this.repositoryOptions.displayName}`,
+        message: 'unique constraint references more than one entity',
         params,
         entities,
       });

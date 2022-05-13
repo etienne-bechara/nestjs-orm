@@ -9,9 +9,7 @@ export class AddressRepository extends OrmRepository<Address> {
     protected readonly entityManager: EntityManager,
     protected readonly entityName: EntityName<Address>,
   ) {
-    super(entityManager, entityName, {
-      displayName: 'address',
-    });
+    super(entityManager, entityName);
   }
 
 }

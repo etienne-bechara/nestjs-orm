@@ -41,7 +41,6 @@ export interface OrmUpdateParams<Entity> {
 }
 
 export interface OrmRepositoryOptions<Entity> {
-  displayName?: string;
   primaryKey?: string;
   nestedPrimaryKeys?: string[];
   defaultPopulate?: Populate<Entity>;
