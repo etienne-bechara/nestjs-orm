@@ -163,41 +163,43 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    */
   public static async handleException(params: OrmExceptionHandlerParams): Promise<any> {
     const { caller, error, retries } = params;
+    const { message } = error;
+
     const retryableExceptions = [ 'read ECONNRESET' ];
-    const isRetryable = retryableExceptions.some((r) => error.message.includes(r));
+    const isRetryable = retryableExceptions.some((r) => message.includes(r));
 
     if (isRetryable && retries < 10) {
       await new Promise((r) => setTimeout(r, 500));
       return caller(retries + 1);
     }
 
-    if (/duplicate entry/gi.test(error.message)) {
-      const entityName = /key '(.+?)\./gi.exec(error.message);
-      const violation = /entry '(.+?)' for/gi.exec(error.message);
+    const constraint = message.split(' - ')[message.split(' - ').length - 1];
+    const isDuplicateError = /duplicate (entry|key)/i.test(message);
+    const isInsertFkError = /add.+foreign key constraint fails|insert.+violates foreign key/i.test(message);
+    const isDeleteFkError = /delete.+foreign key constraint fails|delete.+violates foreign key/i.test(message);
+    const isInvalidFieldError = message.startsWith('Trying to query by not existing property');
+    const isInvalidConditionError = message.startsWith('Invalid query condition');
+
+    if (isDuplicateError) {
       throw new ConflictException({
-        message: `${entityName ? entityName[1] : 'entity'} already exists`,
-        constraint: violation ? violation[1] : null,
+        message: 'entity already exists',
+        constraint,
       });
     }
-    else if (/cannot add.+foreign key.+fails/gi.test(error.message)) {
-      const violation = /references `(.+?)`/gi.exec(error.message);
-      const constraint = violation ? violation[1] : 'undefined';
-      throw new BadRequestException(`${constraint} must reference an existing entity`);
+    else if (isInsertFkError) {
+      throw new ConflictException({
+        message: 'foreign key must reference an existing entity',
+        constraint,
+      });
     }
-    else if (/cannot delete.+foreign key.+fails/gi.test(error.message)) {
-      const violation = /\.`(.+?)`, constraint/gi.exec(error.message);
-      const constraint = violation ? violation[1] : 'undefined';
-      throw new ConflictException(`${constraint} constraint prevents cascade deletion`);
+    else if (isDeleteFkError) {
+      throw new ConflictException({
+        message: 'foreign key prevents cascade deletion',
+        constraint,
+      });
     }
-    else if (error.message.startsWith('Trying to query by not existing property')) {
-      const violation = /.+ (.+)/gi.exec(error.message);
-      const constraint = violation ? violation[1] : 'undefined';
-      throw new BadRequestException(`${constraint.replace('Entity', '').toLowerCase()} should not exist`);
-    }
-    else if (error.message.startsWith('Invalid query condition')) {
-      const violation = /condition: (.+)/gi.exec(error.message);
-      const constraint = violation ? violation[1] : '{}';
-      throw new BadRequestException(`incorrect filter condition ${constraint}`);
+    else if (isInvalidFieldError || isInvalidConditionError) {
+      throw new BadRequestException(constraint?.toLowerCase());
     }
 
     throw new InternalServerErrorException(error);

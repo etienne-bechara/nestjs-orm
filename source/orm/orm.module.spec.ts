@@ -111,6 +111,19 @@ describe('OrmModule', () => {
       expect(error.status).toBe(HttpStatus.CONFLICT);
     });
 
+    it('should disallow creating entity that reference invalid foreign key', async () => {
+      let error: any;
+
+      try {
+        await orderRepository.createOne({ user: 'John' });
+      }
+      catch (e) {
+        error = e;
+      }
+
+      expect(error.status).toBe(HttpStatus.CONFLICT);
+    });
+
     it('should create an one-to-one relation to existing entity', async () => {
       const [ john ] = await userRepository.readBy({ name: 'John Doe' });
 
@@ -232,7 +245,7 @@ describe('OrmModule', () => {
         error = e;
       }
 
-      expect(error.message).toContain('constraint prevents cascade deletion');
+      expect(error.status).toBe(HttpStatus.CONFLICT);
     });
 
     it('should cascade delete entities', async () => {

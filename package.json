@@ -27,12 +27,17 @@
   },
   "scripts": {
     "prepare": "husky install .config/husky",
-    "dev": "pnpm mysql && tsnd --exit-child --rs --watch *.env --inspect=0.0.0.0:9229 ./example/main.ts",
+    "dev": "tsnd --exit-child --rs --watch *.env --inspect=0.0.0.0:9229 ./example/main.ts",
+    "dev:mysql": "export ORM_TYPE=mysql || set ORM_TYPE=mysql&& pnpm mysql && pnpm dev",
+    "dev:postgres": "export ORM_TYPE=postgresql || set ORM_TYPE=postgresql&& pnpm postgres && pnpm dev",
     "mysql": "docker start mysql || docker run -d --rm --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=nestjs-orm mysql",
+    "postgres": "docker start postgres || docker run -d --rm --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_DB=nestjs-orm postgres",
     "build": "rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && rimraf ./source/index.ts",
     "index": "rimraf ./source/index.ts && barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
     "lint": "export TIMING=1 || set TIMING=1&& eslint **/*.ts --max-warnings=0",
-    "test": "pnpm mysql && jest --verbose --forceExit --config .config/jest/.jestrc.json"
+    "test": "pnpm test:mysql && pnpm test:postgres",
+    "test:mysql": "export ORM_TYPE=mysql || set ORM_TYPE=mysql&& pnpm mysql && jest --verbose --forceExit --config .config/jest/.jestrc.json",
+    "test:postgres": "export ORM_TYPE=postgresql || set ORM_TYPE=postgresql&& pnpm postgres && jest --verbose --forceExit --config .config/jest/.jestrc.json"
   },
   "peerDependencies": {
     "@bechara/nestjs-core": "^4.10.0"
