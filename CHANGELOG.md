@@ -1,3 +1,17 @@
+# [4.1.0-beta.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.2...v4.1.0-beta.1) (2022-05-13)
+
+
+### Bug Fixes
+
+* flatten entities ([644d2f4](https://github.com/etienne-bechara/nestjs-orm/commit/644d2f4d6a435733c94185f66836cae766addec7))
+* pagination typing ([7b6a62b](https://github.com/etienne-bechara/nestjs-orm/commit/7b6a62bb2321c25346a8071bd2e31f7cdf831077))
+
+
+### Features
+
+* add pg tests ([3350c11](https://github.com/etienne-bechara/nestjs-orm/commit/3350c11418f32e92d04fd82c99485eb6d132ccb1))
+* add tests ([50232b6](https://github.com/etienne-bechara/nestjs-orm/commit/50232b6d5e8dd81e9b97bb487468aef0220d3271))
+
 ## [4.0.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.1...v4.0.2) (2022-03-22)
 
 
