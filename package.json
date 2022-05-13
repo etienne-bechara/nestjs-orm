@@ -35,7 +35,7 @@
     "build": "rimraf ./dist && pnpm run index && tsc -p tsconfig.build.json && rimraf ./source/index.ts",
     "index": "rimraf ./source/index.ts && barrelsby -q -e \\.spec\\.ts$ -e test -d ./source",
     "lint": "export TIMING=1 || set TIMING=1&& eslint **/*.ts --max-warnings=0",
-    "test": "pnpm test:mysql && pnpm test:postgres",
+    "test": "pnpm mysql && pnpm postgres && pnpm test:mysql && pnpm test:postgres",
     "test:mysql": "export ORM_TYPE=mysql || set ORM_TYPE=mysql&& pnpm mysql && jest --verbose --forceExit --config .config/jest/.jestrc.json",
     "test:postgres": "export ORM_TYPE=postgresql || set ORM_TYPE=postgresql&& pnpm postgres && jest --verbose --forceExit --config .config/jest/.jestrc.json"
   },
