@@ -35,7 +35,8 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     if (!entities || entityArray.length === 0) return [ ];
 
     if (populate) {
-      await this.populate(entityArray, populate);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      await this.populate(entityArray, populate as any);
     }
 
     this.deleteAsync(entityArray);

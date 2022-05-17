@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, ContextStorage, InternalServerErrorException, NotImplementedException } from '@bechara/nestjs-core';
-import { AnyEntity, CountOptions, DeleteOptions, EntityData, EntityManager, EntityName, EntityRepository, FilterQuery, FindOneOptions, Loaded, New, Populate, Primary, QueryOrderMap, UpdateOptions } from '@mikro-orm/core';
+import { AnyEntity, CountOptions, DeleteOptions, EntityData, EntityManager, EntityName, EntityRepository, FilterQuery, FindOneOptions, FindOneOrFailOptions, FindOptions, Loaded, Primary, RequiredEntityData, UpdateOptions } from '@mikro-orm/core';
 import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
@@ -46,6 +46,7 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
 
     try {
       await this.entityManager.flush();
+      this.entityManager.clear();
     }
     catch (e) {
       return OrmBaseRepository.handleException({
@@ -101,9 +102,7 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    * Clear all pending operations on entity manager.
    */
   public rollback(): void {
-    const cleanEntityManager = this.entityManager.fork(true);
-    this.getStore().set(OrmStoreKey.ENTITY_MANAGER, cleanEntityManager);
-    this.clearCommitPending();
+    this.entityManager.clear();
   }
 
   /**
@@ -230,7 +229,8 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
    * @param data
    * @deprecated
    */
-  public create<P extends Populate<Entity> = string[]>(data: EntityData<Entity>): New<Entity, P> {
+  public create(data: RequiredEntityData<Entity>): Entity {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return super.create(data);
   }
 
@@ -245,71 +245,59 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   /**
    * Use `readBy()`.
    * @param where
-   * @param populate
-   * @param orderBy
-   * @param limit
-   * @param offset
+   * @param options
    * @deprecated
    */
-  public find<P extends Populate<Entity> = any>(
-    where: FilterQuery<Entity>, populate?: P, orderBy?: QueryOrderMap, limit?: number, offset?: number,
+  public find<P extends string = never>(
+    where: FilterQuery<Entity>, options?: FindOptions<Entity, P>,
   ): Promise<Loaded<Entity, P>[]> {
-    return super.find(where, populate, orderBy, limit, offset);
+    // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
+    return super.find(where, options);
   }
 
   /**
    * Use `readBy()`.
-   * @param populate
-   * @param orderBy
-   * @param limit
-   * @param offset
+   * @param options
    * @deprecated
    */
-  public findAll<P extends Populate<Entity> = any>(
-    populate?: P, orderBy?: QueryOrderMap, limit?: number, offset?: number,
-  ): Promise<Loaded<Entity, P>[]> {
-    return super.findAll(populate, orderBy, limit, offset);
+  public findAll<P extends string = never>(options?: FindOptions<Entity, P>): Promise<Loaded<Entity, P>[]> {
+    return super.findAll(options);
   }
 
   /**
    * Use `readOne()`.
    * @param where
-   * @param populate
-   * @param orderBy
+   * @param options
    * @deprecated
    */
-  public findOne<P extends Populate<Entity> = any>(
-    where: FilterQuery<Entity>, populate?: FindOneOptions<Entity, P>, orderBy?: QueryOrderMap,
-  ): Promise<Entity> {
-    return super.findOne(where, populate, orderBy);
+  public findOne<P extends string = never>(
+    where: FilterQuery<Entity>, options?: FindOneOptions<Entity, P>,
+  ): Promise<Loaded<Entity, P> | null> {
+    return super.findOne(where, options);
   }
 
   /**
    * Use `readOneOrFail()`.
    * @param where
-   * @param populate
-   * @param orderBy
+   * @param options
    * @deprecated
    */
-  public findOneOrFail<P extends Populate<Entity> = any>(
-    where: FilterQuery<Entity>, populate?: P, orderBy?: QueryOrderMap,
+  public findOneOrFail<P extends string = never>(
+    where: FilterQuery<Entity>, options?: FindOneOrFailOptions<Entity, P>,
   ): Promise<Loaded<Entity, P>> {
-    return super.findOneOrFail(where, populate, orderBy);
+    return super.findOneOrFail(where, options);
   }
 
   /**
    * Use `readAndCountBy()`.
    * @param where
-   * @param populate
-   * @param orderBy
-   * @param limit
-   * @param offset
+   * @param options
    * @deprecated
    */
-  public findAndCount<P extends Populate<Entity> = any>(
-    where: FilterQuery<Entity>, populate?: P, orderBy?: QueryOrderMap, limit?: number, offset?: number,
+  public findAndCount<P extends string = never>(
+    where: FilterQuery<Entity>, options?: FindOptions<Entity, P>,
   ): Promise<[Loaded<Entity, P>[], number]> {
-    return super.findAndCount(where, populate, orderBy, limit, offset);
+    return super.findAndCount(where, options);
   }
 
   /**

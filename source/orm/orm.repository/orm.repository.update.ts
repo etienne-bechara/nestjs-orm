@@ -1,5 +1,5 @@
 import { ConflictException } from '@bechara/nestjs-core';
-import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
+import { EntityData, EntityManager, EntityName, RequiredEntityData } from '@mikro-orm/core';
 
 import { OrmReadOptions, OrmReadParams, OrmRepositoryOptions, OrmUpdateParams, OrmUpsertOptions } from '../orm.interface';
 import { OrmCreateRepository } from './orm.repository.create';
@@ -166,14 +166,19 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
 
     const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
     const updateParams: OrmUpdateParams<Entity>[] = [ ];
-    const createData: EntityData<Entity>[] = [ ];
+    const createData: RequiredEntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
     let createdEntities: Entity[];
 
     // Create clauses to match existing entities
     const clauses = dataArray.map((data) => {
       const clause: Record<keyof Entity, any> = { } as any;
-      for (const key of uniqueKey) clause[key] = data[key];
+
+      for (const key of uniqueKey) {
+        const stringKey = key as string;
+        clause[key] = data[stringKey];
+      }
+
       return clause;
     });
 
@@ -187,7 +192,8 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       }
     }
 
-    const matchingEntities = await this.readBy({ $or: clauses }, { populate });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const matchingEntities = await this.readBy({ $or: clauses } as any, { populate });
 
     // Find matching entities for each item on original data
     const matches = dataArray.map((data, i) => {
@@ -252,7 +258,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       // Missing (create)
       else {
         resultMap.push({ index: createData.length, target: 'create' });
-        createData.push(match.data);
+        createData.push(match.data as RequiredEntityData<Entity>);
       }
     }
 

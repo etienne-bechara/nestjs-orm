@@ -1,4 +1,5 @@
 import { ContextStorage, HttpStatus } from '@bechara/nestjs-core';
+import { MikroORM } from '@mikro-orm/core';
 
 import { AddressState } from '../../test/address/address.enum';
 import { AddressRepository } from '../../test/address/address.repository';
@@ -7,6 +8,7 @@ import { OrderRepository } from '../../test/order/order.repository';
 import { ProductRepository } from '../../test/product/product.repository';
 import { UserRepository } from '../../test/user/user.repository';
 import { SchemaService } from '../schema/schema.service';
+import { OrmQueryOrder, OrmStoreKey } from './orm.enum';
 
 ContextStorage.enterWith(new Map());
 
@@ -19,6 +21,10 @@ describe('OrmModule', () => {
 
   beforeAll(async () => {
     const app = await compileTestApp();
+
+    const mikroOrm = app.get(MikroORM);
+    const entityManager = mikroOrm.em.fork({ clear: true, useContext: true });
+    ContextStorage.getStore().set(OrmStoreKey.ENTITY_MANAGER, entityManager);
 
     schemaService = app.get(SchemaService);
     addressRepository = app.get(AddressRepository);
@@ -152,14 +158,54 @@ describe('OrmModule', () => {
         },
       ]);
 
-      const [ jane ] = await userRepository.readBy({ name: 'Jane Doe' });
-      const [ richard ] = await userRepository.readBy({ name: 'Richard Smith' });
+      const populate: any = [ 'address' ];
+      const [ jane ] = await userRepository.readBy({ name: 'Jane Doe' }, { populate });
+      const [ richard ] = await userRepository.readBy({ name: 'Richard Smith' }, { populate });
 
       expect(jane.age).toBe(30);
       expect(jane.address.zip).toBe('11111111');
 
       expect(richard.age).toBe(40);
       expect(richard.address.zip).toBe('22222222');
+    });
+  });
+
+  describe('OrmReadRepository', () => {
+    it('should read entities respecting order and sort', async () => {
+      const { order, sort, records } = await userRepository.readAndCountBy({ }, {
+        order: OrmQueryOrder.DESC,
+        sort: 'name',
+      });
+
+      expect(order).toBe(OrmQueryOrder.DESC);
+      expect(sort).toBe('name');
+      expect(records[0].name).toBe('Richard Smith');
+      expect(records[3].name).toBe('Jane Doe');
+    });
+
+    it('should read entities respecting limit', async () => {
+      const { count, limit, records } = await userRepository.readAndCountBy({ }, { limit: 1 });
+
+      expect(count).toBe(4);
+      expect(limit).toBe(1);
+      expect(records.length).toBe(1);
+    });
+
+    it('should read entities respecting order, sort, limit and offset', async () => {
+      const { order, sort, records, count, limit, offset } = await userRepository.readAndCountBy({ }, {
+        order: OrmQueryOrder.DESC,
+        sort: 'name',
+        limit: 1,
+        offset: 2,
+      });
+
+      expect(count).toBe(4);
+      expect(order).toBe(OrmQueryOrder.DESC);
+      expect(sort).toBe('name');
+      expect(limit).toBe(1);
+      expect(offset).toBe(2);
+      expect(records.length).toBe(1);
+      expect(records[0].name).toBe('John Doe');
     });
   });
 
@@ -215,21 +261,22 @@ describe('OrmModule', () => {
         uniqueKey: [ 'id' ],
       });
 
-      const orderA = await orderRepository.readByIdOrFail('A');
-      const orderB = await orderRepository.readByIdOrFail('B');
-      const orderC = await orderRepository.readByIdOrFail('C');
+      const populate: any = [ 'user', 'products' ];
+      const orderA = await orderRepository.readByIdOrFail('A', { populate });
+      const orderB = await orderRepository.readByIdOrFail('B', { populate });
+      const orderC = await orderRepository.readByIdOrFail('C', { populate });
 
       expect(orderA.user.name).toBe('John Doe');
       expect(orderA.products.toArray().length).toBe(1);
-      expect(orderA.products.toArray().map((p) => p.title)).toStrictEqual([ 'Banana' ]);
+      expect(orderA.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'Banana' ]);
 
       expect(orderB.user.name).toBe('John Doe');
       expect(orderB.products.toArray().length).toBe(2);
-      expect(orderB.products.toArray().map((p) => p.title)).toStrictEqual([ 'Banana', 'Mango' ]);
+      expect(orderB.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'Banana', 'Mango' ]);
 
       expect(orderC.user.name).toBe('Jane Doe');
       expect(orderC.products.toArray().length).toBe(3);
-      expect(orderC.products.toArray().map((p) => p.title)).toStrictEqual([ 'Apple', 'Banana', 'Mango' ]);
+      expect(orderC.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'Apple', 'Banana', 'Mango' ]);
     });
   });
 

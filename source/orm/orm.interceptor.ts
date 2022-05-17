@@ -23,7 +23,7 @@ export class OrmInterceptor implements NestInterceptor {
    */
   public intercept(context: ExecutionContext, next: CallHandler): any {
     const store = this.contextService.getStore();
-    const entityManager = this.mikroOrm.em.fork(true, true);
+    const entityManager = this.mikroOrm.em.fork({ clear: true, useContext: true });
     store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
 
     return next

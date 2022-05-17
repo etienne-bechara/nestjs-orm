@@ -13,7 +13,7 @@ export class Order extends OrmUuidTimestampEntity {
   public status = OrderStatus.PENDING;
 
   @ManyToMany(() => Product, 'orders', { owner: true })
-  public products = new Collection<Order>(this);
+  public products = new Collection<Product>(this);
 
   @ManyToOne(() => User)
   public user: User;

@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException } from '@bechara/nestjs-core';
-import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
+import { EntityManager, EntityName, FilterQuery } from '@mikro-orm/core';
 
 import { OrmPagination } from '../orm.dto';
 import { OrmQueryOrder } from '../orm.enum';
@@ -32,11 +32,11 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     let readEntities: Entity[];
 
     if (options.sort && options.order) {
-      options.orderBy = { [options.sort]: options.order };
+      options.orderBy = { [options.sort]: options.order } as any;
     }
 
     try {
-      readEntities = await this.entityManager.find(this.entityName, params as EntityData<Entity>, options);
+      readEntities = await this.entityManager.find(this.entityName, params, options);
       readEntities ??= [ ];
     }
     catch (e) {
@@ -61,7 +61,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    */
   public async readById(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
     const pk = this.getPrimaryKey();
-    const entities = await this.readBy({ [pk]: id }, options);
+    const entities = await this.readBy({ [pk]: id } as unknown as Entity, options);
     return entities[0];
   }
 
@@ -120,7 +120,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     let count: number;
 
     try {
-      count = await this.entityManager.count(this.entityName, params as EntityData<Entity>);
+      count = await this.entityManager.count(this.entityName, params);
     }
     catch (e) {
       return OrmBaseRepository.handleException({
@@ -163,12 +163,12 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * between read params and read options.
    * @param query
    */
-  public getReadArguments(query: any): OrmReadArguments<Entity> {
+  public getReadArguments(query: Record<string, any>): OrmReadArguments<Entity> {
     if (!query || typeof query !== 'object') return;
 
     const optionsProperties = new Set([ 'sort', 'order', 'limit', 'offset' ]);
-    const params = { };
-    const options = { };
+    const params = { } as FilterQuery<Entity>;
+    const options = { } as OrmReadOptions<Entity>;
 
     for (const key in query) {
       if (optionsProperties.has(key)) {

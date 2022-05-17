@@ -5,7 +5,7 @@ import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
 import { SchemaModuleOptions } from '../schema/schema.interface';
 import { OrmQueryOrder } from './orm.enum';
 
-export type OrmReadParams<T> = string | number | FilterQuery<T> | EntityData<T>;
+export type OrmReadParams<T> = FilterQuery<T>;
 
 export type OrmSubscriberParams<Entity> = EventArgs<Entity>;
 
@@ -52,7 +52,7 @@ export interface OrmReadArguments<Entity> {
   options: OrmReadOptions<Entity>;
 }
 
-export interface OrmReadOptions<Entity> extends FindOptions<Entity> {
+export interface OrmReadOptions<Entity> extends FindOptions<Entity, keyof Entity extends string ? keyof Entity : never> {
   sort?: string;
   order?: OrmQueryOrder;
   findOrFail?: boolean;

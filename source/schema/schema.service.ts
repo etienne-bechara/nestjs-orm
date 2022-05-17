@@ -37,10 +37,11 @@ export class SchemaService {
    * @param options
    */
   public async syncSchema(options: SchemaModuleOptions = { }): Promise<SchemaSyncResult> {
+    const { safe } = options;
     this.logService.info('Starting database schema sync...');
 
     const generator = this.mikroOrm.getSchemaGenerator();
-    let syncDump = await generator.getUpdateSchemaSQL(false, options.safe);
+    let syncDump = await generator.getUpdateSchemaSQL({ wrap: false, safe });
     syncDump = this.removeBlacklistedQueries(syncDump, options);
 
     if (syncDump.length === 0) {
@@ -49,7 +50,7 @@ export class SchemaService {
     }
 
     let status = SchemaSyncStatus.MIGRATION_SUCCESSFUL;
-    let syncQueries = await generator.getUpdateSchemaSQL(true, options.safe);
+    let syncQueries = await generator.getUpdateSchemaSQL({ wrap: true, safe });
     syncQueries = this.removeBlacklistedQueries(syncQueries, options);
 
     try {
