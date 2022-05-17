@@ -47,12 +47,12 @@ export interface OrmRepositoryOptions<Entity> {
   defaultUniqueKey?: (keyof Entity)[];
 }
 
-export interface OrmReadArguments<Entity> {
+export interface OrmReadArguments<Entity, P extends string> {
   params: OrmReadParams<Entity>;
-  options: OrmReadOptions<Entity>;
+  options: OrmReadOptions<Entity, P>;
 }
 
-export interface OrmReadOptions<Entity> extends FindOptions<Entity, keyof Entity extends string ? keyof Entity : never> {
+export interface OrmReadOptions<Entity, P extends string> extends FindOptions<Entity, P> {
   sort?: string;
   order?: OrmQueryOrder;
   findOrFail?: boolean;

@@ -98,8 +98,10 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    * @param data
    * @param options
    */
-  public async updateBy(
-    params: OrmReadParams<Entity>, data: EntityData<Entity>, options: OrmReadOptions<Entity> = { },
+  public async updateBy<P extends string = never>(
+    params: OrmReadParams<Entity>,
+    data: EntityData<Entity>,
+    options: OrmReadOptions<Entity, P> = { },
   ): Promise<Entity[]> {
     const entities = await this.readBy(params, options);
     return this.update(entities, data);
@@ -155,7 +157,8 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    */
   // eslint-disable-next-line complexity
   public async upsert(
-    data: EntityData<Entity> | EntityData<Entity>[], options: OrmUpsertOptions<Entity> = { },
+    data: EntityData<Entity> | EntityData<Entity>[],
+    options: OrmUpsertOptions<Entity> = { },
   ): Promise<Entity[]> {
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
@@ -212,7 +215,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
             }
           }
 
-          // Match nested entities
+          // Match nested entities or direct values
           if (isNestedEntity) {
             if (clauses[i][key]?.[matchingNestedPk] || clauses[i][key]?.[matchingNestedPk] === 0) {
               if (e[key][matchingNestedPk] !== clauses[i][key][matchingNestedPk]) return false;
@@ -221,7 +224,6 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
               if (e[key][matchingNestedPk] !== clauses[i][key]) return false;
             }
           }
-          // Match direct value
           else {
             if (e[key] !== clauses[i][key]) return false;
           }
@@ -244,7 +246,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
         });
       }
 
-      // Match (create or update)
+      // Match (create or update) or missing (create)
       if (match.entity.length === 1) {
         if (!options.disallowUpdate) {
           resultMap.push({ index: updateParams.length, target: 'update' });
@@ -255,7 +257,6 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
           existingEntities.push(match.entity[0]);
         }
       }
-      // Missing (create)
       else {
         resultMap.push({ index: createData.length, target: 'create' });
         createData.push(match.data as RequiredEntityData<Entity>);
