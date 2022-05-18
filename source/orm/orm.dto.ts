@@ -2,7 +2,7 @@ import { IsArray, IsDefined, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, M
 
 import { OrmQueryOrder } from './orm.enum';
 
-export abstract class OrmPaginationDto {
+export class OrmPaginationDto {
 
   @IsOptional()
   @IsString() @IsDefined()
