@@ -1,5 +1,6 @@
+/* eslint-disable jsdoc/require-jsdoc */
 import { ConflictException } from '@bechara/nestjs-core';
-import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
+import { EntityData, EntityManager, EntityName, RequiredEntityData } from '@mikro-orm/core';
 
 import { OrmReadOptions, OrmReadParams, OrmRepositoryOptions, OrmUpdateParams, OrmUpsertOptions } from '../orm.interface';
 import { OrmCreateRepository } from './orm.repository.create';
@@ -16,7 +17,6 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
 
   public updateAsync(entities: Entity | Entity[], data: EntityData<Entity>): Entity[];
   public updateAsync(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[]): Entity[];
-
   /**
    * Update target entities, data can be provided as an object that applies to all,
    * or each entity may be combined with its own changeset, persist changes on next
@@ -98,8 +98,10 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    * @param data
    * @param options
    */
-  public async updateBy(
-    params: OrmReadParams<Entity>, data: EntityData<Entity>, options: OrmReadOptions<Entity> = { },
+  public async updateBy<P extends string = never>(
+    params: OrmReadParams<Entity>,
+    data: EntityData<Entity>,
+    options: OrmReadOptions<Entity, P> = { },
   ): Promise<Entity[]> {
     const entities = await this.readBy(params, options);
     return this.update(entities, data);
@@ -154,8 +156,9 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    * @param options
    */
   // eslint-disable-next-line complexity
-  public async upsert(
-    data: EntityData<Entity> | EntityData<Entity>[], options: OrmUpsertOptions<Entity> = { },
+  public async upsert<P extends string = never>(
+    data: EntityData<Entity> | EntityData<Entity>[],
+    options: OrmUpsertOptions<Entity, P> = { },
   ): Promise<Entity[]> {
     const dataArray = Array.isArray(data) ? data : [ data ];
     if (!data || dataArray.length === 0) return [ ];
@@ -166,14 +169,19 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
 
     const resultMap: { index: number; target: 'read' | 'create' | 'update' }[] = [ ];
     const updateParams: OrmUpdateParams<Entity>[] = [ ];
-    const createData: EntityData<Entity>[] = [ ];
+    const createData: RequiredEntityData<Entity>[] = [ ];
     const existingEntities: Entity[] = [ ];
     let createdEntities: Entity[];
 
     // Create clauses to match existing entities
     const clauses = dataArray.map((data) => {
       const clause: Record<keyof Entity, any> = { } as any;
-      for (const key of uniqueKey) clause[key] = data[key];
+
+      for (const key of uniqueKey) {
+        const stringKey = key as string;
+        clause[key] = data[stringKey];
+      }
+
       return clause;
     });
 
@@ -187,7 +195,8 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       }
     }
 
-    const matchingEntities = await this.readBy({ $or: clauses }, { populate });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const matchingEntities = await this.readBy({ $or: clauses } as any, { populate });
 
     // Find matching entities for each item on original data
     const matches = dataArray.map((data, i) => {
@@ -206,7 +215,7 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
             }
           }
 
-          // Match nested entities
+          // Match nested entities or direct values
           if (isNestedEntity) {
             if (clauses[i][key]?.[matchingNestedPk] || clauses[i][key]?.[matchingNestedPk] === 0) {
               if (e[key][matchingNestedPk] !== clauses[i][key][matchingNestedPk]) return false;
@@ -215,7 +224,6 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
               if (e[key][matchingNestedPk] !== clauses[i][key]) return false;
             }
           }
-          // Match direct value
           else {
             if (e[key] !== clauses[i][key]) return false;
           }
@@ -232,13 +240,13 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
       // Conflict (error)
       if (match.entity.length > 1) {
         throw new ConflictException({
-          message: `unique constraint references more than one ${this.repositoryOptions.displayName}`,
+          message: 'unique constraint references more than one entity',
           uniqueKey,
           matches: match.entity.map((e) => e[pk]),
         });
       }
 
-      // Match (create or update)
+      // Match (create or update) or missing (create)
       if (match.entity.length === 1) {
         if (!options.disallowUpdate) {
           resultMap.push({ index: updateParams.length, target: 'update' });
@@ -249,10 +257,9 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
           existingEntities.push(match.entity[0]);
         }
       }
-      // Missing (create)
       else {
         resultMap.push({ index: createData.length, target: 'create' });
-        createData.push(match.data);
+        createData.push(match.data as RequiredEntityData<Entity>);
       }
     }
 
@@ -289,7 +296,10 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
    * @param data
    * @param options
    */
-  public async upsertOne(data: EntityData<Entity>, options: OrmUpsertOptions<Entity> = { }): Promise<Entity> {
+  public async upsertOne<P extends string = never>(
+    data: EntityData<Entity>,
+    options: OrmUpsertOptions<Entity, P> = { },
+  ): Promise<Entity> {
     const [ resultEntity ] = await this.upsert(data, options);
     return resultEntity;
   }

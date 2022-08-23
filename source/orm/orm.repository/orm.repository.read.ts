@@ -1,8 +1,9 @@
 import { ConflictException, NotFoundException } from '@bechara/nestjs-core';
-import { EntityData, EntityManager, EntityName } from '@mikro-orm/core';
+import { EntityManager, EntityName, FilterQuery } from '@mikro-orm/core';
 
+import { OrmPagination } from '../orm.dto';
 import { OrmQueryOrder } from '../orm.enum';
-import { OrmPagination, OrmReadArguments, OrmReadOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
+import { OrmReadArguments, OrmReadOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
 import { OrmBaseRepository } from './orm.repository.base';
 
 export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity> {
@@ -22,20 +23,22 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param options
    * @param retries
    */
-  public async readBy(
-    params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }, retries = 0,
+  public async readBy<P extends string = never>(
+    params: OrmReadParams<Entity>,
+    options: OrmReadOptions<Entity, P> = { },
+    retries = 0,
   ): Promise<Entity[]> {
     if (!params || Array.isArray(params) && params.length === 0) return [ ];
 
-    options.populate ??= this.repositoryOptions.defaultPopulate ?? false;
+    options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
     let readEntities: Entity[];
 
     if (options.sort && options.order) {
-      options.orderBy = { [options.sort]: options.order };
+      options.orderBy = { [options.sort]: options.order } as any;
     }
 
     try {
-      readEntities = await this.entityManager.find(this.entityName, params as EntityData<Entity>, options);
+      readEntities = await this.entityManager.find(this.entityName, params, options);
       readEntities ??= [ ];
     }
     catch (e) {
@@ -47,7 +50,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     }
 
     if (!readEntities[0] && options.findOrFail) {
-      throw new NotFoundException(`${this.repositoryOptions.displayName} does not exist`);
+      throw new NotFoundException('entity does not exist');
     }
 
     return readEntities;
@@ -58,9 +61,12 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param id
    * @param options
    */
-  public async readById(id: string | number, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
+  public async readById<P extends string = never>(
+    id: string | number,
+    options: OrmReadOptions<Entity, P> = { },
+  ): Promise<Entity> {
     const pk = this.getPrimaryKey();
-    const entities = await this.readBy({ [pk]: id }, options);
+    const entities = await this.readBy({ [pk]: id } as unknown as Entity, options);
     return entities[0];
   }
 
@@ -69,9 +75,9 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param id
    * @param options
    */
-  public async readByIdOrFail(
+  public async readByIdOrFail<P extends string = never>(
     id: string | number,
-    options: Omit<OrmReadOptions<Entity>, 'findOrFail'> = { },
+    options: Omit<OrmReadOptions<Entity, P>, 'findOrFail'> = { },
   ): Promise<Entity> {
     return this.readById(id, { ...options, findOrFail: true });
   }
@@ -82,12 +88,15 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param options
    */
-  public async readUnique(params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { }): Promise<Entity> {
+  public async readUnique<P extends string = never>(
+    params: OrmReadParams<Entity>,
+    options: OrmReadOptions<Entity, P> = { },
+  ): Promise<Entity> {
     const entities = await this.readBy(params, options);
 
     if (entities.length > 1) {
       throw new ConflictException({
-        message: `unique constraint references more than one ${this.repositoryOptions.displayName}`,
+        message: 'unique constraint references more than one entity',
         params,
         entities,
       });
@@ -102,9 +111,9 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param options
    */
-  public async readUniqueOrFail(
+  public async readUniqueOrFail<P extends string = never>(
     params: OrmReadParams<Entity>,
-    options: Omit<OrmReadOptions<Entity>, 'findOrFail'> = { },
+    options: Omit<OrmReadOptions<Entity, P>, 'findOrFail'> = { },
   ): Promise<Entity> {
     return this.readUnique(params, { ...options, findOrFail: true });
   }
@@ -119,7 +128,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     let count: number;
 
     try {
-      count = await this.entityManager.count(this.entityName, params as EntityData<Entity>);
+      count = await this.entityManager.count(this.entityName, params);
     }
     catch (e) {
       return OrmBaseRepository.handleException({
@@ -139,8 +148,9 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param options
    */
-  public async readAndCountBy(
-    params: OrmReadParams<Entity>, options: OrmReadOptions<Entity> = { },
+  public async readAndCountBy<P extends string = never>(
+    params: OrmReadParams<Entity>,
+    options: OrmReadOptions<Entity, P> = { },
   ): Promise<OrmPagination<Entity>> {
     options.sort ??= this.getPrimaryKey();
     options.order ??= OrmQueryOrder.ASC;
@@ -162,12 +172,14 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * between read params and read options.
    * @param query
    */
-  public getReadArguments(query: any): OrmReadArguments<Entity> {
+  public getReadArguments<P extends string = never>(
+    query: Record<string, any>,
+  ): OrmReadArguments<Entity, P> {
     if (!query || typeof query !== 'object') return;
 
-    const optionsProperties = new Set([ 'sort', 'order', 'limit', 'offset' ]);
-    const params = { };
-    const options = { };
+    const optionsProperties = new Set([ 'sort', 'order', 'limit', 'offset', 'populate' ]);
+    const params = { } as FilterQuery<Entity>;
+    const options = { } as OrmReadOptions<Entity, P>;
 
     for (const key in query) {
       if (optionsProperties.has(key)) {

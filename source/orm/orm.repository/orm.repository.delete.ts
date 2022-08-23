@@ -29,13 +29,17 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param entities
    * @param options
    */
-  public async delete(entities: Entity | Entity[], options: OrmDeleteOptions<Entity> = { }): Promise<Entity[]> {
+  public async delete<P extends string = never>(
+    entities: Entity | Entity[],
+    options: OrmDeleteOptions<Entity, P> = { },
+  ): Promise<Entity[]> {
     const { populate } = options;
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     if (!entities || entityArray.length === 0) return [ ];
 
     if (populate) {
-      await this.populate(entityArray, populate);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      await this.populate(entityArray, populate as any);
     }
 
     this.deleteAsync(entityArray);
@@ -49,7 +53,10 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param params
    * @param options
    */
-  public async deleteBy(params: OrmReadParams<Entity>, options: OrmDeleteOptions<Entity> = { }): Promise<Entity[]> {
+  public async deleteBy<P extends string = never>(
+    params: OrmReadParams<Entity>,
+    options: OrmDeleteOptions<Entity, P> = { },
+  ): Promise<Entity[]> {
     const entities = await this.readBy(params, options);
     return this.delete(entities, options);
   }
@@ -68,7 +75,10 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param id
    * @param options
    */
-  public async deleteById(id: string | number, options: OrmDeleteOptions<Entity> = { }): Promise<Entity> {
+  public async deleteById<P extends string = never>(
+    id: string | number,
+    options: OrmDeleteOptions<Entity, P> = { },
+  ): Promise<Entity> {
     const entity = await this.readByIdOrFail(id);
     await this.delete(entity, options);
     return entity;
@@ -88,7 +98,10 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param entity
    * @param options
    */
-  public async deleteOne(entity: Entity, options: OrmDeleteOptions<Entity> = { }): Promise<Entity> {
+  public async deleteOne<P extends string = never>(
+    entity: Entity,
+    options: OrmDeleteOptions<Entity, P> = { },
+  ): Promise<Entity> {
     const [ deletedEntity ] = await this.delete(entity, options);
     return deletedEntity;
   }

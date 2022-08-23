@@ -6,7 +6,7 @@ import { SchemaModuleOptions } from '../schema/schema.interface';
 import { SchemaModule } from '../schema/schema.module';
 import { OrmBaseEntity, OrmBigIntEntity, OrmBigIntTimestampEntity, OrmIntEntity, OrmIntTimestampEntity, OrmTimestampEntity, OrmUuidEntity, OrmUuidTimestampEntity } from './orm.entity';
 import { OrmInjectionToken, OrmStoreKey } from './orm.enum';
-import { OrmEntityManager } from './orm.interceptor';
+import { OrmInterceptor } from './orm.interceptor';
 import { OrmAsyncModuleOptions, OrmModuleOptions } from './orm.interface';
 
 @Module({ })
@@ -60,7 +60,7 @@ export class OrmModule {
         AppConfig,
         {
           provide: APP_INTERCEPTOR,
-          useClass: OrmEntityManager,
+          useClass: OrmInterceptor,
         },
         {
           provide: OrmInjectionToken.ORM_MODULE_OPTIONS,
