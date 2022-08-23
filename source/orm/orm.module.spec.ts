@@ -73,24 +73,6 @@ describe('OrmModule', () => {
   });
 
   describe('OrmCreateRepository', () => {
-    it('should build an entity and persist only after committing', async () => {
-      const user = userRepository.buildOne({
-        name: 'PERSIST_AFTER_COMMIT',
-        age: 20,
-      });
-
-      await userRepository.commit();
-
-      const softCommitCount = await userRepository.countBy({ name: 'PERSIST_AFTER_COMMIT' });
-      await userRepository.commit(user);
-
-      const [ john ] = await userRepository.readBy({ name: 'PERSIST_AFTER_COMMIT' });
-
-      expect(softCommitCount).toBe(0);
-      expect(john.name).toBe('PERSIST_AFTER_COMMIT');
-      expect(john.age).toBe(20);
-    });
-
     it('should disallow creating entity without mandatory property', async () => {
       let error: any;
 
@@ -129,6 +111,46 @@ describe('OrmModule', () => {
       }
 
       expect(error.status).toBe(HttpStatus.CONFLICT);
+    });
+
+    it('allow persisting entities concurrently', async () => {
+      const iterations = 10;
+      const promises = [ ];
+
+      const persistFlow = async (i: number): Promise<void> => {
+        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_0`, age: i });
+        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_1`, age: i });
+        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_2`, age: i });
+        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_3`, age: i });
+        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_4`, age: i });
+      };
+
+      for (let i = 0; i < iterations; i++) {
+        promises.push(persistFlow(i));
+      }
+
+      await Promise.all(promises);
+      const userCount = await userRepository.countBy({ name: { $like: 'PERSIST_CONCURRENT%' } });
+
+      expect(userCount).toBe(iterations * 5);
+    });
+
+    it('should build an entity and persist only after committing', async () => {
+      const user = userRepository.buildOne({
+        name: 'PERSIST_AFTER_COMMIT',
+        age: 20,
+      });
+
+      await userRepository.commit();
+
+      const softCommitCount = await userRepository.countBy({ name: 'PERSIST_AFTER_COMMIT' });
+      await userRepository.commit(user);
+
+      const [ john ] = await userRepository.readBy({ name: 'PERSIST_AFTER_COMMIT' });
+
+      expect(softCommitCount).toBe(0);
+      expect(john.name).toBe('PERSIST_AFTER_COMMIT');
+      expect(john.age).toBe(20);
     });
 
     it('should create an one-to-one relation to existing entity', async () => {
