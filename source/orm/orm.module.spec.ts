@@ -48,46 +48,46 @@ describe('OrmModule', () => {
   describe('OrmBaseRepository', () => {
     it('should rollback an asynchronously committed operation', async () => {
       userRepository.createOneAsync({
-        name: 'John Doe',
+        name: 'ASYNC_CREATED',
         age: 20,
       });
 
       userRepository.rollback();
       await userRepository.commit();
 
-      const userCount = await userRepository.countBy({ });
-      expect(userCount).toBe(0);
+      const [ user ] = await userRepository.readBy({ name: 'ASYNC_CREATED' });
+      expect(user).toBeUndefined();
     });
   });
 
   describe('OrmSubscriber', () => {
     it('should apply beforeCreate hook', async () => {
       await userRepository.createFrom({
-        name: 'Julia Doe Smith',
+        name: 'After Create Hook',
         age: 10,
       });
 
-      const [ julia ] = await userRepository.readBy({ name: 'Julia Smith' });
-      expect(julia.name).toBe('Julia Smith');
+      const [ user ] = await userRepository.readBy({ name: 'After Hook' });
+      expect(user.name).toBe('After Hook');
     });
   });
 
   describe('OrmCreateRepository', () => {
     it('should build an entity and persist only after committing', async () => {
       const user = userRepository.buildOne({
-        name: 'John Doe',
+        name: 'PERSIST_AFTER_COMMIT',
         age: 20,
       });
 
       await userRepository.commit();
 
-      const softCommitCount = await userRepository.countBy({ name: 'John Doe' });
+      const softCommitCount = await userRepository.countBy({ name: 'PERSIST_AFTER_COMMIT' });
       await userRepository.commit(user);
 
-      const [ john ] = await userRepository.readBy({ name: 'John Doe' });
+      const [ john ] = await userRepository.readBy({ name: 'PERSIST_AFTER_COMMIT' });
 
       expect(softCommitCount).toBe(0);
-      expect(john.name).toBe('John Doe');
+      expect(john.name).toBe('PERSIST_AFTER_COMMIT');
       expect(john.age).toBe(20);
     });
 
@@ -95,7 +95,7 @@ describe('OrmModule', () => {
       let error: any;
 
       try {
-        await userRepository.createOne({ name: 'Jane Doe' });
+        await userRepository.createOne({ name: 'MISSING_AGE' });
       }
       catch (e) {
         error = e;
@@ -106,9 +106,10 @@ describe('OrmModule', () => {
 
     it('should disallow creating entity with duplicate unique key', async () => {
       let error: any;
+      await userRepository.createOne({ name: 'DUPLICATE_KEY', age: 20 });
 
       try {
-        await userRepository.createOne({ name: 'John Doe', age: 20 });
+        await userRepository.createOne({ name: 'DUPLICATE_KEY', age: 20 });
       }
       catch (e) {
         error = e;
@@ -121,7 +122,7 @@ describe('OrmModule', () => {
       let error: any;
 
       try {
-        await orderRepository.createOne({ user: 'John' });
+        await orderRepository.createOne({ user: 'INVALID_USER' });
       }
       catch (e) {
         error = e;
@@ -131,15 +132,16 @@ describe('OrmModule', () => {
     });
 
     it('should create an one-to-one relation to existing entity', async () => {
-      const [ john ] = await userRepository.readBy({ name: 'John Doe' });
+      await userRepository.createOne({ name: 'ONE_TO_ONE', age: 1 });
+      const [ user ] = await userRepository.readBy({ name: 'ONE_TO_ONE' });
 
       await addressRepository.createOne({
-        user: john,
+        user,
         zip: '00000000',
         state: AddressState.ES,
       });
 
-      const addresses = await addressRepository.readBy({ user: john });
+      const addresses = await addressRepository.readBy({ user });
       expect(addresses[0].zip).toBe('00000000');
       expect(addresses[0].state).toBe(AddressState.ES);
     });
@@ -147,136 +149,155 @@ describe('OrmModule', () => {
     it('should create entities with nested one-to-one relations', async () => {
       await userRepository.createFrom([
         {
-          name: 'Jane Doe',
+          name: 'ONE_TO_ONE_NESTED_1',
           age: 30,
           address: { zip: '11111111', state: AddressState.SP },
         },
         {
-          name: 'Richard Smith',
+          name: 'ONE_TO_ONE_NESTED_2',
           age: 40,
           address: { zip: '22222222', state: AddressState.RJ },
         },
       ]);
 
       const populate: any = [ 'address' ];
-      const [ jane ] = await userRepository.readBy({ name: 'Jane Doe' }, { populate });
-      const [ richard ] = await userRepository.readBy({ name: 'Richard Smith' }, { populate });
+      const [ user1 ] = await userRepository.readBy({ name: 'ONE_TO_ONE_NESTED_1' }, { populate });
+      const [ user2 ] = await userRepository.readBy({ name: 'ONE_TO_ONE_NESTED_2' }, { populate });
 
-      expect(jane.age).toBe(30);
-      expect(jane.address.zip).toBe('11111111');
+      expect(user1.age).toBe(30);
+      expect(user1.address.zip).toBe('11111111');
 
-      expect(richard.age).toBe(40);
-      expect(richard.address.zip).toBe('22222222');
+      expect(user2.age).toBe(40);
+      expect(user2.address.zip).toBe('22222222');
     });
   });
 
   describe('OrmReadRepository', () => {
     it('should read entities respecting order and sort', async () => {
+      await userRepository.createFrom([
+        { name: '_SORT_1', age: 10 },
+        { name: '_SORT_2', age: 20 },
+        { name: '_SORT_3', age: 30 },
+      ]);
+
       const { order, sort, records } = await userRepository.readAndCountBy({ }, {
-        order: OrmQueryOrder.DESC,
+        order: OrmQueryOrder.ASC,
         sort: 'name',
       });
 
-      expect(order).toBe(OrmQueryOrder.DESC);
+      expect(order).toBe(OrmQueryOrder.ASC);
       expect(sort).toBe('name');
-      expect(records[0].name).toBe('Richard Smith');
-      expect(records[3].name).toBe('Jane Doe');
+      expect(records[0].name).toBe('_SORT_1');
+      expect(records[2].name).toBe('_SORT_3');
     });
 
     it('should read entities respecting limit', async () => {
-      const { count, limit, records } = await userRepository.readAndCountBy({ }, { limit: 1 });
+      const { limit, records } = await userRepository.readAndCountBy({ }, { limit: 1 });
 
-      expect(count).toBe(4);
       expect(limit).toBe(1);
       expect(records.length).toBe(1);
     });
 
     it('should read entities respecting order, sort, limit and offset', async () => {
-      const { order, sort, records, count, limit, offset } = await userRepository.readAndCountBy({ }, {
+      await userRepository.createFrom([
+        { name: 'Z_SORT_1', age: 10 },
+        { name: 'Z_SORT_2', age: 20 },
+        { name: 'Z_SORT_3', age: 30 },
+      ]);
+
+      const { order, sort, records, limit, offset } = await userRepository.readAndCountBy({ }, {
         order: OrmQueryOrder.DESC,
         sort: 'name',
         limit: 1,
         offset: 2,
       });
 
-      expect(count).toBe(4);
       expect(order).toBe(OrmQueryOrder.DESC);
       expect(sort).toBe('name');
       expect(limit).toBe(1);
       expect(offset).toBe(2);
       expect(records.length).toBe(1);
-      expect(records[0].name).toBe('John Doe');
+      expect(records[0].name).toBe('Z_SORT_1');
     });
   });
 
   describe('OrmUpdateRepository', () => {
     it('should update an existing entity', async () => {
-      await productRepository.createOne({ title: 'Apple', price: 1.23 });
-      const [ preApple ] = await productRepository.readBy({ title: 'Apple' });
-      const preUpdateCost = preApple.price;
+      await productRepository.createOne({ title: 'UPDATE_TARGET', price: 1.23 });
+      const [ preUpdate ] = await productRepository.readBy({ title: 'UPDATE_TARGET' });
+      const preUpdateCost = preUpdate.price;
 
-      await productRepository.update(preApple, { price: 2.34 });
-      const [ postApple ] = await productRepository.readBy({ title: 'Apple' });
-      const postUpdateCost = postApple.price;
+      await productRepository.update(preUpdate, { price: 2.34 });
+      const [ postUpdate ] = await productRepository.readBy({ title: 'UPDATE_TARGET' });
+      const postUpdateCost = postUpdate.price;
 
       expect(preUpdateCost).toBe(1.23);
       expect(postUpdateCost).toBe(2.34);
     });
 
     it('should upsert entities accordingly', async () => {
+      await productRepository.createOne({ title: 'UPSERT_TARGET_1', price: 1.23 });
+
       await productRepository.upsert([
-        { title: 'Apple', price: 3.45 },
-        { title: 'Banana', price: 4.56 },
-        { title: 'Mango', price: 5.67 },
+        { title: 'UPSERT_TARGET_1', price: 3.45 },
+        { title: 'UPSERT_TARGET_2', price: 4.56 },
+        { title: 'UPSERT_TARGET_3', price: 5.67 },
       ], {
         uniqueKey: [ 'title' ],
       });
 
-      const [ apple ] = await productRepository.readBy({ title: 'Apple' });
-      const [ banana ] = await productRepository.readBy({ title: 'Banana' });
-      const [ mango ] = await productRepository.readBy({ title: 'Mango' });
+      const [ update1 ] = await productRepository.readBy({ title: 'UPSERT_TARGET_1' });
+      const [ update2 ] = await productRepository.readBy({ title: 'UPSERT_TARGET_2' });
+      const [ update3 ] = await productRepository.readBy({ title: 'UPSERT_TARGET_3' });
 
-      expect(apple.price).toBe(3.45);
-      expect(banana.price).toBe(4.56);
-      expect(mango.price).toBe(5.67);
+      expect(update1.price).toBe(3.45);
+      expect(update2.price).toBe(4.56);
+      expect(update3.price).toBe(5.67);
     });
 
     it('should upsert entities with many-to-many relationships accordingly', async () => {
-      const [ john ] = await userRepository.readBy({ name: 'John Doe' });
-      const [ jane ] = await userRepository.readBy({ name: 'Jane Doe' });
-      const [ apple ] = await productRepository.readBy({ title: 'Apple' });
-      const [ banana ] = await productRepository.readBy({ title: 'Banana' });
-      const [ mango ] = await productRepository.readBy({ title: 'Mango' });
+      const [ user1 ] = await userRepository.createFrom({ name: 'UPSERT_MN_USER_1', age: 10 });
+      const [ user2 ] = await userRepository.createFrom({ name: 'UPSERT_MN_USER_2', age: 20 });
+      const [ product1 ] = await productRepository.createFrom({ title: 'UPSERT_MN_PRODUCT_1', price: 1 });
+      const [ product2 ] = await productRepository.createFrom({ title: 'UPSERT_MN_PRODUCT_2', price: 2 });
+      const [ product3 ] = await productRepository.createFrom({ title: 'UPSERT_MN_PRODUCT_3', price: 3 });
 
       await orderRepository.createFrom([
-        { id: 'A', user: john, products: [ apple ] },
-        { id: 'B', user: john, products: [ apple ] },
+        { id: 'UPSERT_MN_ORDER_1', user: user1, products: [ product1 ] },
+        { id: 'UPSERT_MN_ORDER_2', user: user1, products: [ product1 ] },
       ]);
 
       await orderRepository.upsert([
-        { id: 'A', products: [ banana ] },
-        { id: 'B', user: john, products: [ banana, mango ] },
-        { id: 'C', user: jane, products: [ apple, banana, mango ] },
+        { id: 'UPSERT_MN_ORDER_1', products: [ product2 ] },
+        { id: 'UPSERT_MN_ORDER_2', user: user1, products: [ product2, product3 ] },
+        { id: 'UPSERT_MN_ORDER_3', user: user2, products: [ product1, product2, product3 ] },
       ], {
         uniqueKey: [ 'id' ],
       });
 
       const populate: any = [ 'user', 'products' ];
-      const orderA = await orderRepository.readByIdOrFail('A', { populate });
-      const orderB = await orderRepository.readByIdOrFail('B', { populate });
-      const orderC = await orderRepository.readByIdOrFail('C', { populate });
+      const order1 = await orderRepository.readByIdOrFail('UPSERT_MN_ORDER_1', { populate });
+      const order2 = await orderRepository.readByIdOrFail('UPSERT_MN_ORDER_2', { populate });
+      const order3 = await orderRepository.readByIdOrFail('UPSERT_MN_ORDER_3', { populate });
 
-      expect(orderA.user.name).toBe('John Doe');
-      expect(orderA.products.toArray().length).toBe(1);
-      expect(orderA.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'Banana' ]);
+      expect(order1.user.name).toBe('UPSERT_MN_USER_1');
+      expect(order1.products.toArray().length).toBe(1);
+      expect(order1.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'UPSERT_MN_PRODUCT_2' ]);
 
-      expect(orderB.user.name).toBe('John Doe');
-      expect(orderB.products.toArray().length).toBe(2);
-      expect(orderB.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'Banana', 'Mango' ]);
+      expect(order2.user.name).toBe('UPSERT_MN_USER_1');
+      expect(order2.products.toArray().length).toBe(2);
+      expect(order2.products.toArray().map((p) => p.title).sort()).toStrictEqual([
+        'UPSERT_MN_PRODUCT_2',
+        'UPSERT_MN_PRODUCT_3',
+      ]);
 
-      expect(orderC.user.name).toBe('Jane Doe');
-      expect(orderC.products.toArray().length).toBe(3);
-      expect(orderC.products.toArray().map((p) => p.title).sort()).toStrictEqual([ 'Apple', 'Banana', 'Mango' ]);
+      expect(order3.user.name).toBe('UPSERT_MN_USER_2');
+      expect(order3.products.toArray().length).toBe(3);
+      expect(order3.products.toArray().map((p) => p.title).sort()).toStrictEqual([
+        'UPSERT_MN_PRODUCT_1',
+        'UPSERT_MN_PRODUCT_2',
+        'UPSERT_MN_PRODUCT_3',
+      ]);
     });
   });
 
