@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.2...v4.1.0) (2022-08-23)
+
+
+### Features
+
+* bump mikro orm to v5 ([6c82d8d](https://github.com/etienne-bechara/nestjs-orm/commit/6c82d8dacc8bfc235bc450d8b1daaf7166bd8c5e))
+
 ## [4.0.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.1...v4.0.2) (2022-03-22)
 
 
