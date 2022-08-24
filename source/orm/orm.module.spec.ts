@@ -196,9 +196,9 @@ describe('OrmModule', () => {
   describe('OrmReadRepository', () => {
     it('should read entities respecting order and sort', async () => {
       await userRepository.createFrom([
-        { name: '_SORT_1', age: 10 },
-        { name: '_SORT_2', age: 20 },
-        { name: '_SORT_3', age: 30 },
+        { name: '0_SORT_1', age: 10 },
+        { name: '0_SORT_2', age: 20 },
+        { name: '0_SORT_3', age: 30 },
       ]);
 
       const { order, sort, records } = await userRepository.readAndCountBy({ }, {
@@ -208,8 +208,8 @@ describe('OrmModule', () => {
 
       expect(order).toBe(OrmQueryOrder.ASC);
       expect(sort).toBe('name');
-      expect(records[0].name).toBe('_SORT_1');
-      expect(records[2].name).toBe('_SORT_3');
+      expect(records[0].name).toBe('0_SORT_1');
+      expect(records[2].name).toBe('0_SORT_3');
     });
 
     it('should read entities respecting limit', async () => {
