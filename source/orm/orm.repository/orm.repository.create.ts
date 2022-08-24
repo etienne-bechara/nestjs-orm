@@ -49,9 +49,11 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
    * @param data
    */
   public async createFrom(data: RequiredEntityData<Entity> | RequiredEntityData<Entity>[]): Promise<Entity[]> {
-    const newEntities = this.createFromAsync(data);
-    await this.commit();
-    return newEntities;
+    return this.runInClearContext(async () => {
+      const newEntities = this.createFromAsync(data);
+      await this.commit();
+      return newEntities;
+    });
   }
 
   /**
@@ -68,9 +70,11 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
    * @param data
    */
   public async createOne(data: RequiredEntityData<Entity>): Promise<Entity> {
-    const newEntity = this.createOneAsync(data);
-    await this.commit();
-    return newEntity;
+    return this.runInClearContext(async () => {
+      const newEntity = this.createOneAsync(data);
+      await this.commit();
+      return newEntity;
+    });
   }
 
 }

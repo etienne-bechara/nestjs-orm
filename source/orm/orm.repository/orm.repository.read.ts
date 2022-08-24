@@ -29,9 +29,9 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     retries = 0,
   ): Promise<Entity[]> {
     if (!params || Array.isArray(params) && params.length === 0) return [ ];
+    let readEntities: Entity[];
 
     options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
-    let readEntities: Entity[];
 
     if (options.sort && options.order) {
       options.orderBy = { [options.sort]: options.order } as any;

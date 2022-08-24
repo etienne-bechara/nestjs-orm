@@ -114,15 +114,14 @@ describe('OrmModule', () => {
     });
 
     it('allow persisting entities concurrently', async () => {
-      const iterations = 10;
+      const iterations = 100;
       const promises = [ ];
 
       const persistFlow = async (i: number): Promise<void> => {
-        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_0`, age: i });
-        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_1`, age: i });
+        await userRepository.createOne({ name: `PERSIST_CONCURRENT_${i}_0`, age: i });
+        await userRepository.createOne({ name: `PERSIST_CONCURRENT_${i}_1`, age: i });
         await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_2`, age: i });
         await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_3`, age: i });
-        await userRepository.createFrom({ name: `PERSIST_CONCURRENT_${i}_4`, age: i });
       };
 
       for (let i = 0; i < iterations; i++) {
@@ -132,7 +131,7 @@ describe('OrmModule', () => {
       await Promise.all(promises);
       const userCount = await userRepository.countBy({ name: { $like: 'PERSIST_CONCURRENT%' } });
 
-      expect(userCount).toBe(iterations * 5);
+      expect(userCount).toBe(iterations * 4);
     });
 
     it('should build an entity and persist only after committing', async () => {

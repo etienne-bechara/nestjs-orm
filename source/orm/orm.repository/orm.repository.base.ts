@@ -58,6 +58,19 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
+   * Executes target function in a clear and isolated entity manager.
+   * @param fn
+   */
+  protected runInClearContext(fn: () => any): Promise<any> {
+    return ContextStorage.run(new Map(), () => {
+      const store = ContextStorage.getStore();
+      const entityManager = this.entityManager.fork({ clear: true, useContext: true });
+      store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
+      return fn();
+    });
+  }
+
+  /**
    * Validates if provided data is valid as single or multiple entities.
    * @param entities
    */
