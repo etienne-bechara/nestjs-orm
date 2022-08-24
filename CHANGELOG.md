@@ -1,3 +1,19 @@
+# [4.2.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.1.0...v4.2.0) (2022-08-24)
+
+
+### Bug Fixes
+
+* add clear context to delete and update ([58e35fd](https://github.com/etienne-bechara/nestjs-orm/commit/58e35fd27d95409171ee6d9694f78779d469b871))
+* decouple tests ([48fcd6b](https://github.com/etienne-bechara/nestjs-orm/commit/48fcd6b3e55c8e8a5b93d74a3d5655d44fb4913b))
+* remove --coverage ([905fdc8](https://github.com/etienne-bechara/nestjs-orm/commit/905fdc88efea01d462ebad82723f5b38f645610e))
+* remove coverage report ([cad822a](https://github.com/etienne-bechara/nestjs-orm/commit/cad822ace9a3ff3883297e0e6292fd130ac9b329))
+* sort test for postgres ([b4deb6c](https://github.com/etienne-bechara/nestjs-orm/commit/b4deb6c3b18831cbc8e22262930f9b7e66c5a4eb))
+
+
+### Features
+
+* add concurrent operation support ([b620d99](https://github.com/etienne-bechara/nestjs-orm/commit/b620d99ed2f66c3ae53d5e3de8a027330ddfef30))
+
 # [4.1.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.0.2...v4.1.0) (2022-08-23)
 
 
