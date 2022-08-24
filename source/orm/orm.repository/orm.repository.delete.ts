@@ -33,19 +33,21 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     entities: Entity | Entity[],
     options: OrmDeleteOptions<Entity, P> = { },
   ): Promise<Entity[]> {
-    const { populate } = options;
-    const entityArray = Array.isArray(entities) ? entities : [ entities ];
-    if (!entities || entityArray.length === 0) return [ ];
+    return this.runInClearContext(async () => {
+      const { populate } = options;
+      const entityArray = Array.isArray(entities) ? entities : [ entities ];
+      if (!entities || entityArray.length === 0) return [ ];
 
-    if (populate) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await this.populate(entityArray, populate as any);
-    }
+      if (populate) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        await this.populate(entityArray, populate as any);
+      }
 
-    this.deleteAsync(entityArray);
-    await this.commit();
+      this.deleteAsync(entityArray);
+      await this.commit();
 
-    return entityArray;
+      return entityArray;
+    });
   }
 
   /**

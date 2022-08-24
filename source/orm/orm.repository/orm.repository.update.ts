@@ -59,37 +59,39 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     params: Entity | Entity[] | OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[],
     data?: EntityData<Entity>,
   ): Promise<Entity[]> {
-    const paramsArray = Array.isArray(params) ? params : [ params ];
-    if (!params || paramsArray.length === 0) return [ ];
+    return this.runInClearContext(async () => {
+      const paramsArray = Array.isArray(params) ? params : [ params ];
+      if (!params || paramsArray.length === 0) return [ ];
 
-    const assignedEntities: Entity[] = [ ];
-    let comboArray: OrmUpdateParams<Entity>[];
+      const assignedEntities: Entity[] = [ ];
+      let comboArray: OrmUpdateParams<Entity>[];
 
-    // Normalize update data into the combo standard
-    if (data) {
-      const entityArray: Entity[] = paramsArray as any;
-      comboArray = entityArray.map((e) => ({ entity: e, data }));
-    }
-    else {
-      comboArray = paramsArray as any;
-    }
+      // Normalize update data into the combo standard
+      if (data) {
+        const entityArray: Entity[] = paramsArray as any;
+        comboArray = entityArray.map((e) => ({ entity: e, data }));
+      }
+      else {
+        comboArray = paramsArray as any;
+      }
 
-    // Before assignment, ensure one to many and many to many collections were populated
-    await Promise.all(
-      comboArray.map(async ({ entity, data }) => {
-        for (const key in entity as any) {
-          if (data?.[key] && entity[key]?.isInitialized && entity[key]?.toArray && !entity[key].isInitialized()) {
-            await entity[key].init();
+      // Before assignment, ensure one to many and many to many collections were populated
+      await Promise.all(
+        comboArray.map(async ({ entity, data }) => {
+          for (const key in entity as any) {
+            if (data?.[key] && entity[key]?.isInitialized && entity[key]?.toArray && !entity[key].isInitialized()) {
+              await entity[key].init();
+            }
           }
-        }
 
-        const [ assignedEntity ] = this.updateAsync({ entity, data });
-        assignedEntities.push(assignedEntity);
-      }),
-    );
+          const [ assignedEntity ] = this.updateAsync({ entity, data });
+          assignedEntities.push(assignedEntity);
+        }),
+      );
 
-    await this.commit();
-    return assignedEntities;
+      await this.commit();
+      return assignedEntities;
+    });
   }
 
   /**
