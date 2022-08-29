@@ -201,7 +201,7 @@ describe('OrmModule', () => {
         { name: '0_SORT_3', age: 30 },
       ]);
 
-      const { order, sort, records } = await userRepository.readAndCountBy({ }, {
+      const { order, sort, records } = await userRepository.readPaginatedBy({
         order: OrmQueryOrder.ASC,
         sort: 'name',
       });
@@ -213,7 +213,7 @@ describe('OrmModule', () => {
     });
 
     it('should read entities respecting limit', async () => {
-      const { limit, records } = await userRepository.readAndCountBy({ }, { limit: 1 });
+      const { limit, records } = await userRepository.readPaginatedBy({ limit: 1 });
 
       expect(limit).toBe(1);
       expect(records.length).toBe(1);
@@ -226,7 +226,7 @@ describe('OrmModule', () => {
         { name: 'Z_SORT_3', age: 30 },
       ]);
 
-      const { order, sort, records, limit, offset } = await userRepository.readAndCountBy({ }, {
+      const { order, sort, records, limit, offset } = await userRepository.readPaginatedBy({
         order: OrmQueryOrder.DESC,
         sort: 'name',
         limit: 1,

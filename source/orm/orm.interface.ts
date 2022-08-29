@@ -3,9 +3,11 @@ import { EntityData, EventArgs, FilterQuery, FindOptions, Populate } from '@mikr
 import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
 
 import { SchemaModuleOptions } from '../schema/schema.interface';
-import { OrmQueryOrder } from './orm.enum';
+import { OrmPaginationDto } from './orm.dto';
 
 export type OrmReadParams<T> = FilterQuery<T>;
+
+export type OrmReadPaginatedParams<T> = FilterQuery<T> & OrmPaginationDto;
 
 export type OrmSubscriberParams<Entity> = EventArgs<Entity>;
 
@@ -59,8 +61,6 @@ export interface OrmRunWithinContextParams<T> {
 }
 
 export interface OrmReadOptions<Entity, P extends string> extends FindOptions<Entity, P> {
-  sort?: string;
-  order?: OrmQueryOrder;
   findOrFail?: boolean;
 }
 

@@ -1,16 +1,8 @@
-import { IsArray, IsDefined, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, Min, ToNumber, ToStringArray } from '@bechara/nestjs-core';
+import { IsArray, IsBoolean, IsDefined, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, Min, ToBoolean, ToNumber, ToStringArray } from '@bechara/nestjs-core';
 
 import { OrmQueryOrder } from './orm.enum';
 
 export class OrmPaginationDto {
-
-  @IsOptional()
-  @IsString() @IsDefined()
-  public sort?: string;
-
-  @IsOptional()
-  @IsIn(Object.values(OrmQueryOrder))
-  public order?: string;
 
   @IsOptional()
   @ToNumber()
@@ -23,6 +15,19 @@ export class OrmPaginationDto {
   public offset?: number;
 
   @IsOptional()
+  @ToBoolean()
+  @IsBoolean()
+  public count?: boolean;
+
+  @IsOptional()
+  @IsString() @IsDefined()
+  public sort?: string;
+
+  @IsOptional()
+  @IsIn(Object.values(OrmQueryOrder))
+  public order?: OrmQueryOrder;
+
+  @IsOptional()
   @ToStringArray()
   @IsString({ each: true })
   public populate?: string[];
@@ -31,20 +36,23 @@ export class OrmPaginationDto {
 
 export class OrmPagination<Entity> {
 
-  @IsString()
-  public sort: string;
-
-  @IsIn(Object.values(OrmQueryOrder))
-  public order: OrmQueryOrder;
-
   @IsInt()
   public limit: number;
 
   @IsInt()
   public offset: number;
 
+  @IsOptional()
   @IsInt()
-  public count: number;
+  public count?: number;
+
+  @IsOptional()
+  @IsString()
+  public sort?: string;
+
+  @IsOptional()
+  @IsIn(Object.values(OrmQueryOrder))
+  public order?: OrmQueryOrder;
 
   @IsArray()
   public records: Entity[];

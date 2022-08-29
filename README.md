@@ -139,7 +139,7 @@ readByIdOrFail(): Promise<Entity>;
 readUnique(): Promise<Entity>;
 readUniqueOrFail(): Promise<Entity>;
 countBy(): Promise<number>;
-readAndCountBy(): Promise<OrmPaginatedResponse<Entity>>;
+readPaginatedBy(): Promise<OrmPaginatedResponse<Entity>>;
 
 // Sync operations (instantly committed)
 createFrom(): Promise<Entity[]>;

@@ -1,9 +1,8 @@
 import { ConflictException, NotFoundException } from '@bechara/nestjs-core';
-import { EntityManager, EntityName, FilterQuery } from '@mikro-orm/core';
+import { EntityManager, EntityName } from '@mikro-orm/core';
 
 import { OrmPagination } from '../orm.dto';
-import { OrmQueryOrder } from '../orm.enum';
-import { OrmReadArguments, OrmReadOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
+import { OrmReadOptions, OrmReadPaginatedParams, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
 import { OrmBaseRepository } from './orm.repository.base';
 
 export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity> {
@@ -33,10 +32,6 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       let readEntities: Entity[];
 
       options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
-
-      if (options.sort && options.order) {
-        options.orderBy = { [options.sort]: options.order } as any;
-      }
 
       try {
         readEntities = await this.entityManager.find(this.entityName, params, options);
@@ -142,55 +137,30 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
   }
 
   /**
-   * Read and count all entities that matches given criteria.
-   * Returns an object containing sort and order criteria,
-   * limit, offset, count and records themselves.
+   * Read entities with pagination support including sort, order,
+   * limit, offset and whether to include total count or not.
    * @param params
-   * @param options
    */
-  public async readAndCountBy<P extends string = never>(
-    params: OrmReadParams<Entity>,
-    options: OrmReadOptions<Entity, P> = { },
-  ): Promise<OrmPagination<Entity>> {
-    options.sort ??= this.getPrimaryKey();
-    options.order ??= OrmQueryOrder.ASC;
-    options.limit ||= 100;
-    options.offset ??= 0;
+  public async readPaginatedBy(params: OrmReadPaginatedParams<Entity>): Promise<OrmPagination<Entity>> {
+    const { limit: bLimit, offset: bOffset, count: hasCount, sort, order, populate: bPopulate, ...remainder } = params;
 
-    return {
-      sort: options.sort,
-      order: options.order,
-      limit: options.limit,
-      offset: options.offset,
-      count: await this.countBy(params),
-      records: await this.readBy(params, options),
-    };
-  }
+    const limit = bLimit ?? 100;
+    const offset = bOffset ?? 0;
+    const orderBy = sort && order ? [ { [sort]: order } ] : undefined;
+    const populate = bPopulate as any;
 
-  /**
-   * Given a record object (usually a http query), split properties
-   * between read params and read options.
-   * @param query
-   */
-  public getReadArguments<P extends string = never>(
-    query: Record<string, any>,
-  ): OrmReadArguments<Entity, P> {
-    if (!query || typeof query !== 'object') return;
+    const readParams: OrmReadParams<Entity> = remainder as any;
+    const readPromise = this.readBy(readParams, { orderBy, limit, offset, populate });
 
-    const optionsProperties = new Set([ 'sort', 'order', 'limit', 'offset', 'populate' ]);
-    const params = { } as FilterQuery<Entity>;
-    const options = { } as OrmReadOptions<Entity, P>;
+    let countPromise: Promise<number>;
 
-    for (const key in query) {
-      if (optionsProperties.has(key)) {
-        options[key] = query[key];
-      }
-      else {
-        params[key] = query[key];
-      }
+    if (hasCount) {
+      countPromise = this.countBy(readParams);
     }
 
-    return { options, params };
+    const [ count, records ] = await Promise.all([ countPromise, readPromise ]);
+
+    return { limit, offset, count, sort, order, records };
   }
 
 }

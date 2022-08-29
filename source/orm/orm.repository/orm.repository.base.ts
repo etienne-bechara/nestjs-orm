@@ -351,7 +351,7 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
-   * Use `readAndCountBy()`.
+   * Use `readPaginatedBy()`.
    * @param where
    * @param options
    * @deprecated

@@ -15,8 +15,7 @@ export class UserController {
     response: { type: UserPagination },
   })
   public get(@Query() query: UserReadDto): Promise<UserPagination> {
-    const { params, options } = this.userRepository.getReadArguments(query);
-    return this.userRepository.readAndCountBy(params, options);
+    return this.userRepository.readPaginatedBy(query);
   }
 
   @Get(':id', {
