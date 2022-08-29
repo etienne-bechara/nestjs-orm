@@ -9,7 +9,9 @@ export class UserRepository extends OrmRepository<User> {
     protected readonly entityManager: EntityManager,
     protected readonly entityName: EntityName<User>,
   ) {
-    super(entityManager, entityName);
+    super(entityManager, entityName, {
+      defaultUniqueKey: [ 'name' ],
+    });
   }
 
 }

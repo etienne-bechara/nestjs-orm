@@ -46,20 +46,19 @@ export abstract class OrmUpdateRepository<Entity> extends OrmCreateRepository<En
     return assignedEntities;
   }
 
-  public async update(entities: Entity | Entity[], data: EntityData<Entity>): Promise<Entity[]>;
-  public async update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[]): Promise<Entity[]>;
-
+  public update(entities: Entity | Entity[], data: EntityData<Entity>): Promise<Entity[]>;
+  public update(params: OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[]): Promise<Entity[]>;
   /**
    * Update target entities, data can be provided as an object that applies to all,
    * or each entity may be combined with its own changeset.
    * @param params
    * @param data
    */
-  public async update(
+  public update(
     params: Entity | Entity[] | OrmUpdateParams<Entity> | OrmUpdateParams<Entity>[],
     data?: EntityData<Entity>,
   ): Promise<Entity[]> {
-    return this.runInClearContext(async () => {
+    return this.runWithinClearContextSpan('update', async () => {
       const paramsArray = Array.isArray(params) ? params : [ params ];
       if (!params || paramsArray.length === 0) return [ ];
 

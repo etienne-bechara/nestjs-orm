@@ -28,32 +28,34 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
     options: OrmReadOptions<Entity, P> = { },
     retries = 0,
   ): Promise<Entity[]> {
-    if (!params || Array.isArray(params) && params.length === 0) return [ ];
-    let readEntities: Entity[];
+    return this.runWithinSpan('read', async () => {
+      if (!params || Array.isArray(params) && params.length === 0) return [ ];
+      let readEntities: Entity[];
 
-    options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
+      options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
 
-    if (options.sort && options.order) {
-      options.orderBy = { [options.sort]: options.order } as any;
-    }
+      if (options.sort && options.order) {
+        options.orderBy = { [options.sort]: options.order } as any;
+      }
 
-    try {
-      readEntities = await this.entityManager.find(this.entityName, params, options);
-      readEntities ??= [ ];
-    }
-    catch (e) {
-      return OrmBaseRepository.handleException({
-        caller: (retries) => this.readBy(params, options, retries),
-        retries,
-        error: e,
-      });
-    }
+      try {
+        readEntities = await this.entityManager.find(this.entityName, params, options);
+        readEntities ??= [ ];
+      }
+      catch (e) {
+        return OrmBaseRepository.handleException({
+          caller: (retries) => this.readBy(params, options, retries),
+          retries,
+          error: e,
+        });
+      }
 
-    if (!readEntities[0] && options.findOrFail) {
-      throw new NotFoundException('entity does not exist');
-    }
+      if (!readEntities[0] && options.findOrFail) {
+        throw new NotFoundException('entity does not exist');
+      }
 
-    return readEntities;
+      return readEntities;
+    });
   }
 
   /**
@@ -123,22 +125,20 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    * @param retries
    */
-  public async countBy(params: OrmReadParams<Entity>, retries = 0): Promise<number> {
-    if (!params || Array.isArray(params) && params.length === 0) return 0;
-    let count: number;
-
-    try {
-      count = await this.entityManager.count(this.entityName, params);
-    }
-    catch (e) {
-      return OrmBaseRepository.handleException({
-        caller: (retries) => this.countBy(params, retries),
-        retries,
-        error: e,
-      });
-    }
-
-    return count;
+  public countBy(params: OrmReadParams<Entity>, retries = 0): Promise<number> {
+    return this.runWithinSpan('count', async () => {
+      try {
+        if (!params || Array.isArray(params) && params.length === 0) return 0;
+        return this.entityManager.count(this.entityName, params);
+      }
+      catch (e) {
+        return OrmBaseRepository.handleException({
+          caller: (retries) => this.countBy(params, retries),
+          retries,
+          error: e,
+        });
+      }
+    });
   }
 
   /**

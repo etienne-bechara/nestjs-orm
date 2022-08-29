@@ -29,11 +29,11 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
    * @param entities
    * @param options
    */
-  public async delete<P extends string = never>(
+  public delete<P extends string = never>(
     entities: Entity | Entity[],
     options: OrmDeleteOptions<Entity, P> = { },
   ): Promise<Entity[]> {
-    return this.runInClearContext(async () => {
+    return this.runWithinClearContextSpan('delete', async () => {
       const { populate } = options;
       const entityArray = Array.isArray(entities) ? entities : [ entities ];
       if (!entities || entityArray.length === 0) return [ ];

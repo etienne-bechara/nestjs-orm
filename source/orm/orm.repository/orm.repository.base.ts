@@ -1,10 +1,10 @@
-import { BadRequestException, ConflictException, ContextStorage, InternalServerErrorException, NotImplementedException } from '@bechara/nestjs-core';
+import { BadRequestException, ConflictException, ContextStorage, InternalServerErrorException, NotImplementedException, TraceService } from '@bechara/nestjs-core';
 import { AnyEntity, CountOptions, DeleteOptions, EntityData, EntityManager, EntityName, EntityRepository, FilterQuery, FindOneOptions, FindOneOrFailOptions, FindOptions, Loaded, Primary, RequiredEntityData, UpdateOptions } from '@mikro-orm/core';
 import { QueryBuilder as MySqlQueryBuilder } from '@mikro-orm/mysql';
 import { QueryBuilder as PostgreSqlQueryBuilder } from '@mikro-orm/postgresql';
 
 import { OrmStoreKey } from '../orm.enum';
-import { OrmExceptionHandlerParams, OrmRepositoryOptions } from '../orm.interface';
+import { OrmExceptionHandlerParams, OrmRepositoryOptions, OrmRunWithinContextParams } from '../orm.interface';
 
 export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity> {
 
@@ -58,15 +58,64 @@ export abstract class OrmBaseRepository<Entity> extends EntityRepository<Entity>
   }
 
   /**
-   * Executes target function in a clear and isolated entity manager.
-   * @param fn
+   * Executes target operation wrapped into a tracing span.
+   * In the event of an exception, register span as failed and rethrow.
+   * @param spanSuffix
+   * @param operation
    */
-  protected runInClearContext(fn: () => any): Promise<any> {
-    return ContextStorage.run(new Map(), () => {
-      const store = ContextStorage.getStore();
-      const entityManager = this.entityManager.fork({ clear: true, useContext: true });
-      store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
-      return fn();
+  protected runWithinSpan<T>(spanSuffix: string, operation: () => Promise<T>): Promise<T> {
+    return this.runWithinSpanHandler({
+      name: `${this.entityName}Repository.${spanSuffix}()`,
+      operation,
+    });
+  }
+
+  /**
+   * Executes target operation wrapped into a tracing span, as wll as
+   * clear entity manager.
+   * In the event of an exception, register span as failed and rethrow.
+   * @param spanSuffix
+   * @param operation
+   */
+  protected runWithinClearContextSpan<T>(spanSuffix: string, operation: () => Promise<T>): Promise<T> {
+    return this.runWithinSpanHandler({
+      name: `${this.entityName}Repository.${spanSuffix}()`,
+      clear: true,
+      operation,
+    });
+  }
+
+  /**
+   * Executes target operation wrapped into a tracing span, allow to
+   * optionally run in a clear context as well.
+   * In the event of an exception, register span as failed and rethrow.
+   * @param params
+   */
+  private runWithinSpanHandler<T>(params: OrmRunWithinContextParams<T>): Promise<T> {
+    const { name, clear, operation } = params;
+
+    return TraceService.startActiveSpan(name, { }, async (span) => {
+      try {
+        const result = !clear
+          ? await operation()
+          : await ContextStorage.run(new Map(), () => {
+            const store = ContextStorage.getStore();
+            const entityManager = this.entityManager.fork({ clear: true, useContext: true });
+            store.set(OrmStoreKey.ENTITY_MANAGER, entityManager);
+            return operation();
+          });
+
+        span.setStatus({ code: 1 });
+        return result;
+      }
+      catch (e) {
+        span.recordException(e as Error);
+        span.setStatus({ code: 2, message: e.message });
+        throw e;
+      }
+      finally {
+        span.end();
+      }
     });
   }
 

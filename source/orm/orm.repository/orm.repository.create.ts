@@ -48,8 +48,8 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
    * Create multiple entities based on provided data.
    * @param data
    */
-  public async createFrom(data: RequiredEntityData<Entity> | RequiredEntityData<Entity>[]): Promise<Entity[]> {
-    return this.runInClearContext(async () => {
+  public createFrom(data: RequiredEntityData<Entity> | RequiredEntityData<Entity>[]): Promise<Entity[]> {
+    return this.runWithinClearContextSpan('create', async () => {
       const newEntities = this.createFromAsync(data);
       await this.commit();
       return newEntities;
@@ -69,8 +69,8 @@ export abstract class OrmCreateRepository<Entity> extends OrmReadRepository<Enti
    * Create a single entity based on provided data, persist changes on next commit call.
    * @param data
    */
-  public async createOne(data: RequiredEntityData<Entity>): Promise<Entity> {
-    return this.runInClearContext(async () => {
+  public createOne(data: RequiredEntityData<Entity>): Promise<Entity> {
+    return this.runWithinClearContextSpan('create', async () => {
       const newEntity = this.createOneAsync(data);
       await this.commit();
       return newEntity;

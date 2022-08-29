@@ -52,6 +52,12 @@ export interface OrmReadArguments<Entity, P extends string> {
   options: OrmReadOptions<Entity, P>;
 }
 
+export interface OrmRunWithinContextParams<T> {
+  name: string;
+  clear?: boolean;
+  operation: () => Promise<T>;
+}
+
 export interface OrmReadOptions<Entity, P extends string> extends FindOptions<Entity, P> {
   sort?: string;
   order?: OrmQueryOrder;
