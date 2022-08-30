@@ -181,7 +181,7 @@ describe('OrmModule', () => {
         },
       ]);
 
-      const populate: any = [ 'address' ];
+      const populate = [ 'address' ];
       const [ user1 ] = await userRepository.readBy({ name: 'ONE_TO_ONE_NESTED_1' }, { populate });
       const [ user2 ] = await userRepository.readBy({ name: 'ONE_TO_ONE_NESTED_2' }, { populate });
 
@@ -296,7 +296,7 @@ describe('OrmModule', () => {
         uniqueKey: [ 'id' ],
       });
 
-      const populate: any = [ 'user', 'products' ];
+      const populate = [ 'user', 'products' ];
       const order1 = await orderRepository.readByIdOrFail('UPSERT_MN_ORDER_1', { populate });
       const order2 = await orderRepository.readByIdOrFail('UPSERT_MN_ORDER_2', { populate });
       const order3 = await orderRepository.readByIdOrFail('UPSERT_MN_ORDER_3', { populate });

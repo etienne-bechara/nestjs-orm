@@ -1,5 +1,6 @@
 import { ModuleMetadata } from '@bechara/nestjs-core';
-import { EntityData, EventArgs, FilterQuery, FindOptions, Populate } from '@mikro-orm/core';
+import { EntityData, EventArgs, FilterQuery, FindOptions } from '@mikro-orm/core';
+import { AutoPath } from '@mikro-orm/core/typings';
 import { MikroOrmModuleOptions } from '@mikro-orm/nestjs';
 
 import { SchemaModuleOptions } from '../schema/schema.interface';
@@ -60,17 +61,20 @@ export interface OrmRunWithinContextParams<T> {
   operation: () => Promise<T>;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export interface OrmReadOptions<Entity, P extends string> extends FindOptions<Entity, P> {
+  populate?: AutoPath<Entity, P>[] | boolean | string[];
   findOrFail?: boolean;
 }
 
 export interface OrmUpsertOptions<Entity, P extends string> {
-  populate?: Populate<Entity, P>;
+  populate?: AutoPath<Entity, P>[] | boolean | string[];
   uniqueKey?: (keyof Entity)[];
   disallowUpdate?: boolean;
   disallowRetry?: boolean;
 }
 
 export interface OrmDeleteOptions<Entity, P extends string> {
-  populate?: Populate<Entity, P>;
+  populate?: AutoPath<Entity, P>[] | boolean | string[];
 }

@@ -22,7 +22,8 @@ export class UserController {
     response: { type: User },
   })
   public getById(@Param('id') id: string): Promise<User> {
-    return this.userRepository.readByIdOrFail(id, { populate: [ 'address' ] });
+    const populate = [ 'address' ];
+    return this.userRepository.readByIdOrFail(id, { populate });
   }
 
   @Post({

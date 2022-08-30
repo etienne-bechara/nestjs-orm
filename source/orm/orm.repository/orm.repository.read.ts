@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException } from '@bechara/nestjs-core';
-import { EntityManager, EntityName } from '@mikro-orm/core';
+import { EntityManager, EntityName, FindOptions } from '@mikro-orm/core';
 
 import { OrmPagination } from '../orm.dto';
 import { OrmReadOptions, OrmReadPaginatedParams, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
@@ -34,7 +34,7 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
 
       try {
-        readEntities = await this.entityManager.find(this.entityName, params, options);
+        readEntities = await this.entityManager.find(this.entityName, params, options as FindOptions<Entity, P>);
         readEntities ??= [ ];
       }
       catch (e) {
@@ -142,12 +142,11 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
    * @param params
    */
   public async readPaginatedBy(params: OrmReadPaginatedParams<Entity>): Promise<OrmPagination<Entity>> {
-    const { limit: bLimit, offset: bOffset, count: hasCount, sort, order, populate: bPopulate, ...remainder } = params;
+    const { limit: bLimit, offset: bOffset, count: hasCount, sort, order, populate, ...remainder } = params;
 
     const limit = bLimit ?? 100;
     const offset = bOffset ?? 0;
     const orderBy = sort && order ? [ { [sort]: order } ] : undefined;
-    const populate = bPopulate as any;
 
     const readParams: OrmReadParams<Entity> = remainder as any;
     const readPromise = this.readBy(readParams, { orderBy, limit, offset, populate });
