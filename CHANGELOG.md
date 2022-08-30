@@ -1,3 +1,10 @@
+## [4.3.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.0...v4.3.1) (2022-08-30)
+
+
+### Bug Fixes
+
+* populate typing ([b0e163e](https://github.com/etienne-bechara/nestjs-orm/commit/b0e163e3068949e4308b1576c8581b13e0ff9f46))
+
 # [4.3.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.2.0...v4.3.0) (2022-08-29)
 
 
