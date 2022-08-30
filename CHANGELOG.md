@@ -1,3 +1,15 @@
+# [4.3.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.2.0...v4.3.0) (2022-08-29)
+
+
+### Bug Fixes
+
+* improve pagination ([2fa39fb](https://github.com/etienne-bechara/nestjs-orm/commit/2fa39fb26a53da9f2a042c55fd5d1a196687330f))
+
+
+### Features
+
+* add tracing support ([6a5a9a2](https://github.com/etienne-bechara/nestjs-orm/commit/6a5a9a290c1d77a01f8eff833a11690f00adc81f))
+
 # [4.2.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.1.0...v4.2.0) (2022-08-24)
 
 
