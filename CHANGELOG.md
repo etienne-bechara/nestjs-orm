@@ -1,3 +1,10 @@
+## [4.3.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.1...v4.3.2) (2022-08-31)
+
+
+### Bug Fixes
+
+* read refresh by default ([93c4ea8](https://github.com/etienne-bechara/nestjs-orm/commit/93c4ea87d7cfaac4a9ff6f7572dd7ab4f7b76c45))
+
 ## [4.3.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.0...v4.3.1) (2022-08-30)
 
 
