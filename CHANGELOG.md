@@ -1,3 +1,10 @@
+## [4.3.3](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.2...v4.3.3) (2022-09-01)
+
+
+### Bug Fixes
+
+* wrap upsert in new context ([047965a](https://github.com/etienne-bechara/nestjs-orm/commit/047965a29d905814b698cc3bd29017be4ee22b13))
+
 ## [4.3.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.1...v4.3.2) (2022-08-31)
 
 
