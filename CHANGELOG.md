@@ -1,3 +1,10 @@
+## [4.3.4](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.3...v4.3.4) (2022-09-01)
+
+
+### Bug Fixes
+
+* fallback refresh as true ([6c845e7](https://github.com/etienne-bechara/nestjs-orm/commit/6c845e7976ff6da193f9987a9e1c3e851cb1cb74))
+
 ## [4.3.3](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.2...v4.3.3) (2022-09-01)
 
 
