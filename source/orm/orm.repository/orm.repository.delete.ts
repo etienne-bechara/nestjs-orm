@@ -20,6 +20,7 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
   public deleteAsync(entities: Entity | Entity[]): Entity[] {
     const entityArray = Array.isArray(entities) ? entities : [ entities ];
     if (!entities || entityArray.length === 0) return [ ];
+
     this.removeAsync(entities);
     return entityArray;
   }
@@ -33,11 +34,11 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     entities: Entity | Entity[],
     options: OrmDeleteOptions<Entity, P> = { },
   ): Promise<Entity[]> {
-    return this.runWithinClearContextSpan('delete', async () => {
-      const { populate } = options;
-      const entityArray = Array.isArray(entities) ? entities : [ entities ];
-      if (!entities || entityArray.length === 0) return [ ];
+    const { populate } = options;
+    const entityArray = Array.isArray(entities) ? entities : [ entities ];
+    if (!entities || entityArray.length === 0) return new Promise((r) => r([ ]));
 
+    return this.runWithinClearContextSpan('delete', async () => {
       if (populate) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         await this.populate(entityArray, populate as any);

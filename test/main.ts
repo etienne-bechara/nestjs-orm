@@ -3,6 +3,7 @@ import { AppModule, INestApplication } from '@bechara/nestjs-core';
 import { OrmModuleOptions } from '../source/orm/orm.interface';
 import { OrmModule } from '../source/orm/orm.module';
 import { Address } from './address/address.entity';
+import { Metadata } from './metadata/metadata.entity';
 import { Order } from './order/order.entity';
 import { Product } from './product/product.entity';
 import { User } from './user/user.entity';
@@ -41,7 +42,7 @@ export async function compileTestApp(): Promise<INestApplication> {
       OrmModule.registerAsync({
         disableEntityScan: true,
         useFactory: () => options,
-        entities: [ Address, Order, Product, User ],
+        entities: [ Address, Metadata, Order, Product, User ],
       }),
     ],
     exports: [

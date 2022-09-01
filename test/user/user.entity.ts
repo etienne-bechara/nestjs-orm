@@ -3,6 +3,7 @@ import { Collection, Entity, OneToMany, OneToOne, Property, Unique } from '@mikr
 
 import { OrmUuidTimestampEntity } from '../../source/orm/orm.entity';
 import { Address } from '../address/address.entity';
+import { Metadata } from '../metadata/metadata.entity';
 import { Order } from '../order/order.entity';
 import { UserRepository } from './user.repository';
 
@@ -28,5 +29,8 @@ export class User extends OrmUuidTimestampEntity {
 
   @OneToMany(() => Order, 'user')
   public orders = new Collection<Order>(this);
+
+  @OneToMany(() => Metadata, 'user', { orphanRemoval: true })
+  public metadata = new Collection<Metadata>(this);
 
 }

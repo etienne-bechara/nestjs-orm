@@ -32,7 +32,6 @@ export abstract class OrmReadRepository<Entity> extends OrmBaseRepository<Entity
       let readEntities: Entity[];
 
       options.populate ??= this.repositoryOptions.defaultPopulate as any ?? false;
-      options.refresh ??= true;
 
       try {
         readEntities = await this.entityManager.find(this.entityName, params, options as FindOptions<Entity, P>);

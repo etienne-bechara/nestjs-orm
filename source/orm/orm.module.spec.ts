@@ -191,6 +191,46 @@ describe('OrmModule', () => {
       expect(user2.age).toBe(40);
       expect(user2.address.zip).toBe('22222222');
     });
+
+    it('should create entities with nested one-to-many relations', async () => {
+      await userRepository.createFrom([
+        {
+          name: 'ONE_TO_MANY_NESTED_1',
+          age: 50,
+          metadata: [
+            { key: 'ONE_TO_MANY_METADATA_KEY_1', value: 'ONE_TO_MANY_METADATA_VALUE_1' },
+          ],
+        },
+        {
+          name: 'ONE_TO_MANY_NESTED_2',
+          age: 60,
+          metadata: [
+            { key: 'ONE_TO_MANY_METADATA_KEY_2', value: 'ONE_TO_MANY_METADATA_VALUE_2' },
+            { key: 'ONE_TO_MANY_METADATA_KEY_3', value: 'ONE_TO_MANY_METADATA_VALUE_3' },
+          ],
+        },
+      ]);
+
+      const populate = [ 'metadata' ];
+      const [ user1 ] = await userRepository.readBy({ name: 'ONE_TO_MANY_NESTED_1' }, { populate });
+      const [ user2 ] = await userRepository.readBy({ name: 'ONE_TO_MANY_NESTED_2' }, { populate });
+
+      expect(user1.age).toBe(50);
+      expect(user1.metadata.length).toBe(1);
+      expect(user1.metadata[0].key).toBe('ONE_TO_MANY_METADATA_KEY_1');
+      expect(user1.metadata[0].value).toBe('ONE_TO_MANY_METADATA_VALUE_1');
+
+      expect(user2.age).toBe(60);
+      expect(user2.metadata.length).toBe(2);
+      expect(user2.metadata.toArray().map((m) => m.key).sort()).toStrictEqual([
+        'ONE_TO_MANY_METADATA_KEY_2',
+        'ONE_TO_MANY_METADATA_KEY_3',
+      ]);
+      expect(user2.metadata.toArray().map((m) => m.value).sort()).toStrictEqual([
+        'ONE_TO_MANY_METADATA_VALUE_2',
+        'ONE_TO_MANY_METADATA_VALUE_3',
+      ]);
+    });
   });
 
   describe('OrmReadRepository', () => {
@@ -276,6 +316,78 @@ describe('OrmModule', () => {
       expect(update3.price).toBe(5.67);
     });
 
+    it('should upsert entities with one-to-many relationships accordingly', async () => {
+      await userRepository.createFrom([
+        {
+          name: 'UPSERT_1M_USER_1',
+          age: 10,
+          metadata: [
+            { key: 'UPSERT_1M_METADATA_KEY_1', value: 'UPSERT_1M_METADATA_VALUE_1' },
+          ],
+        },
+        {
+          name: 'UPSERT_1M_USER_2',
+          age: 20,
+          metadata: [
+            { key: 'UPSERT_1M_METADATA_KEY_2', value: 'UPSERT_1M_METADATA_VALUE_2' },
+            { key: 'UPSERT_1M_METADATA_KEY_3', value: 'UPSERT_1M_METADATA_VALUE_3' },
+          ],
+        },
+        {
+          name: 'UPSERT_1M_USER_3',
+          age: 20,
+          metadata: [
+            { key: 'UPSERT_1M_METADATA_KEY_4', value: 'UPSERT_1M_METADATA_VALUE_4' },
+            { key: 'UPSERT_1M_METADATA_KEY_5', value: 'UPSERT_1M_METADATA_VALUE_5' },
+            { key: 'UPSERT_1M_METADATA_KEY_6', value: 'UPSERT_1M_METADATA_VALUE_6' },
+          ],
+        },
+      ]);
+
+      await userRepository.upsert([
+        {
+          name: 'UPSERT_1M_USER_1',
+          metadata: [
+            { key: 'UPSERT_1M_METADATA_KEY_4', value: 'UPSERT_1M_METADATA_VALUE_4' },
+            { key: 'UPSERT_1M_METADATA_KEY_5', value: 'UPSERT_1M_METADATA_VALUE_5' },
+          ],
+        },
+        {
+          name: 'UPSERT_1M_USER_2',
+          metadata: [
+            { key: 'UPSERT_1M_METADATA_KEY_1', value: 'UPSERT_1M_METADATA_VALUE_1' },
+            { key: 'UPSERT_1M_METADATA_KEY_2', value: 'UPSERT_1M_METADATA_VALUE_2' },
+          ],
+        },
+        {
+          name: 'UPSERT_1M_USER_3',
+          metadata: [ ],
+        },
+      ], {
+        uniqueKey: [ 'name' ],
+      });
+
+      const populate = [ 'metadata' ];
+
+      const [ user1 ] = await userRepository.readBy({ name: 'UPSERT_1M_USER_1' }, { populate });
+      const [ user2 ] = await userRepository.readBy({ name: 'UPSERT_1M_USER_2' }, { populate });
+      const [ user3 ] = await userRepository.readBy({ name: 'UPSERT_1M_USER_3' }, { populate });
+
+      expect(user1.metadata.length).toBe(2);
+      expect(user1.metadata.toArray().map((m) => m.key).sort()).toStrictEqual([
+        'UPSERT_1M_METADATA_KEY_4',
+        'UPSERT_1M_METADATA_KEY_5',
+      ]);
+
+      expect(user2.metadata.length).toBe(2);
+      expect(user2.metadata.toArray().map((m) => m.key).sort()).toStrictEqual([
+        'UPSERT_1M_METADATA_KEY_1',
+        'UPSERT_1M_METADATA_KEY_2',
+      ]);
+
+      expect(user3.metadata.length).toBe(0);
+    });
+
     it('should upsert entities with many-to-many relationships accordingly', async () => {
       const [ user1 ] = await userRepository.createFrom({ name: 'UPSERT_MN_USER_1', age: 10 });
       const [ user2 ] = await userRepository.createFrom({ name: 'UPSERT_MN_USER_2', age: 20 });
@@ -324,7 +436,7 @@ describe('OrmModule', () => {
 
   describe('OrmDeleteRepository', () => {
     it('should prevent cascade deletion', async () => {
-      const users = await userRepository.readBy({ });
+      const users = await userRepository.readBy({ }, { populate: [ 'address', 'metadata', 'orders' ] });
       let error: any;
 
       try {
@@ -338,7 +450,7 @@ describe('OrmModule', () => {
     });
 
     it('should cascade delete entities', async () => {
-      const users = await userRepository.readBy({ });
+      const users = await userRepository.readBy({ }, { populate: [ 'address', 'metadata' ] });
       const orders = await orderRepository.readBy({ });
 
       await orderRepository.delete(orders);
