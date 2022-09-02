@@ -1,3 +1,10 @@
+# [4.4.0-beta.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0-beta.1...v4.4.0-beta.2) (2022-09-02)
+
+
+### Bug Fixes
+
+* interceptor async ([ed627ac](https://github.com/etienne-bechara/nestjs-orm/commit/ed627ac4fbd6c32a0e1ff42ab328a097c3f07042))
+
 # [4.4.0-beta.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.4...v4.4.0-beta.1) (2022-09-02)
 
 
