@@ -1,3 +1,10 @@
+# [4.4.0-beta.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.4...v4.4.0-beta.1) (2022-09-02)
+
+
+### Features
+
+* simplify orm repository to contain only sync operations ([6ee995d](https://github.com/etienne-bechara/nestjs-orm/commit/6ee995d5dc99de8b24a23731c97a71708f82ace8))
+
 ## [4.3.4](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.3...v4.3.4) (2022-09-01)
 
 
