@@ -2,7 +2,6 @@ import { CallHandler, ContextService, ExecutionContext, Injectable, mergeMap, Ne
 import { MikroORM } from '@mikro-orm/core';
 
 import { OrmStoreKey } from './orm.enum';
-import { OrmBaseRepository } from './orm.repository/orm.repository.base';
 
 @Injectable()
 export class OrmInterceptor implements NestInterceptor {
@@ -29,35 +28,10 @@ export class OrmInterceptor implements NestInterceptor {
     return next
       .handle()
       .pipe(
-        mergeMap(async (data) => {
-          await this.commitPendingChanges(store);
+        mergeMap((data) => {
           return this.stringifyEntities(data);
         }),
       );
-  }
-
-  /**
-   * Checks if entity manager contains any pending changes,
-   * if so flushes them to database.
-   * @param store
-   * @param retries
-   */
-  private async commitPendingChanges(store: Map<string, any>, retries = 0): Promise<void> {
-    const commitPending = store.get(OrmStoreKey.COMMIT_PENDING);
-
-    if (commitPending) {
-      try {
-        const entityManager = store.get(OrmStoreKey.ENTITY_MANAGER);
-        await entityManager.flush();
-      }
-      catch (e) {
-        return OrmBaseRepository.handleException({
-          caller: (retries) => this.commitPendingChanges(store, retries),
-          retries,
-          error: e,
-        });
-      }
-    }
   }
 
   /**

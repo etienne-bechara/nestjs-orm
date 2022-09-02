@@ -55,12 +55,6 @@ export interface OrmReadArguments<Entity, P extends string> {
   options: OrmReadOptions<Entity, P>;
 }
 
-export interface OrmRunWithinContextParams<T> {
-  name: string;
-  clear?: boolean;
-  operation: () => Promise<T>;
-}
-
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export interface OrmReadOptions<Entity, P extends string> extends FindOptions<Entity, P> {

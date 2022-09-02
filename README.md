@@ -64,17 +64,16 @@ void AppModule.bootServer({
           controller: true,
           safe: ormConfig.NODE_ENV === AppEnvironment.PRODUCTION,
         },
-        driverOptions: ormConfig.ORM_SERVER_CA
-          ? {
-            connection: {
-              ssl: {
-                ca: Buffer.from(ormConfig.ORM_SERVER_CA, 'base64'),
-                cert: Buffer.from(ormConfig.ORM_CLIENT_CERTIFICATE, 'base64'),
-                key: Buffer.from(ormConfig.ORM_CLIENT_KEY, 'base64'),
-              },
+        // SSL configuration (optional)
+        driverOptions: {
+          connection: {
+            ssl: {
+              ca: Buffer.from(ormConfig.ORM_SERVER_CA, 'base64'),
+              cert: Buffer.from(ormConfig.ORM_CLIENT_CERTIFICATE, 'base64'),
+              key: Buffer.from(ormConfig.ORM_CLIENT_KEY, 'base64'),
             },
-          }
-          : undefined,
+          },
+        }
       }),
     }),
   ],
@@ -120,7 +119,6 @@ export class UserRepository extends OrmRepository<User> {
     protected readonly entityName: EntityName<User>,
   ) {
     super(entityManager, entityName, {
-      entityName: 'user',
       defaultUniqueKey: [ 'name', 'surname' ],
     });
   }
@@ -141,37 +139,22 @@ readUniqueOrFail(): Promise<Entity>;
 countBy(): Promise<number>;
 readPaginatedBy(): Promise<OrmPaginatedResponse<Entity>>;
 
-// Sync operations (instantly committed)
-createFrom(): Promise<Entity[]>;
+// Create operations
+build(): Entity[];
+buildOne(): Entity;
+create(): Promise<Entity[]>;
 createOne(): Promise<Entity>;
+
+// Update operations
 update(): Promise<Entity[]>;
 updateBy(): Promise<Entity[]>;
 updateById(): Promise<Entity>;
 updateOne(): Promise<Entity>;
 upsert(): Promise<Entity[]>;
 upsertOne(): Promise<Entity>;
-delete(): Promise<Entity[]>;
-deleteBy(): Promise<Entity[]>;
-deleteById(id: string): Promise<Entity>;
-deleteOne(): Promise<Entity>;
-
-// Async operations (committed before HTTP response)
-build(): Entity[]
-buildOne(): Entity
-createFromAsync(): Entity[];
-createOneAsync(): Entity;
-updateAsync(): Entity[];
-updateByIdAsync(): Entity;
-updateOneAsync(): Entity;
-upsertAsync(): Entity[];
-upsertOneAsync(): Entity;
-deleteAsync(): Entity[];
-deleteById(id: string): Entity;
-deleteOneAsync(): Entity;
 
 // Async manipulation (optional)
-commit(): Promise<void>
-rollback(): Promise<void>
+commit(): Promise<void>;
 ```
 
 ### Creating an Subscriber
@@ -222,7 +205,7 @@ import { OrmController, OrmPagination } from '@bechara/nestjs-orm';
 
 // These DTOs are validations customized with class-validator and class-transformer
 import { UserCreateDto, UserReadDto, UserUpdateDto } from './user.dto';
-import { UserEntity } from './user.entity';
+import { User } from './user.entity';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -233,40 +216,37 @@ export class UserController {
   ) { }
 
   @Get()
-  public async get(@Query() query: UserReadDto): Promise<OrmPagination<UserEntity>> {
-    // getReadArguments() is a built-in method that extracts pagination
-    // properties like sort, order, limit and offset
-    const { params, options } = this.getReadArguments(query);
-    return this.userRepository.readAndCount(params, options);
+  public async get(@Query() query: UserReadDto): Promise<OrmPagination<User>> {
+    return this.userRepository.readPaginatedBy(query);
   }
 
   @Get(':id')
-  public async getById(@Param('id') id: string): Promise<UserEntity> {
+  public async getById(@Param('id') id: string): Promise<User> {
     return this.userRepository.readByIdOrFail(id);
   }
 
   @Post()
-  public async post(@Body() body: UserCreateDto): Promise<UserEntity> {
+  public async post(@Body() body: UserCreateDto): Promise<User> {
     return this.userRepository.createOne(body);
   }
 
   @Put()
-  public async put(@Body() body: UserCreateDto): Promise<UserEntity> {
+  public async put(@Body() body: UserCreateDto): Promise<User> {
     return this.userRepository.upsertOne(body);
   }
 
   @Put(':id')
-  public async putById(@Param('id') id: string, @Body() body: UserCreateDto): Promise<UserEntity> {
+  public async putById(@Param('id') id: string, @Body() body: UserCreateDto): Promise<User> {
     return this.userRepository.updateById(id, body);
   }
 
   @Patch(':id')
-  public async patchById(@Param('id') id: string, @Body() body: UserUpdateDto): Promise<UserEntity> {
+  public async patchById(@Param('id') id: string, @Body() body: UserUpdateDto): Promise<User> {
     return this.userRepository.updateById(id, body);
   }
 
   @Delete(':id')
-  public async deleteById(@Param('id') id: string): Promise<UserEntity> {
+  public async deleteById(@Param('id') id: string): Promise<User> {
     return this.userRepository.deleteById(id);
   }
 
