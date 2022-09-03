@@ -1,3 +1,10 @@
+# [4.4.0-beta.3](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0-beta.2...v4.4.0-beta.3) (2022-09-03)
+
+
+### Bug Fixes
+
+* read options type ([4d5808d](https://github.com/etienne-bechara/nestjs-orm/commit/4d5808d1e396e9debf46a2aacb7d0dfee7b6df67))
+
 # [4.4.0-beta.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0-beta.1...v4.4.0-beta.2) (2022-09-02)
 
 
