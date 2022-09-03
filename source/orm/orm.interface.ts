@@ -55,9 +55,7 @@ export interface OrmReadArguments<Entity, P extends string> {
   options: OrmReadOptions<Entity, P>;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export interface OrmReadOptions<Entity, P extends string> extends FindOptions<Entity, P> {
+export interface OrmReadOptions<Entity, P extends string> extends Omit<FindOptions<Entity, P>, 'populate'> {
   populate?: AutoPath<Entity, P>[] | boolean | string[];
   findOrFail?: boolean;
 }
