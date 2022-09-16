@@ -6,6 +6,8 @@ import { Address } from './address/address.entity';
 import { Metadata } from './metadata/metadata.entity';
 import { Order } from './order/order.entity';
 import { Product } from './product/product.entity';
+import { Relation } from './relation/relation.entity';
+import { RelationModule } from './relation/relation.module';
 import { User } from './user/user.entity';
 import { UserModule } from './user/user.module';
 
@@ -38,11 +40,12 @@ export async function compileTestApp(): Promise<INestApplication> {
     disableScan: true,
     disableLogs: true,
     imports: [
+      RelationModule,
       UserModule,
       OrmModule.registerAsync({
         disableEntityScan: true,
         useFactory: () => options,
-        entities: [ Address, Metadata, Order, Product, User ],
+        entities: [ Address, Metadata, Order, Product, Relation, User ],
       }),
     ],
     exports: [

@@ -6,6 +6,7 @@ import { AddressRepository } from '../../test/address/address.repository';
 import { compileTestApp } from '../../test/main';
 import { OrderRepository } from '../../test/order/order.repository';
 import { ProductRepository } from '../../test/product/product.repository';
+import { RelationRepository } from '../../test/relation/relation.repository';
 import { UserRepository } from '../../test/user/user.repository';
 import { SchemaService } from '../schema/schema.service';
 import { OrmQueryOrder, OrmStoreKey } from './orm.enum';
@@ -17,6 +18,7 @@ describe('OrmModule', () => {
   let addressRepository: AddressRepository;
   let orderRepository: OrderRepository;
   let productRepository: ProductRepository;
+  let relationRepository: RelationRepository;
   let userRepository: UserRepository;
 
   beforeAll(async () => {
@@ -30,6 +32,7 @@ describe('OrmModule', () => {
     addressRepository = app.get(AddressRepository);
     orderRepository = app.get(OrderRepository);
     productRepository = app.get(ProductRepository);
+    relationRepository = app.get(RelationRepository);
     userRepository = app.get(UserRepository);
   });
 
@@ -230,6 +233,29 @@ describe('OrmModule', () => {
         'ONE_TO_MANY_METADATA_VALUE_2',
         'ONE_TO_MANY_METADATA_VALUE_3',
       ]);
+    });
+
+    it('should create entities with pivot many-to-many relations', async () => {
+      const [ createdUser1, createdUser2 ] = await userRepository.createFrom([
+        { name: 'MANY_TO_MANY_PIVOT_1', age: 70 },
+        { name: 'MANY_TO_MANY_PIVOT_2', age: 80 },
+      ]);
+
+      await relationRepository.createFrom({ child: createdUser1.id, parent: createdUser2.id });
+
+      const populate = [ 'children', 'parents' ];
+      const [ user1 ] = await userRepository.readBy({ name: 'MANY_TO_MANY_PIVOT_1' }, { populate });
+      const [ user2 ] = await userRepository.readBy({ name: 'MANY_TO_MANY_PIVOT_2' }, { populate });
+
+      expect(user1.age).toBe(70);
+      expect(user1.children.length).toBe(0);
+      expect(user1.parents.length).toBe(1);
+      expect(user1.parents[0].name).toBe('MANY_TO_MANY_PIVOT_2');
+
+      expect(user2.age).toBe(80);
+      expect(user2.children.length).toBe(1);
+      expect(user2.parents.length).toBe(0);
+      expect(user2.children[0].name).toBe('MANY_TO_MANY_PIVOT_1');
     });
   });
 
@@ -452,7 +478,9 @@ describe('OrmModule', () => {
     it('should cascade delete entities', async () => {
       const users = await userRepository.readBy({ }, { populate: [ 'address', 'metadata' ] });
       const orders = await orderRepository.readBy({ });
+      const relations = await relationRepository.readBy({ });
 
+      await relationRepository.delete(relations);
       await orderRepository.delete(orders);
       await userRepository.delete(users);
 
