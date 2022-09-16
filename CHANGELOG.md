@@ -1,3 +1,10 @@
+## [4.3.5](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.4...v4.3.5) (2022-09-16)
+
+
+### Bug Fixes
+
+* add many to many pivot test scenario ([93730c0](https://github.com/etienne-bechara/nestjs-orm/commit/93730c04e31a134eca0c045dde4ef1e10285f246))
+
 ## [4.3.4](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.3...v4.3.4) (2022-09-01)
 
 
