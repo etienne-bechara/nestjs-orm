@@ -221,12 +221,12 @@ describe('OrmModule', () => {
     });
 
     it('should create entities with pivot many-to-many relations', async () => {
-      const [ createdUser1, createdUser2 ] = await userRepository.createFrom([
+      const [ createdUser1, createdUser2 ] = await userRepository.create([
         { name: 'MANY_TO_MANY_PIVOT_1', age: 70 },
         { name: 'MANY_TO_MANY_PIVOT_2', age: 80 },
       ]);
 
-      await relationRepository.createFrom({ child: createdUser1.id, parent: createdUser2.id });
+      await relationRepository.create({ child: createdUser1.id, parent: createdUser2.id });
 
       const populate = [ 'children', 'parents' ];
       const [ user1 ] = await userRepository.readBy({ name: 'MANY_TO_MANY_PIVOT_1' }, { populate });
