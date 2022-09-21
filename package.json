@@ -43,11 +43,11 @@
     "@bechara/nestjs-core": "^4.10.0"
   },
   "dependencies": {
-    "@mikro-orm/core": "5.3.1",
-    "@mikro-orm/mongodb": "5.3.1",
-    "@mikro-orm/mysql": "5.3.1",
+    "@mikro-orm/core": "5.4.2",
+    "@mikro-orm/mongodb": "5.4.2",
+    "@mikro-orm/mysql": "5.4.2",
     "@mikro-orm/nestjs": "5.1.1",
-    "@mikro-orm/postgresql": "5.3.1"
+    "@mikro-orm/postgresql": "5.4.2"
   },
   "devDependencies": {
     "@bechara/eslint-config-bechara-ts": "1.4.1",

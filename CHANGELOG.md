@@ -1,9 +1,25 @@
 ## [4.3.5](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.4...v4.3.5) (2022-09-16)
+# [4.4.0-beta.3](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0-beta.2...v4.4.0-beta.3) (2022-09-03)
 
 
 ### Bug Fixes
 
 * add many to many pivot test scenario ([93730c0](https://github.com/etienne-bechara/nestjs-orm/commit/93730c04e31a134eca0c045dde4ef1e10285f246))
+* read options type ([4d5808d](https://github.com/etienne-bechara/nestjs-orm/commit/4d5808d1e396e9debf46a2aacb7d0dfee7b6df67))
+
+# [4.4.0-beta.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0-beta.1...v4.4.0-beta.2) (2022-09-02)
+
+
+### Bug Fixes
+
+* interceptor async ([ed627ac](https://github.com/etienne-bechara/nestjs-orm/commit/ed627ac4fbd6c32a0e1ff42ab328a097c3f07042))
+
+# [4.4.0-beta.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.4...v4.4.0-beta.1) (2022-09-02)
+
+
+### Features
+
+* simplify orm repository to contain only sync operations ([6ee995d](https://github.com/etienne-bechara/nestjs-orm/commit/6ee995d5dc99de8b24a23731c97a71708f82ace8))
 
 ## [4.3.4](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.3...v4.3.4) (2022-09-01)
 

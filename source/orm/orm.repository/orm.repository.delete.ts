@@ -3,7 +3,7 @@ import { EntityManager, EntityName } from '@mikro-orm/core';
 import { OrmDeleteOptions, OrmReadParams, OrmRepositoryOptions } from '../orm.interface';
 import { OrmUpdateRepository } from './orm.repository.update';
 
-export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<Entity> {
+export abstract class OrmDeleteRepository<Entity extends object> extends OrmUpdateRepository<Entity> {
 
   public constructor(
     protected readonly entityManager: EntityManager,
@@ -11,18 +11,6 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     protected readonly repositoryOptions: OrmRepositoryOptions<Entity>,
   ) {
     super(entityManager, entityName, repositoryOptions);
-  }
-
-  /**
-   * Remove target entities and returns their reference, persist changes on next commit call.
-   * @param entities
-   */
-  public deleteAsync(entities: Entity | Entity[]): Entity[] {
-    const entityArray = Array.isArray(entities) ? entities : [ entities ];
-    if (!entities || entityArray.length === 0) return [ ];
-
-    this.removeAsync(entities);
-    return entityArray;
   }
 
   /**
@@ -34,19 +22,18 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     entities: Entity | Entity[],
     options: OrmDeleteOptions<Entity, P> = { },
   ): Promise<Entity[]> {
-    const { populate } = options;
-    const entityArray = Array.isArray(entities) ? entities : [ entities ];
-    if (!entities || entityArray.length === 0) return new Promise((r) => r([ ]));
+    return this.runWithinSpan('delete', async () => {
+      if (!this.isValidData(entities)) return [ ];
 
-    return this.runWithinClearContextSpan('delete', async () => {
+      const { populate } = options;
+      const entityArray = Array.isArray(entities) ? entities : [ entities ];
+
       if (populate) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         await this.populate(entityArray, populate as any);
       }
 
-      this.deleteAsync(entityArray);
-      await this.commit();
-
+      await this.entityManager.removeAndFlush(entities);
       return entityArray;
     });
   }
@@ -65,15 +52,6 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
   }
 
   /**
-   * Remove a single entity by its ID, persist changes on next commit call.
-   * @param id
-   */
-  public deleteByIdAsync(id: string | number): void {
-    const pk = this.getPrimaryKey();
-    this.deleteAsync({ [pk]: id } as unknown as Entity);
-  }
-
-  /**
    * Remove a single entity by its ID.
    * @param id
    * @param options
@@ -85,15 +63,6 @@ export abstract class OrmDeleteRepository<Entity> extends OrmUpdateRepository<En
     const entity = await this.readByIdOrFail(id);
     await this.delete(entity, options);
     return entity;
-  }
-
-  /**
-   * Remove a single entity, persist changes on next commit call.
-   * @param entity
-   */
-  public deleteOneAsync(entity: Entity): Entity {
-    const [ deletedEntity ] = this.deleteAsync(entity);
-    return deletedEntity;
   }
 
   /**
