@@ -7,7 +7,7 @@ import { setTimeout } from 'timers/promises';
 import { OrmStoreKey } from '../orm.enum';
 import { OrmExceptionHandlerParams, OrmRepositoryOptions } from '../orm.interface';
 
-export abstract class OrmBaseRepository<Entity> {
+export abstract class OrmBaseRepository<Entity extends object> {
 
   public constructor(
     protected readonly entityManager: EntityManager,
