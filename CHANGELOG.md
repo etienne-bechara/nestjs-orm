@@ -1,3 +1,18 @@
+# [4.4.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.5...v4.4.0) (2022-09-21)
+
+
+### Bug Fixes
+
+* bump orm ([0e58227](https://github.com/etienne-bechara/nestjs-orm/commit/0e58227d7ef8b51e96d49d85f9fbef9f0885a664))
+* interceptor async ([ed627ac](https://github.com/etienne-bechara/nestjs-orm/commit/ed627ac4fbd6c32a0e1ff42ab328a097c3f07042))
+* read options type ([4d5808d](https://github.com/etienne-bechara/nestjs-orm/commit/4d5808d1e396e9debf46a2aacb7d0dfee7b6df67))
+* test createFrom ([536d725](https://github.com/etienne-bechara/nestjs-orm/commit/536d725df5a501eff6cec0c08ada312ffdc97ca5))
+
+
+### Features
+
+* simplify orm repository to contain only sync operations ([6ee995d](https://github.com/etienne-bechara/nestjs-orm/commit/6ee995d5dc99de8b24a23731c97a71708f82ace8))
+
 ## [4.3.5](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.4...v4.3.5) (2022-09-16)
 # [4.4.0-beta.3](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0-beta.2...v4.4.0-beta.3) (2022-09-03)
 
