@@ -90,7 +90,8 @@ export abstract class OrmBaseRepository<Entity extends object> {
   protected async runWithinSpan<T>(spanSuffix: string, operation: () => Promise<T>, retries = 0): Promise<T> {
     const spanName = `${this.entityName}Repository.${spanSuffix}()`;
     const hasContext = !!ContextStorage.getStore();
-    const cleanContext = !hasContext || spanSuffix !== 'read';
+    const shareableContext = [ 'count', 'populate', 'read' ];
+    const cleanContext = !hasContext || !shareableContext.includes(spanSuffix);
 
     try {
       const traceResult = await TraceService.startActiveSpan(spanName, { }, async (span) => {
