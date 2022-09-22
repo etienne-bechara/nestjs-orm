@@ -1,3 +1,10 @@
+## [4.4.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0...v4.4.1) (2022-09-22)
+
+
+### Bug Fixes
+
+* use shared read cache within same context ([5db3621](https://github.com/etienne-bechara/nestjs-orm/commit/5db3621c806976992f61203d2b365dbc2bc13518))
+
 # [4.4.0](https://github.com/etienne-bechara/nestjs-orm/compare/v4.3.5...v4.4.0) (2022-09-21)
 
 
