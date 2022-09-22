@@ -1,3 +1,10 @@
+## [4.4.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.1...v4.4.2) (2022-09-22)
+
+
+### Bug Fixes
+
+* missing span suffix as shareable ([727d6bf](https://github.com/etienne-bechara/nestjs-orm/commit/727d6bf69634640ca687dba4a51c9f19a009e2c8))
+
 ## [4.4.1](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.0...v4.4.1) (2022-09-22)
 
 
