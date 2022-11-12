@@ -1,3 +1,10 @@
+## [4.4.3](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.2...v4.4.3) (2022-11-12)
+
+
+### Bug Fixes
+
+* skip orm stringify for buffers ([b1801b5](https://github.com/etienne-bechara/nestjs-orm/commit/b1801b58ae2f4ffe63a19207fe915300611c7f28))
+
 ## [4.4.2](https://github.com/etienne-bechara/nestjs-orm/compare/v4.4.1...v4.4.2) (2022-09-22)
 
 
